@@ -1,4 +1,4 @@
-package com.umc.pyeongsaeng.apiPayload.code;
+package com.umc.pyeongsaeng.global.apiPayload.code;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @Builder
-public class ErrorReasonDTO {
+public class ReasonDTO {
 
     private HttpStatus httpStatus;
 

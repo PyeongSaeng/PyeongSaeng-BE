@@ -1,4 +1,4 @@
-package com.umc.pyeongsaeng.apiPayload.code;
+package com.umc.pyeongsaeng.global.apiPayload.code;
 
 public interface BaseCode {
 

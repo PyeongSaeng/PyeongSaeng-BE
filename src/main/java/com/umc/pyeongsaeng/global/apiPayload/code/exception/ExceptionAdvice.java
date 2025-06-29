@@ -1,8 +1,8 @@
-package com.umc.pyeongsaeng.exception;
+package com.umc.pyeongsaeng.global.apiPayload.code.exception;
 
-import com.umc.pyeongsaeng.apiPayload.ApiResponse;
-import com.umc.pyeongsaeng.apiPayload.code.ErrorReasonDTO;
-import com.umc.pyeongsaeng.apiPayload.code.status.ErrorStatus;
+import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
+import com.umc.pyeongsaeng.global.apiPayload.code.ErrorReasonDTO;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;

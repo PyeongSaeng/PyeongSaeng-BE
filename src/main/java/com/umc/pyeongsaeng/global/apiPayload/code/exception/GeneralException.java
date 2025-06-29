@@ -1,7 +1,7 @@
-package com.umc.pyeongsaeng.exception;
+package com.umc.pyeongsaeng.global.apiPayload.code.exception;
 
-import com.umc.pyeongsaeng.apiPayload.code.BaseErrorCode;
-import com.umc.pyeongsaeng.apiPayload.code.ErrorReasonDTO;
+import com.umc.pyeongsaeng.global.apiPayload.code.BaseErrorCode;
+import com.umc.pyeongsaeng.global.apiPayload.code.ErrorReasonDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

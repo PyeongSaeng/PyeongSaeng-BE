@@ -1,10 +1,10 @@
-package com.umc.pyeongsaeng.apiPayload;
+package com.umc.pyeongsaeng.global.apiPayload;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.umc.pyeongsaeng.apiPayload.code.BaseCode;
-import com.umc.pyeongsaeng.apiPayload.code.status.SuccessStatus;
+import com.umc.pyeongsaeng.global.apiPayload.code.BaseCode;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
