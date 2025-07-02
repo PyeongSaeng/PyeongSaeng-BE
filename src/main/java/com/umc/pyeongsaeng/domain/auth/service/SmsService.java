@@ -6,6 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -46,12 +49,12 @@ public class SmsService {
 		VerificationCode storedCode = verificationCodes.get(phone);
 
 		if (storedCode == null) {
-			return false;
+			throw new GeneralException(ErrorStatus.SMS_VERIFICATION_FAILED);
 		}
 
 		if (storedCode.isExpired()) {
 			verificationCodes.remove(phone);
-			return false;
+			throw new GeneralException(ErrorStatus.SMS_VERIFICATION_FAILED);
 		}
 
 		if (storedCode.matches(code)) {
@@ -59,7 +62,7 @@ public class SmsService {
 			return true;
 		}
 
-		return false;
+		throw new GeneralException(ErrorStatus.SMS_VERIFICATION_FAILED);
 	}
 
 	private String generateVerificationCode() {

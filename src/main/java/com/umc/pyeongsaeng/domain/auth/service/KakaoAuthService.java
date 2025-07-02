@@ -27,6 +27,8 @@ import com.umc.pyeongsaeng.domain.user.entity.enums.Role;
 import com.umc.pyeongsaeng.domain.user.entity.enums.Status;
 import com.umc.pyeongsaeng.domain.user.repository.ProtectorSeniorRepository;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import com.umc.pyeongsaeng.global.util.JwtUtil;
 
 import jakarta.servlet.ServletException;
@@ -148,20 +150,18 @@ public class KakaoAuthService extends DefaultOAuth2UserService implements Authen
 	}
 
 	public LoginResponseDto confirmSmsAndCompleteSignup(SmsVerificationConfirmDto confirmDto) {
-		if (!smsService.verifyCode(confirmDto.getPhone(), confirmDto.getVerificationCode())) {
-			throw new RuntimeException("인증번호가 올바르지 않습니다.");
-		}
+		smsService.verifyCode(confirmDto.getPhone(), confirmDto.getVerificationCode());
 
 		User protector = userRepository.findById(confirmDto.getUserId())
-			.orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		if (!protector.getRole().equals(Role.PROTECTOR)) {
-			throw new RuntimeException("보호자만 시니어를 추가할 수 있습니다.");
+			throw new GeneralException(ErrorStatus.PROTECTOR_ONLY_ACCESS);
 		}
 
 		long currentSeniorCount = protectorSeniorRepository.countByProtectorId(protector.getId());
 		if (currentSeniorCount >= 2) {
-			throw new RuntimeException("보호자는 최대 2명의 시니어만 추가할 수 있습니다.");
+			throw new GeneralException(ErrorStatus.PROTECTOR_SENIOR_LIMIT_EXCEEDED);
 		}
 
 		User senior = userRepository.findByPhone(confirmDto.getPhone())

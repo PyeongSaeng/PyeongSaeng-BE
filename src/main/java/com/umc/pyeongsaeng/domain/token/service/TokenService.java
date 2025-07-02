@@ -13,6 +13,8 @@ import com.umc.pyeongsaeng.domain.token.entity.RefreshToken;
 import com.umc.pyeongsaeng.domain.token.repository.RefreshTokenRepository;
 import com.umc.pyeongsaeng.domain.user.entity.User;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import com.umc.pyeongsaeng.global.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class TokenService {
 		refreshTokenRepository.deleteByUser_Id(userId);
 
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
 		RefreshToken token = RefreshToken.builder()
 			.user(user)
@@ -45,11 +47,11 @@ public class TokenService {
 
 	public String refreshAccessToken(String refreshToken) {
 		RefreshToken storedToken = refreshTokenRepository.findByRefreshToken(refreshToken)
-			.orElseThrow(() -> new RuntimeException("유효하지 않은 리프레시 토큰입니다."));
+			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_REFRESH_TOKEN));
 
 		if (storedToken.getExpiresAt().isBefore(LocalDateTime.now())) {
 			refreshTokenRepository.delete(storedToken);
-			throw new RuntimeException("만료된 리프레시 토큰입니다.");
+			throw new GeneralException(ErrorStatus.EXPIRED_REFRESH_TOKEN);
 		}
 
 		Long userId = storedToken.getUser().getId();

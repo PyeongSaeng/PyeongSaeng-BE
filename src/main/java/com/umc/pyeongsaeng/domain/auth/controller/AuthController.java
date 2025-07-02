@@ -1,5 +1,6 @@
 package com.umc.pyeongsaeng.domain.auth.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,8 @@ import com.umc.pyeongsaeng.domain.auth.service.KakaoAuthService;
 import com.umc.pyeongsaeng.domain.token.service.TokenService;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,18 +51,15 @@ public class AuthController {
 	) {
 
 		if (request.getKakaoId() == null || request.getKakaoId() <= 0) {
-			return ResponseEntity.badRequest()
-				.body(ApiResponse.onFailure("INVALID_KAKAO_ID", "유효한 카카오 ID가 필요합니다.", null));
+			throw new GeneralException(ErrorStatus.INVALID_KAKAO_ID);
 		}
 
 		if (socialAccountRepository.existsByProviderTypeAndProviderUserId("KAKAO", request.getKakaoId().toString())) {
-			return ResponseEntity.badRequest()
-				.body(ApiResponse.onFailure("KAKAO_ALREADY_REGISTERED", "이미 가입된 카카오 계정입니다.", null));
+			throw new GeneralException(ErrorStatus.KAKAO_ALREADY_REGISTERED);
 		}
 
 		if (userRepository.existsByUsername(request.getUsername())) {
-			return ResponseEntity.badRequest()
-				.body(ApiResponse.onFailure("USERNAME_DUPLICATED", "이미 사용 중인 아이디입니다.", null));
+			throw new GeneralException(ErrorStatus.USERNAME_DUPLICATED);
 		}
 
 		LoginResponseDto response = kakaoAuthService.processKakaoSignup(
@@ -70,21 +70,16 @@ public class AuthController {
 			request.getRole()
 		);
 
-		return ResponseEntity.ok(ApiResponse.onSuccess(response));
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(ApiResponse.onSuccess(response));
 	}
 
 	@PostMapping("/sms/send")
 	@Operation(summary = "SMS 인증번호 발송", description = "시니어 전화번호로 인증번호를 발송합니다.")
 	public ResponseEntity<ApiResponse<String>> sendSmsVerification(
 		@Validated @RequestBody SmsVerificationRequestDto request) {
-
-		try {
-			kakaoAuthService.sendSmsForProtector(request.getPhone());
-			return ResponseEntity.ok(ApiResponse.onSuccess("인증번호가 발송되었습니다."));
-		} catch (Exception e) {
-			return ResponseEntity.badRequest()
-				.body(ApiResponse.onFailure("SMS_SEND_FAILED", e.getMessage(), null));
-		}
+		kakaoAuthService.sendSmsForProtector(request.getPhone());
+		return ResponseEntity.ok(ApiResponse.onSuccess("인증번호가 발송되었습니다."));
 	}
 
 	@PostMapping("/sms/verify")
@@ -92,13 +87,9 @@ public class AuthController {
 	public ResponseEntity<ApiResponse<LoginResponseDto>> verifySmsAndCompleteSignup(
 		@Validated @RequestBody SmsVerificationConfirmDto request) {
 
-		try {
-			LoginResponseDto response = kakaoAuthService.confirmSmsAndCompleteSignup(request);
-			return ResponseEntity.ok(ApiResponse.onSuccess(response));
-		} catch (Exception e) {
-			return ResponseEntity.badRequest()
-				.body(ApiResponse.onFailure("SMS_VERIFICATION_FAILED", e.getMessage(), null));
-		}
+		LoginResponseDto response = kakaoAuthService.confirmSmsAndCompleteSignup(request);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(ApiResponse.onSuccess(response));
 	}
 
 	@GetMapping("/check-username")
@@ -107,7 +98,7 @@ public class AuthController {
 		boolean exists = userRepository.existsByUsername(username);
 
 		if (exists) {
-			return ResponseEntity.ok(ApiResponse.onSuccess("이미 사용 중인 아이디입니다."));
+			throw new GeneralException(ErrorStatus.USERNAME_DUPLICATED);
 		} else {
 			return ResponseEntity.ok(ApiResponse.onSuccess("사용 가능한 아이디입니다."));
 		}
@@ -116,13 +107,8 @@ public class AuthController {
 	@PostMapping("/refresh")
 	@Operation(summary = "토큰 갱신", description = "리프레시 토큰을 사용하여 액세스 토큰을 갱신합니다.")
 	public ResponseEntity<ApiResponse<String>> refreshToken(@RequestParam String refreshToken) {
-		try {
-			String newAccessToken = tokenService.refreshAccessToken(refreshToken);
-			return ResponseEntity.ok(ApiResponse.onSuccess(newAccessToken));
-		} catch (Exception e) {
-			return ResponseEntity.badRequest()
-				.body(ApiResponse.onFailure("INVALID_REFRESH_TOKEN", e.getMessage(), null));
-		}
+		String newAccessToken = tokenService.refreshAccessToken(refreshToken);
+		return ResponseEntity.ok(ApiResponse.onSuccess(newAccessToken));
 	}
 
 	@PostMapping("/logout")
@@ -138,10 +124,6 @@ public class AuthController {
 		@RequestParam("tempToken") String tempToken) {
 
 		LoginResponseDto tokens = tokenService.getTokensByTempToken(tempToken);
-		if (tokens == null) {
-			return ResponseEntity.badRequest()
-				.body(ApiResponse.onFailure("INVALID_TEMP_TOKEN", "유효하지 않은 임시 토큰입니다.", null));
-		}
 
 		tokenService.deleteTempToken(tempToken);
 		return ResponseEntity.ok(ApiResponse.onSuccess(tokens));
