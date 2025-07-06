@@ -9,11 +9,11 @@ resolved #<issue_number> : 문의나 요청사항에 대한 이슈 <br />
 - [ ] 💻 CrossBrowsing Browser compatibility
 - [ ] 🌏 Deploy Deploy
 - [ ] 🎨 Design Markup & styling
-- [ ] 📃 Docs Documentation writing and editing (README.md, etc.)
+- [ ] 📃 Docs Documentation writing and editing (README.md, Swagger, etc.)
 - [ ] ✨ Feature Feature
 - [ ] 🔨 Refactor Code refactoring
 - [ ] ⚙️ Setting Development environment setup
-- [ ] ✅ Test Test related (storybook, jest, etc.)
+- [ ] ✅ Test Test related 
 
 ## CheckPoint ✅
 [//]: # (PR 요구사항 확인)
