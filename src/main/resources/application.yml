@@ -9,3 +9,13 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET_NAME}
+    stack.auto: false
+    region.static: ${S3_REGION}
+    credentials:
+      accessKey: ${S3_IAM_ACCESS_KEY}
+      secretKey: ${S3_IAM_SECRET_KEY}
