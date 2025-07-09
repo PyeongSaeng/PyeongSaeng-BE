@@ -1,4 +1,4 @@
-package com.umc.pyeongsaeng.domain.token;
+package com.umc.pyeongsaeng.domain.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +18,7 @@ public class RefreshToken extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, length = 100)
+	@Column(nullable = false, length = 500)
 	private String refreshToken;
 
 	@Column(nullable = false)

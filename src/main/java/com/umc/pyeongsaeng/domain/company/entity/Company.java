@@ -1,4 +1,4 @@
-package com.umc.pyeongsaeng.domain.company;
+package com.umc.pyeongsaeng.domain.company.entity;
 
 import java.util.ArrayList;
 import java.util.List;

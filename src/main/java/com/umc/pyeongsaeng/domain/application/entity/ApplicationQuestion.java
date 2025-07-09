@@ -1,5 +1,7 @@
 package com.umc.pyeongsaeng.domain.application.entity;
 
+import com.umc.pyeongsaeng.domain.application.enums.QuestionType;
+import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import com.umc.pyeongsaeng.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,6 +18,10 @@ public class ApplicationQuestion extends BaseEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "job_post_id")
+	private JobPost jobPost;
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "application_id")
 	private Application application;
 
@@ -28,7 +34,4 @@ public class ApplicationQuestion extends BaseEntity {
 	@Column(columnDefinition = "TEXT")
 	private String options;
 
-	public enum QuestionType {
-		SHORT_TEXT, LONG_TEXT, MULTIPLE_CHOICE, CHECKBOX
-	}
 }

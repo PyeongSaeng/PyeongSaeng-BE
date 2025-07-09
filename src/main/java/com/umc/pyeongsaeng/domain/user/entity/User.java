@@ -1,11 +1,13 @@
 package com.umc.pyeongsaeng.domain.user.entity;
 
 import com.umc.pyeongsaeng.domain.application.entity.Application;
-import com.umc.pyeongsaeng.domain.social.SocialAccount;
 import com.umc.pyeongsaeng.domain.terms.entity.UserTerms;
-import com.umc.pyeongsaeng.domain.token.RefreshToken;
+import com.umc.pyeongsaeng.domain.auth.entity.RefreshToken;
 import jakarta.persistence.*;
 import lombok.*;
+
+import com.umc.pyeongsaeng.domain.user.enums.Role;
+import com.umc.pyeongsaeng.domain.user.enums.UserStatus;
 import com.umc.pyeongsaeng.global.common.BaseEntity;
 
 import java.util.ArrayList;
@@ -56,15 +58,4 @@ public class User extends BaseEntity {
 
 	@OneToMany(mappedBy = "user")
 	private List<UserTerms> userTerms = new ArrayList<>();
-
-	public enum Role {
-		SENIOR,
-		PROTECTOR
-	}
-
-	public enum UserStatus {
-		ACTIVE,
-		INACTIVE,
-		WITHDRAWN
-	}
 }

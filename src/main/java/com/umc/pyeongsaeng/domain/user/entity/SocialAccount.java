@@ -1,6 +1,5 @@
-package com.umc.pyeongsaeng.domain.social;
+package com.umc.pyeongsaeng.domain.user.entity;
 
-import com.umc.pyeongsaeng.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import com.umc.pyeongsaeng.global.common.BaseEntity;
