@@ -9,6 +9,19 @@ on:
 env:
   DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
   CONTAINER_NAME: pyeongsaeng-prod-container
+  DOCKER_HUB_TOKEN : ${{ secrets.DOCKER_HUB_TOKEN }}
+  DOCKER_USERNAME : ${{ secrets.DOCKER_USERNAME }}
+  EC2_URL : ${{ secrets.EC2_URL }}
+  EC2_USERNAME : ubuntu
+  EC2_SSH_PRIVATE_KEY : ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+  EC2_PORT : 22
+  DB_URL : ${{ secrets.DB_URL }}
+  DB_USERNAME : ${{ secrets.DB_USERNAME }}
+  DB_PASSWORD : ${{ secrets.DB_PASSWORD }}
+  S3_BUCKET_NAME : ${{ secrets.S3_BUCKET_NAME }}
+  S3_IAM_ACCESS_KEY : ${{ secrets.S3_IAM_ACCESS_KEY }}
+  S3_IAM_SECRET_KEY : ${{ secrets.S3_IAM_SECRET_KEY }}
+  S3_REGION : ${{ secrets.S3_REGION }}
 
 jobs:
   build-and-push-docker:
@@ -33,7 +46,7 @@ jobs:
         run: docker build . --file Dockerfile --tag ${{ env.DOCKER_IMAGE_NAME }}:latest
 
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        run: echo "${{ env.DOCKER_HUB_TOKEN }}" | docker login -u ${{ env.DOCKER_USERNAME }} --password-stdin
 
       - name: Push the Docker image
         run: docker push ${{ env.DOCKER_IMAGE_NAME }}:latest
@@ -45,10 +58,10 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_URL }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          port: 22
+          host: ${{ env.EC2_URL }}
+          username: ${{ env.EC2_USERNAME }}
+          key: ${{ env.EC2_SSH_PRIVATE_KEY }}
+          port: ${{ env.EC2_USERNAME }}
           script: |
             TIMESTAMP=$(date +"%Y%m%d%H%M%S")
             NEW_CONTAINER_NAME="${{ env.CONTAINER_NAME }}-$TIMESTAMP"
@@ -68,9 +81,13 @@ jobs:
             echo "Starting new container..."
             sudo docker run --name $NEW_CONTAINER_NAME -d -p 8080:8080 \
               -e "SPRING_PROFILES_ACTIVE=prod" \
-              -e "DB_URL=${{ secrets.DB_URL }}" \
-              -e "DB_USERNAME=${{ secrets.DB_USERNAME }}" \
-              -e "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" \
+              -e "DB_URL=${{ env.DB_URL }}" \
+              -e "DB_USERNAME=${{ env.DB_USERNAME }}" \
+              -e "DB_PASSWORD=${{ env.DB_PASSWORD }}" \
+              -e "S3_BUCKET_NAME=${{ env.S3_BUCKET_NAME }}" \
+              -e "S3_IAM_ACCESS_KEY=${{ env.S3_IAM_ACCESS_KEY }}" \
+              -e "S3_IAM_SECRET_KEY=${{ env.S3_IAM_SECRET_KEY }}" \
+              -e "S3_REGION=${{ env.S3_REGION }}" \
               -e TZ=Asia/Seoul \
               ${{ env.DOCKER_IMAGE_NAME }}:latest
 
