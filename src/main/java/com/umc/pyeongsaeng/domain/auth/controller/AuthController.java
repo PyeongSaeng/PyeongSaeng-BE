@@ -20,8 +20,8 @@ import com.umc.pyeongsaeng.domain.auth.dto.SmsVerificationConfirmDto;
 import com.umc.pyeongsaeng.domain.auth.dto.SmsVerificationRequestDto;
 import com.umc.pyeongsaeng.domain.auth.service.AuthService;
 import com.umc.pyeongsaeng.domain.auth.service.SmsService;
-import com.umc.pyeongsaeng.domain.social.repository.SocialAccountRepository;
-import com.umc.pyeongsaeng.domain.token.service.TokenService;
+import com.umc.pyeongsaeng.domain.user.repository.SocialAccountRepository;
+import com.umc.pyeongsaeng.domain.auth.service.TokenService;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
@@ -93,8 +93,8 @@ public class AuthController {
 					summary = "일반 보호자 회원가입 예시",
 					value = """
                         {
-                            "username": "protector01",
-                            "password": "password123!",
+                            "username": "protector1",
+                            "password": "password1",
                             "name": "보호자",
                             "phone": "01012345678",
                             "providerType": null,
@@ -148,7 +148,13 @@ public class AuthController {
 			+ "   - username은 providerUserId와 동일하게 처리\n"
 			+ "   - password는 null 또는 빈 문자열\n\n"
 			+ "**프로필 정보:**\n"
-			+ "- 성별(gender): MALE 또는 FEMALE\n\n"
+			+ "- 성별(gender): MALE 또는 FEMALE\n"
+			+ "- 직업(job): HOUSEWIFE, EMPLOYEE, PUBLIC_OFFICER, PROFESSIONAL, ARTIST, BUSINESS_OWNER, ETC\n"
+			+ "- 경력기간(experiencePeriod): LESS_THAN_6_MONTHS, SIX_MONTHS_TO_1_YEAR, ONE_TO_THREE_YEARS, THREE_TO_FIVE_YEARS, FIVE_TO_TEN_YEARS, OVER_TEN_YEARS\n\n"
+			+ "**주소 정보:**\n"
+			+ "- zipcode: 우편번호 (필수)\n"
+			+ "- roadAddress: 도로명 주소 (필수)\n"
+			+ "- detailAddress: 상세 주소 (선택)\n\n"
 			+ "**보호자 연결:**\n"
 			+ "- 독립적인 시니어 회원가입의 경우 protectorId가 null\n"
 			+ "- 보호자와 연결일 경우 null 아님.\n"
@@ -169,12 +175,14 @@ public class AuthController {
                             "name": "시니어",
                             "age": 75,
                             "gender": "FEMALE",
-                            "phone": "01011111111",
-                            "address": "서울특별시 강남구",
-                            "job": "회사원",
-                            "career": "10년 이상",
+                            "phoneNum": "01011111111",
+                            "zipcode": "13494",
+                            "roadAddress": "경기 성남시 분당구 판교역로 235 (에이치스퀘어 엔동)",
+                            "detailAddress": "101호",
+                            "job": "EMPLOYEE",
+                            "experiencePeriod": "OVER_TEN_YEARS",
                             "protectorId": 1,
-                            "relation": "어머니",
+                            "relation": "모녀",
                             "providerType": null,
                             "providerUserId": null
                         }
@@ -190,12 +198,14 @@ public class AuthController {
                           "name": "시니어",
                           "age": 75,
                           "gender": "MALE",
-                          "phone": "01011111112",
-                          "address": "서울특별시 강남구",
-                          "job": "회사원",
-                          "career": "10년 이상",
+                          "phoneNum": "01011111112",
+                          "zipcode": "13494",
+                          "roadAddress": "경기 성남시 분당구 판교역로 235 (에이치스퀘어 엔동)",
+                          "detailAddress": "101호",
+                          "job": "EMPLOYEE",
+                          "experiencePeriod": "OVER_TEN_YEARS",
                           "protectorId": 1,
-                          "relation": "아버지",
+                          "relation": "부녀",
                           "providerType": "KAKAO",
                           "providerUserId": "1234567899"
                         }
@@ -215,10 +225,12 @@ public class AuthController {
 			request.getName(),
 			request.getAge(),
 			request.getGender(),
-			request.getPhone(),
-			request.getAddress(),
+			request.getPhoneNum(),
+			request.getZipcode(),
+			request.getRoadAddress(),
+			request.getDetailAddress(),
 			request.getJob(),
-			request.getCareer(),
+			request.getExperiencePeriod(),
 			request.getProtectorId(),
 			request.getRelation(),
 			request.getProviderType(),
@@ -304,7 +316,7 @@ public class AuthController {
 			validateGeneralSignup(request.getUsername(), request.getPassword());
 		}
 
-		validateDuplicatePhone(request.getPhone());
+		validateDuplicatePhone(request.getPhoneNum());
 		validateProtectorExists(request.getProtectorId());
 	}
 

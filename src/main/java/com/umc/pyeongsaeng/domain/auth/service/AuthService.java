@@ -19,14 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.umc.pyeongsaeng.domain.auth.dto.KakaoUserInfoDto;
 import com.umc.pyeongsaeng.domain.auth.dto.LoginRequestDto;
 import com.umc.pyeongsaeng.domain.auth.dto.LoginResponseDto;
-import com.umc.pyeongsaeng.domain.social.repository.SocialAccountRepository;
-import com.umc.pyeongsaeng.domain.token.service.TokenService;
-import com.umc.pyeongsaeng.domain.user.entity.SeniorProfile;
+import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
+import com.umc.pyeongsaeng.domain.senior.enums.ExperiencePeriod;
+import com.umc.pyeongsaeng.domain.senior.enums.Gender;
+import com.umc.pyeongsaeng.domain.senior.enums.JobType;
+import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
+import com.umc.pyeongsaeng.domain.user.entity.SocialAccount;
 import com.umc.pyeongsaeng.domain.user.entity.User;
-import com.umc.pyeongsaeng.domain.user.entity.enums.Gender;
-import com.umc.pyeongsaeng.domain.user.entity.enums.Role;
-import com.umc.pyeongsaeng.domain.user.entity.enums.Status;
-import com.umc.pyeongsaeng.domain.user.repository.SeniorProfileRepository;
+import com.umc.pyeongsaeng.domain.user.enums.Role;
+import com.umc.pyeongsaeng.domain.user.enums.UserStatus;
+import com.umc.pyeongsaeng.domain.user.repository.SocialAccountRepository;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
@@ -115,10 +117,11 @@ public class AuthService extends DefaultOAuth2UserService
 
 	@Transactional
 	public LoginResponseDto processSeniorSignup(String username, String password, String name,
-		Integer age, String gender, String phone, String address, String job, String career,
-		Long protectorId, String relation, String providerType, String providerUserId) {
+		Integer age, String gender, String phoneNum, String zipcode, String roadAddress,
+		String detailAddress, String job, String experiencePeriod, Long protectorId,
+		String relation, String providerType, String providerUserId) {
 
-		User savedUser = createUser(username, password, name, phone, Role.SENIOR);
+		User savedUser = createUser(username, password, name, phoneNum, Role.SENIOR);
 
 		if (isKakaoProvider(providerType) && providerUserId != null) {
 			createSocialAccount(savedUser, providerUserId);
@@ -126,7 +129,7 @@ public class AuthService extends DefaultOAuth2UserService
 
 		User protector = validateProtectorIfExists(protectorId);
 		createSeniorProfileWithDetails(savedUser, protector, relation, age, gender,
-			phone, address, job, career);
+			phoneNum, zipcode, roadAddress, detailAddress, job, experiencePeriod);
 
 		return generateTokenResponse(savedUser, true);
 	}
@@ -192,7 +195,7 @@ public class AuthService extends DefaultOAuth2UserService
 			.name(name)
 			.phone(phone)
 			.role(role)
-			.status(Status.ACTIVE);
+			.status(UserStatus.ACTIVE);
 
 		if (password != null) {
 			userBuilder.password(passwordEncoder.encode(password));
@@ -227,7 +230,8 @@ public class AuthService extends DefaultOAuth2UserService
 	}
 
 	private void createSeniorProfileWithDetails(User senior, User protector, String relation,
-		Integer age, String gender, String phone, String address, String job, String career) {
+		Integer age, String gender, String phone, String zipcode, String roadAddress,
+		String detailAddress, String job, String experiencePeriod) {
 
 		SeniorProfile seniorProfile = SeniorProfile.builder()
 			.senior(senior)
@@ -236,11 +240,12 @@ public class AuthService extends DefaultOAuth2UserService
 			.age(age)
 			.gender(gender != null ? Gender.valueOf(gender) : null)
 			.phoneNum(phone)
-			.address(address)
-			.job(job)
-			.career(career)
+			.zipcode(zipcode)
+			.roadAddress(roadAddress)
+			.detailAddress(detailAddress)
+			.job(job != null ? JobType.valueOf(job) : null)
+			.experiencePeriod(experiencePeriod != null ? ExperiencePeriod.valueOf(experiencePeriod) : null)
 			.build();
-
 		seniorProfileRepository.save(seniorProfile);
 	}
 

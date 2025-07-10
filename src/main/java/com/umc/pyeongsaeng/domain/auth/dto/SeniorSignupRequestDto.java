@@ -44,19 +44,29 @@ public class SeniorSignupRequestDto {
 	@Schema(description = "전화번호", example = "01012341234", required = true)
 	@NotBlank
 	@Pattern(regexp = "^01[0-9]{8,9}$", message = "올바른 전화번호 형식이 아닙니다.")
-	private String phone;
+	private String phoneNum;
 
-	@Schema(description = "거주지", required = false)
-	@Size(max = 100)
-	private String address;
+	@Schema(description = "우편번호", example = "01234", required = true)
+	@NotBlank
+	@Size(max = 10, message = "우편번호는 10자 이하여야 합니다.")
+	private String zipcode;
 
-	@Schema(description = "직무", required = false)
-	@Size(max = 50)
+	@Schema(description = "도로명 주소", required = true)
+	@NotBlank
+	@Size(max = 255, message = "도로명 주소는 255자 이하여야 합니다.")
+	private String roadAddress;
+
+	@Schema(description = "상세 주소", required = false)
+	@Size(max = 255, message = "상세 주소는 255자 이하여야 합니다.")
+	private String detailAddress;
+
+	@Schema(description = "직무", example = "BABYSITTER", allowableValues = {"BABYSITTER", "NURSING_CARE", "HOUSE_CLEANING", "MEAL_PREPARATION", "ACCOMPANYING_HOSPITAL", "OTHER"}, required = true)
+	@NotBlank
 	private String job;
 
-	@Schema(description = "경력", required = false)
-	@Size(max = 50)
-	private String career;
+	@Schema(description = "경력 기간", example = "ONE_TO_TWO_YEARS", allowableValues = {"LESS_THAN_ONE_YEAR", "ONE_TO_TWO_YEARS", "THREE_TO_FIVE_YEARS", "MORE_THAN_FIVE_YEARS"}, required = true)
+	@NotBlank
+	private String experiencePeriod;
 
 	@Schema(description = "보호자 ID (보호자와 연결할 경우에 사용)", example = "1", required = false)
 	private Long protectorId;

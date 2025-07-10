@@ -22,6 +22,8 @@ env:
   S3_IAM_ACCESS_KEY : ${{ secrets.S3_IAM_ACCESS_KEY }}
   S3_IAM_SECRET_KEY : ${{ secrets.S3_IAM_SECRET_KEY }}
   S3_REGION : ${{ secrets.S3_REGION }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
 
 jobs:
   build-and-push-docker:
@@ -88,6 +90,8 @@ jobs:
               -e "S3_IAM_ACCESS_KEY=${{ env.S3_IAM_ACCESS_KEY }}" \
               -e "S3_IAM_SECRET_KEY=${{ env.S3_IAM_SECRET_KEY }}" \
               -e "S3_REGION=${{ env.S3_REGION }}" \
+              -e "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
+              -e "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" \
               -e TZ=Asia/Seoul \
               ${{ env.DOCKER_IMAGE_NAME }}:latest
 

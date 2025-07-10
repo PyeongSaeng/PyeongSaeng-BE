@@ -1,10 +1,10 @@
-package com.umc.pyeongsaeng.domain.user.repository;
+package com.umc.pyeongsaeng.domain.senior.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.umc.pyeongsaeng.domain.user.entity.SeniorProfile;
+import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
 
 public interface SeniorProfileRepository extends JpaRepository<SeniorProfile, Long> {
 

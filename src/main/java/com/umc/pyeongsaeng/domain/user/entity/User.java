@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.umc.pyeongsaeng.domain.application.entity.Application;
+import com.umc.pyeongsaeng.domain.auth.entity.RefreshToken;
 import com.umc.pyeongsaeng.domain.terms.entity.UserTerms;
 import com.umc.pyeongsaeng.domain.user.enums.Role;
 import com.umc.pyeongsaeng.domain.user.enums.UserStatus;

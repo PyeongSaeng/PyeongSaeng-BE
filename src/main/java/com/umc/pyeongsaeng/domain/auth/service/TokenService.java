@@ -1,4 +1,4 @@
-package com.umc.pyeongsaeng.domain.token.service;
+package com.umc.pyeongsaeng.domain.auth.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.umc.pyeongsaeng.domain.auth.dto.LoginResponseDto;
-import com.umc.pyeongsaeng.domain.token.entity.RefreshToken;
-import com.umc.pyeongsaeng.domain.token.repository.RefreshTokenRepository;
+import com.umc.pyeongsaeng.domain.auth.entity.RefreshToken;
+import com.umc.pyeongsaeng.domain.auth.repository.RefreshTokenRepository;
 import com.umc.pyeongsaeng.domain.user.entity.User;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
@@ -83,7 +83,8 @@ public class TokenService {
 	}
 
 	public LoginResponseDto getTokensByTempToken(String tempToken) {
-		Map<String, Object> tokenData = (Map<String, Object>) redisTemplate.opsForValue().get(tempToken);
+		String redisKey = TEMP_TOKEN_PREFIX + tempToken;
+		Map<String, Object> tokenData = (Map<String, Object>) redisTemplate.opsForValue().get(redisKey);
 		if (tokenData == null) return null;
 
 		User user = userRepository.findById(((Number) tokenData.get("userId")).longValue())
@@ -101,6 +102,7 @@ public class TokenService {
 	}
 
 	public void deleteTempToken(String tempToken) {
-		redisTemplate.delete(tempToken);
+		String redisKey = TEMP_TOKEN_PREFIX + tempToken;
+		redisTemplate.delete(redisKey);
 	}
 }

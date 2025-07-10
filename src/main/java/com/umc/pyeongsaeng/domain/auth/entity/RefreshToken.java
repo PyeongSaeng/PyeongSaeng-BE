@@ -1,4 +1,4 @@
-package com.umc.pyeongsaeng.domain.token.entity;
+package com.umc.pyeongsaeng.domain.auth.entity;
 
 import java.time.LocalDateTime;
 
