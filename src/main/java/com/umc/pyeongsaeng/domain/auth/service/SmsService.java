@@ -1,72 +1,56 @@
 package com.umc.pyeongsaeng.domain.auth.service;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class SmsService {
 
-	private final ConcurrentHashMap<String, VerificationCode> verificationCodes = new ConcurrentHashMap<>();
+	private static final String SMS_PREFIX = "sms:";
+	private static final int VERIFICATION_CODE_LENGTH = 6;
+	private static final int EXPIRY_MINUTES = 5;
+	private static final int MAX_CODE_VALUE = 1000000;
 
-	private static class VerificationCode {
-		private final String code;
-		private final LocalDateTime expiredAt;
-
-		public VerificationCode(String code, LocalDateTime expiredAt) {
-			this.code = code;
-			this.expiredAt = expiredAt;
-		}
-
-		public boolean isExpired() {
-			return LocalDateTime.now().isAfter(expiredAt);
-		}
-
-		public boolean matches(String inputCode) {
-			return code.equals(inputCode);
-		}
-	}
+	private final RedisTemplate<String, Object> redisTemplate;
 
 	public void sendVerificationCode(String phone) {
 		String code = generateVerificationCode();
-		LocalDateTime expiredAt = LocalDateTime.now().plusMinutes(5);
+		String redisKey = SMS_PREFIX + phone;
 
-		verificationCodes.put(phone, new VerificationCode(code, expiredAt));
+		redisTemplate.opsForValue().set(redisKey, code, Duration.ofMinutes(EXPIRY_MINUTES));
 
 		log.info("SMS 발송 - 전화번호: {}, 인증번호: {}", phone, code);
-
 	}
 
-	public boolean verifyCode(String phone, String code) {
-		VerificationCode storedCode = verificationCodes.get(phone);
+	public void verifyCode(String phone, String code) {
+		String redisKey = SMS_PREFIX + phone;
+		String storedCode = (String) redisTemplate.opsForValue().get(redisKey);
 
 		if (storedCode == null) {
 			throw new GeneralException(ErrorStatus.SMS_VERIFICATION_FAILED);
 		}
 
-		if (storedCode.isExpired()) {
-			verificationCodes.remove(phone);
+		if (!storedCode.equals(code)) {
 			throw new GeneralException(ErrorStatus.SMS_VERIFICATION_FAILED);
 		}
 
-		if (storedCode.matches(code)) {
-			verificationCodes.remove(phone);
-			return true;
-		}
-
-		throw new GeneralException(ErrorStatus.SMS_VERIFICATION_FAILED);
+		redisTemplate.delete(redisKey);
 	}
 
 	private String generateVerificationCode() {
 		Random random = new Random();
-		return String.format("%06d", random.nextInt(1000000));
+		return String.format("%0" + VERIFICATION_CODE_LENGTH + "d",
+			random.nextInt(MAX_CODE_VALUE));
 	}
 }

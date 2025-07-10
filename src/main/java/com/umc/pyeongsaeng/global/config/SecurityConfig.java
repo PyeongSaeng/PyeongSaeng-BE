@@ -5,11 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.umc.pyeongsaeng.domain.auth.service.KakaoAuthService;
+import com.umc.pyeongsaeng.domain.auth.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-	private final KakaoAuthService kakaoAuthService;
+	private final AuthService authService;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -28,6 +26,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(
 					"/api/auth/**",
+					"/oauth2/authorization/**",
 					"/login/oauth2/**",
 					"/swagger-ui/**",
 					"/v3/api-docs/**",
@@ -41,17 +40,12 @@ public class SecurityConfig {
 					.baseUri("/login/oauth2/code/*")
 				)
 				.userInfoEndpoint(userInfo -> userInfo
-					.userService(kakaoAuthService)
+					.userService(authService)
 				)
-				.successHandler(kakaoAuthService::onAuthenticationSuccess)
-				.failureHandler(kakaoAuthService::onAuthenticationFailure)
+				.successHandler(authService/*::onAuthenticationSuccess*/)
+				.failureHandler(authService/*::onAuthenticationFailure*/)
 			);
 
 		return http.build();
-	}
-
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
 	}
 }

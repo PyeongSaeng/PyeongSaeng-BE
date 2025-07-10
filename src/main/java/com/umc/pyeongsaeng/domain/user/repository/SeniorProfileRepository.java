@@ -4,11 +4,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.umc.pyeongsaeng.domain.user.entity.ProtectorSenior;
+import com.umc.pyeongsaeng.domain.user.entity.SeniorProfile;
 
-public interface ProtectorSeniorRepository extends JpaRepository<ProtectorSenior, Long> {
+public interface SeniorProfileRepository extends JpaRepository<SeniorProfile, Long> {
 
-	@Query("SELECT COUNT(ps) FROM ProtectorSenior ps WHERE ps.protector.id = :protectorId")
+	@Query("SELECT COUNT(ps) FROM SeniorProfile ps WHERE ps.protector.id = :protectorId")
 	long countByProtectorId(@Param("protectorId") Long protectorId);
 
 }

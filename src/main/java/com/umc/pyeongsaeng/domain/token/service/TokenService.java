@@ -23,6 +23,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class TokenService {
+	private static final String TEMP_TOKEN_PREFIX = "temp:";
+	private static final int TEMP_TOKEN_EXPIRY_MINUTES = 3;
+	private static final int REFRESH_TOKEN_EXPIRY_DAYS = 14;
 
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final UserRepository userRepository;
@@ -33,13 +36,14 @@ public class TokenService {
 		refreshTokenRepository.deleteByUser_Id(userId);
 
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
+		LocalDateTime now = LocalDateTime.now();
 		RefreshToken token = RefreshToken.builder()
 			.user(user)
 			.refreshToken(refreshToken)
-			.issuedAt(LocalDateTime.now())
-			.expiresAt(LocalDateTime.now().plusDays(14))
+			.issuedAt(now)
+			.expiresAt(now.plusDays(REFRESH_TOKEN_EXPIRY_DAYS))
 			.build();
 
 		refreshTokenRepository.save(token);
@@ -54,8 +58,7 @@ public class TokenService {
 			throw new GeneralException(ErrorStatus.EXPIRED_REFRESH_TOKEN);
 		}
 
-		Long userId = storedToken.getUser().getId();
-		return jwtUtil.generateAccessToken(userId);
+		return jwtUtil.generateAccessToken(storedToken.getUser().getId());
 	}
 
 	public void deleteRefreshToken(Long userId) {
@@ -74,7 +77,9 @@ public class TokenService {
 			"refreshToken", refreshToken,
 			"userId", userId
 		);
-		redisTemplate.opsForValue().set(tempToken, tokenData, Duration.ofMinutes(3));
+
+		String redisKey = TEMP_TOKEN_PREFIX + tempToken;
+		redisTemplate.opsForValue().set(redisKey, tokenData, Duration.ofMinutes(TEMP_TOKEN_EXPIRY_MINUTES));
 	}
 
 	public LoginResponseDto getTokensByTempToken(String tempToken) {

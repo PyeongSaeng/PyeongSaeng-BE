@@ -1,8 +1,7 @@
-package com.umc.pyeongsaeng.domain.auth.repository;
+package com.umc.pyeongsaeng.domain.social.repository;
 
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.umc.pyeongsaeng.domain.auth.entity.SocialAccount;
 
 public interface SocialAccountRepository extends JpaRepository<SocialAccount, Long> {
 
