@@ -35,7 +35,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	// Token
 	INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "TOKEN4001", "유효하지 않은 리프레시 토큰입니다."),
 	EXPIRED_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "TOKEN4002", "만료된 리프레시 토큰입니다."),
-	INVALID_TEMP_TOKEN(HttpStatus.BAD_REQUEST, "TOKEN4003", "유효하지 않은 임시 토큰입니다."),
+	INVALID_AUTH_CODE(HttpStatus.BAD_REQUEST, "TOKEN4003", "유효하지 않은 인증 코드입니다."),
 
 	// Sms
 	SMS_VERIFICATION_FAILED(HttpStatus.BAD_REQUEST, "SMS4001", "SMS 인증에 실패했습니다. 인증번호를 다시 확인하거나 재발송 해주세요.");

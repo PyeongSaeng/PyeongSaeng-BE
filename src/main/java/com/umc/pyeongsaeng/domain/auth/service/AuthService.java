@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,7 +50,7 @@ public class AuthService extends DefaultOAuth2UserService
 	implements AuthenticationSuccessHandler, AuthenticationFailureHandler {
 
 	private static final String KAKAO_PROVIDER = "KAKAO";
-	private static final String REDIRECT_URL_FORMAT = "http://localhost:3000/auth/callback?tempToken=%s&isFirstLogin=%s";
+	private static final String REDIRECT_URL_FORMAT = "http://localhost:3000/auth/callback?code=%s&isFirstLogin=%s";
 	private static final String SIGNUP_REDIRECT_URL_FORMAT = "http://localhost:3000/auth/signup/kakao?kakaoId=%s&nickname=%s";
 	private static final String ERROR_REDIRECT_URL = "http://localhost:3000/login?error=oauth_failed";
 	private static final int MAX_SENIOR_COUNT = 3;
@@ -72,7 +73,7 @@ public class AuthService extends DefaultOAuth2UserService
 
 		KakaoUserInfoDto kakaoUserInfo = extractKakaoUserInfo(oAuth2User);
 		log.info("카카오 사용자 정보 - ID: {}, 이메일: {}, 닉네임: {}",
-			kakaoUserInfo.getKakaoId(), kakaoUserInfo.getEmail(), kakaoUserInfo.getNickname());
+			kakaoUserInfo.getId(), kakaoUserInfo.getEmail(), kakaoUserInfo.getNickname());
 
 		return oAuth2User;
 	}
@@ -85,7 +86,7 @@ public class AuthService extends DefaultOAuth2UserService
 		KakaoUserInfoDto kakaoUserInfo = extractKakaoUserInfo(oAuth2User);
 
 		Optional<SocialAccount> existingSocialAccount = socialAccountRepository
-			.findByProviderTypeAndProviderUserId(KAKAO_PROVIDER, kakaoUserInfo.getKakaoId().toString());
+			.findByProviderTypeAndProviderUserId(KAKAO_PROVIDER, kakaoUserInfo.getId().toString());
 
 		if (existingSocialAccount.isPresent()) {
 			handleExistingUser(response, existingSocialAccount.get().getUser());
@@ -152,7 +153,7 @@ public class AuthService extends DefaultOAuth2UserService
 		Map<String, Object> profile = (Map<String, Object>)kakaoAccount.get("profile");
 
 		return KakaoUserInfoDto.builder()
-			.kakaoId(Long.parseLong(attributes.get("id").toString()))
+			.id(Long.parseLong(attributes.get("id").toString()))
 			.email((String)kakaoAccount.get("email"))
 			.nickname((String)profile.get("nickname"))
 			.build();
@@ -161,12 +162,10 @@ public class AuthService extends DefaultOAuth2UserService
 	private void handleExistingUser(HttpServletResponse response, User user) throws IOException {
 		LoginResponseDto loginResponse = generateTokenResponse(user, false);
 
-		String redirectUrl = String.format(REDIRECT_URL_FORMAT,
-			URLEncoder.encode(loginResponse.getAccessToken(), StandardCharsets.UTF_8),
-			URLEncoder.encode(loginResponse.getRefreshToken(), StandardCharsets.UTF_8),
-			loginResponse.getUserId(),
-			loginResponse.isFirstLogin());
+		String authCode = UUID.randomUUID().toString();
+		tokenService.saveAuthorizationCode(authCode, loginResponse);
 
+		String redirectUrl = String.format(REDIRECT_URL_FORMAT, authCode, false);
 		response.sendRedirect(redirectUrl);
 	}
 
@@ -177,7 +176,7 @@ public class AuthService extends DefaultOAuth2UserService
 			URLEncoder.encode(kakaoUserInfo.getNickname(), StandardCharsets.UTF_8) : "";
 
 		String redirectUrl = String.format(SIGNUP_REDIRECT_URL_FORMAT,
-			kakaoUserInfo.getKakaoId(),
+			kakaoUserInfo.getId(),
 			nickname);
 
 		response.sendRedirect(redirectUrl);

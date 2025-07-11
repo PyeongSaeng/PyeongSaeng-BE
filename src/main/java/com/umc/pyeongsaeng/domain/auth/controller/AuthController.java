@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.umc.pyeongsaeng.domain.auth.dto.AuthCodeExchangeDto;
 import com.umc.pyeongsaeng.domain.auth.dto.LoginRequestDto;
 import com.umc.pyeongsaeng.domain.auth.dto.LoginResponseDto;
 import com.umc.pyeongsaeng.domain.auth.dto.ProtectorSignupRequestDto;
@@ -268,7 +269,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/refresh")
-	@Operation(summary = "토큰 갱신", description = "리프레시 토큰을 사용하여 액세스 토큰을 갱신합니다.")
+	@Operation(summary = "토큰 갱신", description = "refresh 토큰을 사용하여 access 토큰을 갱신합니다.")
 	public ResponseEntity<ApiResponse<String>> refreshToken(@RequestParam String refreshToken) {
 		String newAccessToken = tokenService.refreshAccessToken(refreshToken);
 		return ResponseEntity.ok(ApiResponse.onSuccess(newAccessToken));
@@ -279,6 +280,16 @@ public class AuthController {
 	public ResponseEntity<ApiResponse<String>> logout(@RequestParam Long userId) {
 		tokenService.deleteRefreshToken(userId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus.LOGOUT_SUCCESS.getMessage()));
+	}
+
+	@PostMapping("/exchange-token")
+	@Operation(summary = "Authorization Code로 토큰 교환",
+		description = "OAuth 로그인 후 받은 Authorization Code를 실제 토큰(access, refresh)으로 교환합니다.")
+	public ResponseEntity<ApiResponse<LoginResponseDto>> exchangeToken(
+		@RequestBody @Validated AuthCodeExchangeDto request) {
+
+		LoginResponseDto response = tokenService.exchangeAuthorizationCode(request.getCode());
+		return ResponseEntity.ok(ApiResponse.onSuccess(response));
 	}
 
 	private void validateProtectorSignup(ProtectorSignupRequestDto request) {
