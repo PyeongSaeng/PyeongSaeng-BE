@@ -1,9 +1,10 @@
 package com.umc.pyeongsaeng.domain.auth.service;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,7 +50,7 @@ public class AuthService extends DefaultOAuth2UserService
 
 	private static final String KAKAO_PROVIDER = "KAKAO";
 	private static final String REDIRECT_URL_FORMAT = "http://localhost:3000/auth/callback?tempToken=%s&isFirstLogin=%s";
-	private static final String SIGNUP_REDIRECT_URL = "http://localhost:3000/auth/signup/kakao";
+	private static final String SIGNUP_REDIRECT_URL_FORMAT = "http://localhost:3000/auth/signup/kakao?kakaoId=%s&nickname=%s";
 	private static final String ERROR_REDIRECT_URL = "http://localhost:3000/login?error=oauth_failed";
 	private static final int MAX_SENIOR_COUNT = 3;
 
@@ -62,7 +63,7 @@ public class AuthService extends DefaultOAuth2UserService
 
 	public LoginResponseDto login(LoginRequestDto request) {
 		User user = validateAndGetUser(request.getUsername(), request.getPassword());
-		return generateDirectTokenResponse(user, false);
+		return generateTokenResponse(user, false);
 	}
 
 	@Override
@@ -71,7 +72,7 @@ public class AuthService extends DefaultOAuth2UserService
 
 		KakaoUserInfoDto kakaoUserInfo = extractKakaoUserInfo(oAuth2User);
 		log.info("카카오 사용자 정보 - ID: {}, 이메일: {}, 닉네임: {}",
-			kakaoUserInfo.getId(), kakaoUserInfo.getEmail(), kakaoUserInfo.getNickname());
+			kakaoUserInfo.getKakaoId(), kakaoUserInfo.getEmail(), kakaoUserInfo.getNickname());
 
 		return oAuth2User;
 	}
@@ -80,11 +81,11 @@ public class AuthService extends DefaultOAuth2UserService
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 		Authentication authentication) throws IOException, ServletException {
 
-		OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+		OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
 		KakaoUserInfoDto kakaoUserInfo = extractKakaoUserInfo(oAuth2User);
 
 		Optional<SocialAccount> existingSocialAccount = socialAccountRepository
-			.findByProviderTypeAndProviderUserId(KAKAO_PROVIDER, kakaoUserInfo.getId().toString());
+			.findByProviderTypeAndProviderUserId(KAKAO_PROVIDER, kakaoUserInfo.getKakaoId().toString());
 
 		if (existingSocialAccount.isPresent()) {
 			handleExistingUser(response, existingSocialAccount.get().getUser());
@@ -147,38 +148,39 @@ public class AuthService extends DefaultOAuth2UserService
 
 	private KakaoUserInfoDto extractKakaoUserInfo(OAuth2User oAuth2User) {
 		Map<String, Object> attributes = oAuth2User.getAttributes();
-		Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-		Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+		Map<String, Object> kakaoAccount = (Map<String, Object>)attributes.get("kakao_account");
+		Map<String, Object> profile = (Map<String, Object>)kakaoAccount.get("profile");
 
 		return KakaoUserInfoDto.builder()
-			.id(Long.parseLong(attributes.get("id").toString()))
-			.email((String) kakaoAccount.get("email"))
-			.nickname((String) profile.get("nickname"))
+			.kakaoId(Long.parseLong(attributes.get("id").toString()))
+			.email((String)kakaoAccount.get("email"))
+			.nickname((String)profile.get("nickname"))
 			.build();
 	}
 
 	private void handleExistingUser(HttpServletResponse response, User user) throws IOException {
-		String tempToken = generateTempToken(user);
-		String redirectUrl = String.format(REDIRECT_URL_FORMAT, tempToken, false);
+		LoginResponseDto loginResponse = generateTokenResponse(user, false);
+
+		String redirectUrl = String.format(REDIRECT_URL_FORMAT,
+			URLEncoder.encode(loginResponse.getAccessToken(), StandardCharsets.UTF_8),
+			URLEncoder.encode(loginResponse.getRefreshToken(), StandardCharsets.UTF_8),
+			loginResponse.getUserId(),
+			loginResponse.isFirstLogin());
+
 		response.sendRedirect(redirectUrl);
 	}
 
 	private void handleNewUser(HttpServletRequest request, HttpServletResponse response,
 		KakaoUserInfoDto kakaoUserInfo) throws IOException {
-		request.getSession().setAttribute("kakaoUserInfo", kakaoUserInfo);
-		response.sendRedirect(SIGNUP_REDIRECT_URL);
-	}
 
-	private String generateTempToken(User user) {
-		String accessToken = jwtUtil.generateAccessToken(user.getId());
-		String refreshToken = jwtUtil.generateRefreshToken(user.getId());
+		String nickname = kakaoUserInfo.getNickname() != null ?
+			URLEncoder.encode(kakaoUserInfo.getNickname(), StandardCharsets.UTF_8) : "";
 
-		tokenService.saveRefreshToken(user.getId(), refreshToken);
+		String redirectUrl = String.format(SIGNUP_REDIRECT_URL_FORMAT,
+			kakaoUserInfo.getKakaoId(),
+			nickname);
 
-		String tempToken = UUID.randomUUID().toString();
-		tokenService.saveTempToken(tempToken, accessToken, refreshToken, user.getId());
-
-		return tempToken;
+		response.sendRedirect(redirectUrl);
 	}
 
 	private void validateSeniorLimit(Long protectorId) {
@@ -249,32 +251,12 @@ public class AuthService extends DefaultOAuth2UserService
 		seniorProfileRepository.save(seniorProfile);
 	}
 
-	private LoginResponseDto generateDirectTokenResponse(User user, boolean isFirstLogin) {
-		String accessToken = jwtUtil.generateAccessToken(user.getId());
-		String refreshToken = jwtUtil.generateRefreshToken(user.getId());
-
-		tokenService.saveRefreshToken(user.getId(), refreshToken);
-
-		return LoginResponseDto.builder()
-			.accessToken(accessToken)
-			.refreshToken(refreshToken)
-			.userId(user.getId())
-			.username(user.getUsername())
-			.role(user.getRole().name())
-			.isFirstLogin(isFirstLogin)
-			.tempToken(null)
-			.build();
-	}
-
 	private LoginResponseDto generateTokenResponse(User user, boolean isFirstLogin) {
 		String accessToken = jwtUtil.generateAccessToken(user.getId());
 		String refreshToken = jwtUtil.generateRefreshToken(user.getId());
 
 		tokenService.saveRefreshToken(user.getId(), refreshToken);
 
-		String tempToken = UUID.randomUUID().toString();
-		tokenService.saveTempToken(tempToken, accessToken, refreshToken, user.getId());
-
 		return LoginResponseDto.builder()
 			.accessToken(accessToken)
 			.refreshToken(refreshToken)
@@ -282,7 +264,6 @@ public class AuthService extends DefaultOAuth2UserService
 			.username(user.getUsername())
 			.role(user.getRole().name())
 			.isFirstLogin(isFirstLogin)
-			.tempToken(tempToken)
 			.build();
 	}
 

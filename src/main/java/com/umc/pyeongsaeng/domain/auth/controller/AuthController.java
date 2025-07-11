@@ -1,7 +1,5 @@
 package com.umc.pyeongsaeng.domain.auth.controller;
 
-import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,8 +18,8 @@ import com.umc.pyeongsaeng.domain.auth.dto.SmsVerificationConfirmDto;
 import com.umc.pyeongsaeng.domain.auth.dto.SmsVerificationRequestDto;
 import com.umc.pyeongsaeng.domain.auth.service.AuthService;
 import com.umc.pyeongsaeng.domain.auth.service.SmsService;
-import com.umc.pyeongsaeng.domain.user.repository.SocialAccountRepository;
 import com.umc.pyeongsaeng.domain.auth.service.TokenService;
+import com.umc.pyeongsaeng.domain.user.repository.SocialAccountRepository;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
@@ -119,7 +117,7 @@ public class AuthController {
 			}
 		)
 	)
-	public ResponseEntity<ApiResponse<Map<String, String>>> signupProtector(
+	public ResponseEntity<ApiResponse<LoginResponseDto>> signupProtector(
 		@Validated @RequestBody ProtectorSignupRequestDto request) {
 
 		validateProtectorSignup(request);
@@ -134,7 +132,7 @@ public class AuthController {
 		);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(ApiResponse.onSuccess(createTempTokenResponse(response)));
+			.body(ApiResponse.onSuccess(response));
 	}
 
 	@PostMapping("/signup/senior")
@@ -214,7 +212,7 @@ public class AuthController {
 			}
 		)
 	)
-	public ResponseEntity<ApiResponse<Map<String, String>>> signupSenior(
+	public ResponseEntity<ApiResponse<LoginResponseDto>> signupSenior(
 		@Validated @RequestBody SeniorSignupRequestDto request) {
 
 		validateSeniorSignup(request);
@@ -238,7 +236,7 @@ public class AuthController {
 		);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(ApiResponse.onSuccess(createTempTokenResponse(response)));
+			.body(ApiResponse.onSuccess(response));
 	}
 
 	@PostMapping("/sms/send")
@@ -281,22 +279,6 @@ public class AuthController {
 	public ResponseEntity<ApiResponse<String>> logout(@RequestParam Long userId) {
 		tokenService.deleteRefreshToken(userId);
 		return ResponseEntity.ok(ApiResponse.onSuccess(SuccessStatus.LOGOUT_SUCCESS.getMessage()));
-	}
-
-	@GetMapping("/token")
-	@Operation(summary = "임시 토큰으로 JWT 조회",
-		description = "임시 토큰을 사용하여 실제 액세스, 리프레시 토큰을 받아옵니다.\n"
-			+ "(회원 가입의 경우 임시 토큰이 발급되니 리프레시 토큰을 얻으려면 해당 api를 이용해야 합니다. 3분만 유효합니다.)")
-	public ResponseEntity<ApiResponse<LoginResponseDto>> getTokenByTempToken(
-		@RequestParam("tempToken") String tempToken) {
-
-		LoginResponseDto tokens = tokenService.getTokensByTempToken(tempToken);
-		if (tokens == null) {
-			throw new GeneralException(ErrorStatus.INVALID_TEMP_TOKEN);
-		}
-
-		tokenService.deleteTempToken(tempToken);
-		return ResponseEntity.ok(ApiResponse.onSuccess(tokens));
 	}
 
 	private void validateProtectorSignup(ProtectorSignupRequestDto request) {
@@ -370,12 +352,5 @@ public class AuthController {
 
 	private String extractPassword(SeniorSignupRequestDto request) {
 		return isKakaoSignup(request.getProviderType()) ? null : request.getPassword();
-	}
-
-	private Map<String, String> createTempTokenResponse(LoginResponseDto response) {
-		return Map.of(
-			"tempToken", response.getTempToken(),
-			"isFirstLogin", String.valueOf(response.isFirstLogin())
-		);
 	}
 }

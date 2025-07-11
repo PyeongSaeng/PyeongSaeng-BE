@@ -1,14 +1,10 @@
 package com.umc.pyeongsaeng.domain.auth.service;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Map;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.umc.pyeongsaeng.domain.auth.dto.LoginResponseDto;
 import com.umc.pyeongsaeng.domain.auth.entity.RefreshToken;
 import com.umc.pyeongsaeng.domain.auth.repository.RefreshTokenRepository;
 import com.umc.pyeongsaeng.domain.user.entity.User;
@@ -23,14 +19,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional
 public class TokenService {
-	private static final String TEMP_TOKEN_PREFIX = "temp:";
-	private static final int TEMP_TOKEN_EXPIRY_MINUTES = 3;
 	private static final int REFRESH_TOKEN_EXPIRY_DAYS = 14;
 
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final UserRepository userRepository;
 	private final JwtUtil jwtUtil;
-	private final RedisTemplate<String, Object> redisTemplate;
 
 	public void saveRefreshToken(Long userId, String refreshToken) {
 		refreshTokenRepository.deleteByUser_Id(userId);
@@ -71,38 +64,4 @@ public class TokenService {
 			.orElse(false);
 	}
 
-	public void saveTempToken(String tempToken, String accessToken, String refreshToken, Long userId) {
-		Map<String, Object> tokenData = Map.of(
-			"accessToken", accessToken,
-			"refreshToken", refreshToken,
-			"userId", userId
-		);
-
-		String redisKey = TEMP_TOKEN_PREFIX + tempToken;
-		redisTemplate.opsForValue().set(redisKey, tokenData, Duration.ofMinutes(TEMP_TOKEN_EXPIRY_MINUTES));
-	}
-
-	public LoginResponseDto getTokensByTempToken(String tempToken) {
-		String redisKey = TEMP_TOKEN_PREFIX + tempToken;
-		Map<String, Object> tokenData = (Map<String, Object>) redisTemplate.opsForValue().get(redisKey);
-		if (tokenData == null) return null;
-
-		User user = userRepository.findById(((Number) tokenData.get("userId")).longValue())
-			.orElse(null);
-		if (user == null) return null;
-
-		return LoginResponseDto.builder()
-			.accessToken((String) tokenData.get("accessToken"))
-			.refreshToken((String) tokenData.get("refreshToken"))
-			.userId(user.getId())
-			.username(user.getUsername())
-			.role(user.getRole().name())
-			.isFirstLogin(false)
-			.build();
-	}
-
-	public void deleteTempToken(String tempToken) {
-		String redisKey = TEMP_TOKEN_PREFIX + tempToken;
-		redisTemplate.delete(redisKey);
-	}
 }

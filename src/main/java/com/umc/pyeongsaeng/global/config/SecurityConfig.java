@@ -42,8 +42,8 @@ public class SecurityConfig {
 				.userInfoEndpoint(userInfo -> userInfo
 					.userService(authService)
 				)
-				.successHandler(authService/*::onAuthenticationSuccess*/)
-				.failureHandler(authService/*::onAuthenticationFailure*/)
+				.successHandler(authService)
+				.failureHandler(authService)
 			);
 
 		return http.build();

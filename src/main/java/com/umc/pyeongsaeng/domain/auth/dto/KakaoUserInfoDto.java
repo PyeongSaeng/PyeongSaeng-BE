@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class KakaoUserInfoDto {
-	private Long id;
+	private Long kakaoId;
 	private String email;
 	private String nickname;
 }

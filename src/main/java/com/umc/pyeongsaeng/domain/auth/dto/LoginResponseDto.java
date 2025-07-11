@@ -15,5 +15,4 @@ public class LoginResponseDto {
 	private String username;
 	private String role;
 	private boolean isFirstLogin;
-	private String tempToken;
 }
