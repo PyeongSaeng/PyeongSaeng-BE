@@ -1,4 +1,4 @@
-package com.umc.pyeongsaeng.domain.auth.service;
+package com.umc.pyeongsaeng.domain.token.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -8,9 +8,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.umc.pyeongsaeng.domain.auth.dto.LoginResponseDto;
-import com.umc.pyeongsaeng.domain.auth.entity.RefreshToken;
-import com.umc.pyeongsaeng.domain.auth.repository.RefreshTokenRepository;
+import com.umc.pyeongsaeng.domain.token.dto.TokenResponse;
+import com.umc.pyeongsaeng.domain.token.entity.RefreshToken;
+import com.umc.pyeongsaeng.domain.token.repository.RefreshTokenRepository;
 import com.umc.pyeongsaeng.domain.user.entity.User;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
@@ -22,7 +22,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class TokenService {
+public class TokenServiceImpl implements TokenService {
+
 	private static final String AUTH_CODE_PREFIX = "auth:";
 	private static final int AUTH_CODE_EXPIRY_MINUTES = 5;
 	private static final int REFRESH_TOKEN_EXPIRY_DAYS = 14;
@@ -32,6 +33,8 @@ public class TokenService {
 	private final JwtUtil jwtUtil;
 	private final RedisTemplate<String, Object> redisTemplate;
 
+	// Refresh Token 저장
+	@Override
 	public void saveRefreshToken(Long userId, String refreshToken) {
 		refreshTokenRepository.deleteByUser_Id(userId);
 
@@ -49,43 +52,54 @@ public class TokenService {
 		refreshTokenRepository.save(token);
 	}
 
+	// Access Token 갱신
+	@Override
 	public String refreshAccessToken(String refreshToken) {
+		if (!isValidRefreshToken(refreshToken)) {
+			throw new GeneralException(ErrorStatus.INVALID_REFRESH_TOKEN);
+		}
+
 		RefreshToken storedToken = refreshTokenRepository.findByRefreshToken(refreshToken)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_REFRESH_TOKEN));
 
-		if (storedToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-			refreshTokenRepository.delete(storedToken);
-			throw new GeneralException(ErrorStatus.EXPIRED_REFRESH_TOKEN);
-		}
-
-		return jwtUtil.generateAccessToken(storedToken.getUser().getId());
+		User user = storedToken.getUser();
+		return jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
 	}
 
+	// Refresh Token 삭제 (로그아웃)
+	@Override
 	public void deleteRefreshToken(Long userId) {
 		refreshTokenRepository.deleteByUser_Id(userId);
 	}
 
+	// Refresh Token 유효성 확인
+	@Override
+	@Transactional(readOnly = true)
 	public boolean isValidRefreshToken(String refreshToken) {
 		return refreshTokenRepository.findByRefreshToken(refreshToken)
 			.map(token -> token.getExpiresAt().isAfter(LocalDateTime.now()))
 			.orElse(false);
 	}
 
-	public void saveAuthorizationCode(String authCode, LoginResponseDto loginResponse) {
+	// Authorization Code와 토큰 정보 (Redis에 5분 저장)
+	@Override
+	public void saveAuthorizationCode(String authCode, TokenResponse.TokenInfo tokenInfo) {
 		Map<String, Object> tokenData = Map.of(
-			"accessToken", loginResponse.getAccessToken(),
-			"refreshToken", loginResponse.getRefreshToken(),
-			"userId", loginResponse.getUserId(),
-			"username", loginResponse.getUsername(),
-			"role", loginResponse.getRole(),
-			"isFirstLogin", loginResponse.isFirstLogin()
+			"accessToken", tokenInfo.getAccessToken(),
+			"refreshToken", tokenInfo.getRefreshToken(),
+			"userId", tokenInfo.getUserId(),
+			"username", tokenInfo.getUsername(),
+			"role", tokenInfo.getRole(),
+			"isFirstLogin", tokenInfo.isFirstLogin()
 		);
 
 		String redisKey = AUTH_CODE_PREFIX + authCode;
 		redisTemplate.opsForValue().set(redisKey, tokenData, Duration.ofMinutes(AUTH_CODE_EXPIRY_MINUTES));
 	}
 
-	public LoginResponseDto exchangeAuthorizationCode(String authCode) {
+	// Authorization Code를 토큰으로 교환
+	@Override
+	public TokenResponse.TokenInfo exchangeAuthorizationCode(String authCode) {
 		String redisKey = AUTH_CODE_PREFIX + authCode;
 		Map<String, Object> tokenData = (Map<String, Object>) redisTemplate.opsForValue().get(redisKey);
 
@@ -95,7 +109,7 @@ public class TokenService {
 
 		redisTemplate.delete(redisKey);
 
-		return LoginResponseDto.builder()
+		return TokenResponse.TokenInfo.builder()
 			.accessToken((String) tokenData.get("accessToken"))
 			.refreshToken((String) tokenData.get("refreshToken"))
 			.userId(((Number) tokenData.get("userId")).longValue())
@@ -105,4 +119,20 @@ public class TokenService {
 			.build();
 	}
 
+	// JWT 토큰 생성 및 응답 객체 반환
+	@Override
+	public TokenResponse.TokenInfo generateTokenResponse(User user, boolean isFirstLogin) {
+		String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
+		String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getRole().name());
+		saveRefreshToken(user.getId(), refreshToken);
+
+		return TokenResponse.TokenInfo.builder()
+			.accessToken(accessToken)
+			.refreshToken(refreshToken)
+			.userId(user.getId())
+			.username(user.getUsername())
+			.role(user.getRole().name())
+			.isFirstLogin(isFirstLogin)
+			.build();
+	}
 }

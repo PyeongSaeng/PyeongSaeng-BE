@@ -1,4 +1,4 @@
-package com.umc.pyeongsaeng.domain.auth.service;
+package com.umc.pyeongsaeng.domain.sms.service;
 
 import java.time.Duration;
 import java.util.Random;
@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class SmsService {
+public class SmsServiceImpl implements SmsService {
 
 	private static final String SMS_PREFIX = "sms:";
 	private static final int VERIFICATION_CODE_LENGTH = 6;
@@ -24,6 +24,7 @@ public class SmsService {
 
 	private final RedisTemplate<String, Object> redisTemplate;
 
+	@Override
 	public void sendVerificationCode(String phone) {
 		String code = generateVerificationCode();
 		String redisKey = SMS_PREFIX + phone;
@@ -33,6 +34,7 @@ public class SmsService {
 		log.info("SMS 발송 - 전화번호: {}, 인증번호: {}", phone, code);
 	}
 
+	@Override
 	public void verifyCode(String phone, String code) {
 		String redisKey = SMS_PREFIX + phone;
 		String storedCode = (String) redisTemplate.opsForValue().get(redisKey);

@@ -90,8 +90,8 @@ jobs:
               -e "S3_IAM_ACCESS_KEY=${{ env.S3_IAM_ACCESS_KEY }}" \
               -e "S3_IAM_SECRET_KEY=${{ env.S3_IAM_SECRET_KEY }}" \
               -e "S3_REGION=${{ env.S3_REGION }}" \
-              -e "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
-              -e "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" \
+              -e "JWT_SECRET=${{ env.JWT_SECRET }}" \
+              -e "KAKAO_CLIENT_ID=${{ env.KAKAO_CLIENT_ID }}" \
               -e TZ=Asia/Seoul \
               ${{ env.DOCKER_IMAGE_NAME }}:latest
 
