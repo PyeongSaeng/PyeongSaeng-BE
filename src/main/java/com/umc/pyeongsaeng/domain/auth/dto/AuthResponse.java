@@ -11,7 +11,7 @@ public class AuthResponse {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class KakaoUserInfo {
+	public static class KakaoUserInfoResponseDto {
 		private Long id;
 		private String email;
 		private String nickname;

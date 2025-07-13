@@ -61,15 +61,12 @@ public class SecurityConfig {
 			// CORS 설정
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-			// CSRF 보호 비활성화 (JWT 사용)
 			.csrf(csrf -> csrf.disable())
 
-			// 세션 사용하지 않음
 			.sessionManagement(session ->
 				session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			)
 
-			// 예외 처리
 			.exceptionHandling(exception -> exception
 				.authenticationEntryPoint((request, response, authException) -> {
 					response.sendError(401, "Unauthorized");

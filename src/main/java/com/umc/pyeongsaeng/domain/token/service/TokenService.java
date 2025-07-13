@@ -28,16 +28,16 @@ public interface TokenService {
 	/**
 	 * Authorization Code 저장
 	 * @param authCode 인증 코드
-	 * @param tokenInfo 토큰 정보
+	 * @param tokenInfoResponseDto 토큰 정보
 	 */
-	void saveAuthorizationCode(String authCode, TokenResponse.TokenInfo tokenInfo);
+	void saveAuthorizationCode(String authCode, TokenResponse.TokenInfoResponseDto tokenInfoResponseDto);
 
 	/**
 	 * Authorization Code로 토큰 교환
 	 * @param authCode 인증 코드
 	 * @return 토큰 정보
 	 */
-	TokenResponse.TokenInfo exchangeAuthorizationCode(String authCode);
+	TokenResponse.TokenInfoResponseDto exchangeAuthorizationCode(String authCode);
 
 	/**
 	 * JWT 토큰 생성 및 응답 객체 반환
@@ -45,7 +45,7 @@ public interface TokenService {
 	 * @param isFirstLogin 최초 로그인 여부
 	 * @return 토큰 정보
 	 */
-	TokenResponse.TokenInfo generateTokenResponse(User user, boolean isFirstLogin);
+	TokenResponse.TokenInfoResponseDto generateTokenResponse(User user, boolean isFirstLogin);
 
 	/**
 	 * Refresh Token 유효성 확인

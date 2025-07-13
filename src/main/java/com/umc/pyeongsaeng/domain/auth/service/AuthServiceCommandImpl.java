@@ -40,13 +40,13 @@ public class AuthServiceCommandImpl implements AuthServiceCommand {
 	private final PasswordEncoder passwordEncoder;
 
 	@Override
-	public TokenResponse.TokenInfo login(AuthRequest.Login request) {
+	public TokenResponse.TokenInfoResponseDto login(AuthRequest.LoginRequestDto request) {
 		User user = validateAndGetUser(request.getUsername(), request.getPassword());
 		return tokenService.generateTokenResponse(user, false);
 	}
 
 	@Override
-	public TokenResponse.TokenInfo signupProtector(AuthRequest.ProtectorSignup request) {
+	public TokenResponse.TokenInfoResponseDto signupProtector(AuthRequest.ProtectorSignupRequestDto request) {
 		validateProtectorSignup(request);
 
 		User savedUser = createUser(
@@ -65,7 +65,7 @@ public class AuthServiceCommandImpl implements AuthServiceCommand {
 	}
 
 	@Override
-	public TokenResponse.TokenInfo signupSenior(AuthRequest.SeniorSignup request) {
+	public TokenResponse.TokenInfoResponseDto signupSenior(AuthRequest.SeniorSignupRequestDto request) {
 		validateSeniorSignup(request);
 
 		User savedUser = createUser(
@@ -92,7 +92,7 @@ public class AuthServiceCommandImpl implements AuthServiceCommand {
 	}
 
 	// 보호자 회원가입 유효성 검증
-	private void validateProtectorSignup(AuthRequest.ProtectorSignup request) {
+	private void validateProtectorSignup(AuthRequest.ProtectorSignupRequestDto request) {
 		if (isKakaoProvider(request.getProviderType())) {
 			validateKakaoSignup(request.getProviderUserId());
 		} else {
@@ -102,7 +102,7 @@ public class AuthServiceCommandImpl implements AuthServiceCommand {
 	}
 
 	// 시니어 회원가입 유효성 검증
-	private void validateSeniorSignup(AuthRequest.SeniorSignup request) {
+	private void validateSeniorSignup(AuthRequest.SeniorSignupRequestDto request) {
 		if (isKakaoProvider(request.getProviderType())) {
 			validateKakaoSignup(request.getProviderUserId());
 		} else {
@@ -198,7 +198,7 @@ public class AuthServiceCommandImpl implements AuthServiceCommand {
 	}
 
 	// 시니어 프로필 생성 및 저장
-	private void createSeniorProfile(User senior, User protector, AuthRequest.SeniorSignup request) {
+	private void createSeniorProfile(User senior, User protector, AuthRequest.SeniorSignupRequestDto request) {
 		SeniorProfile seniorProfile = SeniorProfile.builder()
 			.senior(senior)
 			.protector(protector)
@@ -222,22 +222,22 @@ public class AuthServiceCommandImpl implements AuthServiceCommand {
 	}
 
 	// 회원가입 요청에서 username 추출 (위는 보호자, 아래는 시니어)
-	private String extractUsername(AuthRequest.ProtectorSignup request) {
+	private String extractUsername(AuthRequest.ProtectorSignupRequestDto request) {
 		return isKakaoProvider(request.getProviderType()) ?
 			request.getProviderUserId() : request.getUsername();
 	}
 
-	private String extractUsername(AuthRequest.SeniorSignup request) {
+	private String extractUsername(AuthRequest.SeniorSignupRequestDto request) {
 		return isKakaoProvider(request.getProviderType()) ?
 			request.getProviderUserId() : request.getUsername();
 	}
 
 	// 회원가입 요청에서 password 추출 (위는 보호자, 아래는 시니어)
-	private String extractPassword(AuthRequest.ProtectorSignup request) {
+	private String extractPassword(AuthRequest.ProtectorSignupRequestDto request) {
 		return isKakaoProvider(request.getProviderType()) ? null : request.getPassword();
 	}
 
-	private String extractPassword(AuthRequest.SeniorSignup request) {
+	private String extractPassword(AuthRequest.SeniorSignupRequestDto request) {
 		return isKakaoProvider(request.getProviderType()) ? null : request.getPassword();
 	}
 }

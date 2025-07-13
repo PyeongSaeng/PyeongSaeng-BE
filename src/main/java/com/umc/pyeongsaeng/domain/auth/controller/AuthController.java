@@ -42,11 +42,11 @@ public class AuthController {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH401", description = "아이디 또는 비밀번호가 올바르지 않습니다.")
 	})
-	public ApiResponse<TokenResponse.TokenInfo> login(
-		@Validated @RequestBody AuthRequest.Login request) {
+	public ApiResponse<TokenResponse.TokenInfoResponseDto> login(
+		@Validated @RequestBody AuthRequest.LoginRequestDto request) {
 
 		// 일반 회원 로그인 처리
-		TokenResponse.TokenInfo response = authServiceCommand.login(request);
+		TokenResponse.TokenInfoResponseDto response = authServiceCommand.login(request);
 
 		return ApiResponse.onSuccess(response);
 	}
@@ -88,7 +88,7 @@ public class AuthController {
 		description = "보호자 회원가입 요청 데이터",
 		content = @Content(
 			mediaType = "application/json",
-			schema = @Schema(implementation = AuthRequest.ProtectorSignup.class),
+			schema = @Schema(implementation = AuthRequest.ProtectorSignupRequestDto.class),
 			examples = {
 				@ExampleObject(
 					name = "일반 회원가입",
@@ -121,11 +121,11 @@ public class AuthController {
 			}
 		)
 	)
-	public ApiResponse<TokenResponse.TokenInfo> signupProtector(
-		@Validated @RequestBody AuthRequest.ProtectorSignup request) {
+	public ApiResponse<TokenResponse.TokenInfoResponseDto> signupProtector(
+		@Validated @RequestBody AuthRequest.ProtectorSignupRequestDto request) {
 
 		// 보호자 회원가입 처리
-		TokenResponse.TokenInfo response = authServiceCommand.signupProtector(request);
+		TokenResponse.TokenInfoResponseDto response = authServiceCommand.signupProtector(request);
 
 		return ApiResponse.onSuccess(response);
 	}
@@ -168,7 +168,7 @@ public class AuthController {
 		description = "시니어 회원가입 요청 데이터",
 		content = @Content(
 			mediaType = "application/json",
-			schema = @Schema(implementation = AuthRequest.SeniorSignup.class),
+			schema = @Schema(implementation = AuthRequest.SeniorSignupRequestDto.class),
 			examples = {
 				@ExampleObject(
 					name = "보호자 연결 시니어 회원가입(일반가입)",
@@ -219,11 +219,11 @@ public class AuthController {
 			}
 		)
 	)
-	public ApiResponse<TokenResponse.TokenInfo> signupSenior(
-		@Validated @RequestBody AuthRequest.SeniorSignup request) {
+	public ApiResponse<TokenResponse.TokenInfoResponseDto> signupSenior(
+		@Validated @RequestBody AuthRequest.SeniorSignupRequestDto request) {
 
 		// 시니어 회원가입 처리
-		TokenResponse.TokenInfo response = authServiceCommand.signupSenior(request);
+		TokenResponse.TokenInfoResponseDto response = authServiceCommand.signupSenior(request);
 
 		return ApiResponse.onSuccess(response);
 	}

@@ -14,7 +14,7 @@ public class AuthRequest {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Schema(description = "로그인 요청")
-	public static class Login {
+	public static class LoginRequestDto {
 		@NotBlank
 		@Schema(description = "사용자 아이디")
 		private String username;
@@ -29,7 +29,7 @@ public class AuthRequest {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Schema(description = "보호자 회원가입 요청")
-	public static class ProtectorSignup {
+	public static class ProtectorSignupRequestDto {
 		@Schema(description = "아이디", required = true)
 		@NotBlank
 		@Size(min = 4, max = 20)
@@ -60,7 +60,7 @@ public class AuthRequest {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Schema(description = "시니어 회원가입 요청")
-	public static class SeniorSignup {
+	public static class SeniorSignupRequestDto {
 		@Schema(description = "아이디", required = true)
 		@NotBlank
 		@Size(min = 4, max = 20)

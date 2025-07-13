@@ -14,7 +14,7 @@ public class TokenRequest {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	@Schema(description = "Authorization Code 교환 요청")
-	public static class AuthCodeExchange {
+	public static class AuthCodeExchangeRequestDto {
 		@NotBlank
 		@Schema(description = "OAuth 로그인 후 받은 Authorization Code")
 		private String code;

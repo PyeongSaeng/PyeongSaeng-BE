@@ -55,15 +55,15 @@ public class AuthService extends DefaultOAuth2UserService
 		Authentication authentication) throws IOException, ServletException {
 
 		OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-		AuthResponse.KakaoUserInfo kakaoUserInfo = extractKakaoUserInfo(oAuth2User);
+		AuthResponse.KakaoUserInfoResponseDto kakaoUserInfoResponseDto = extractKakaoUserInfo(oAuth2User);
 
 		Optional<SocialAccount> existingSocialAccount = socialAccountRepository
-			.findByProviderTypeAndProviderUserId(KAKAO_PROVIDER, kakaoUserInfo.getId().toString());
+			.findByProviderTypeAndProviderUserId(KAKAO_PROVIDER, kakaoUserInfoResponseDto.getId().toString());
 
 		if (existingSocialAccount.isPresent()) {
 			handleExistingUser(response, existingSocialAccount.get().getUser());
 		} else {
-			handleNewUser(response, kakaoUserInfo);
+			handleNewUser(response, kakaoUserInfoResponseDto);
 		}
 	}
 
@@ -77,12 +77,12 @@ public class AuthService extends DefaultOAuth2UserService
 	}
 
 	// 카카오 사용자 정보 추출
-	private AuthResponse.KakaoUserInfo extractKakaoUserInfo(OAuth2User oAuth2User) {
+	private AuthResponse.KakaoUserInfoResponseDto extractKakaoUserInfo(OAuth2User oAuth2User) {
 		Map<String, Object> attributes = oAuth2User.getAttributes();
 		Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
 		Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
-		return AuthResponse.KakaoUserInfo.builder()
+		return AuthResponse.KakaoUserInfoResponseDto.builder()
 			.id(Long.parseLong(attributes.get("id").toString()))
 			.email((String) kakaoAccount.get("email"))
 			.nickname((String) profile.get("nickname"))
@@ -91,7 +91,7 @@ public class AuthService extends DefaultOAuth2UserService
 
 	// 기존 소셜 계정이 있으면 기존 사용자 로그인 처리
 	private void handleExistingUser(HttpServletResponse response, User user) throws IOException {
-		TokenResponse.TokenInfo loginResponse = tokenService.generateTokenResponse(user, false);
+		TokenResponse.TokenInfoResponseDto loginResponse = tokenService.generateTokenResponse(user, false);
 
 		String authCode = UUID.randomUUID().toString();
 		tokenService.saveAuthorizationCode(authCode, loginResponse);
@@ -101,14 +101,14 @@ public class AuthService extends DefaultOAuth2UserService
 	}
 
 	// 신규 소셜 계정이면 회원가입 페이지로 리다이렉트
-	private void handleNewUser(HttpServletResponse response, AuthResponse.KakaoUserInfo kakaoUserInfo)
+	private void handleNewUser(HttpServletResponse response, AuthResponse.KakaoUserInfoResponseDto kakaoUserInfoResponseDto)
 		throws IOException {
 
-		String nickname = kakaoUserInfo.getNickname() != null ?
-			URLEncoder.encode(kakaoUserInfo.getNickname(), StandardCharsets.UTF_8) : "";
+		String nickname = kakaoUserInfoResponseDto.getNickname() != null ?
+			URLEncoder.encode(kakaoUserInfoResponseDto.getNickname(), StandardCharsets.UTF_8) : "";
 
 		String redirectUrl = String.format(SIGNUP_REDIRECT_URL_FORMAT,
-			kakaoUserInfo.getId(), nickname);
+			kakaoUserInfoResponseDto.getId(), nickname);
 
 		response.sendRedirect(redirectUrl);
 	}

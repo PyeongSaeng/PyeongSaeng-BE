@@ -83,14 +83,14 @@ public class TokenServiceImpl implements TokenService {
 
 	// Authorization Code와 토큰 정보 (Redis에 5분 저장)
 	@Override
-	public void saveAuthorizationCode(String authCode, TokenResponse.TokenInfo tokenInfo) {
+	public void saveAuthorizationCode(String authCode, TokenResponse.TokenInfoResponseDto tokenInfoResponseDto) {
 		Map<String, Object> tokenData = Map.of(
-			"accessToken", tokenInfo.getAccessToken(),
-			"refreshToken", tokenInfo.getRefreshToken(),
-			"userId", tokenInfo.getUserId(),
-			"username", tokenInfo.getUsername(),
-			"role", tokenInfo.getRole(),
-			"isFirstLogin", tokenInfo.isFirstLogin()
+			"accessToken", tokenInfoResponseDto.getAccessToken(),
+			"refreshToken", tokenInfoResponseDto.getRefreshToken(),
+			"userId", tokenInfoResponseDto.getUserId(),
+			"username", tokenInfoResponseDto.getUsername(),
+			"role", tokenInfoResponseDto.getRole(),
+			"isFirstLogin", tokenInfoResponseDto.isFirstLogin()
 		);
 
 		String redisKey = AUTH_CODE_PREFIX + authCode;
@@ -99,7 +99,7 @@ public class TokenServiceImpl implements TokenService {
 
 	// Authorization Code를 토큰으로 교환
 	@Override
-	public TokenResponse.TokenInfo exchangeAuthorizationCode(String authCode) {
+	public TokenResponse.TokenInfoResponseDto exchangeAuthorizationCode(String authCode) {
 		String redisKey = AUTH_CODE_PREFIX + authCode;
 		Map<String, Object> tokenData = (Map<String, Object>) redisTemplate.opsForValue().get(redisKey);
 
@@ -109,7 +109,7 @@ public class TokenServiceImpl implements TokenService {
 
 		redisTemplate.delete(redisKey);
 
-		return TokenResponse.TokenInfo.builder()
+		return TokenResponse.TokenInfoResponseDto.builder()
 			.accessToken((String) tokenData.get("accessToken"))
 			.refreshToken((String) tokenData.get("refreshToken"))
 			.userId(((Number) tokenData.get("userId")).longValue())
@@ -121,12 +121,12 @@ public class TokenServiceImpl implements TokenService {
 
 	// JWT 토큰 생성 및 응답 객체 반환
 	@Override
-	public TokenResponse.TokenInfo generateTokenResponse(User user, boolean isFirstLogin) {
+	public TokenResponse.TokenInfoResponseDto generateTokenResponse(User user, boolean isFirstLogin) {
 		String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
 		String refreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getRole().name());
 		saveRefreshToken(user.getId(), refreshToken);
 
-		return TokenResponse.TokenInfo.builder()
+		return TokenResponse.TokenInfoResponseDto.builder()
 			.accessToken(accessToken)
 			.refreshToken(refreshToken)
 			.userId(user.getId())

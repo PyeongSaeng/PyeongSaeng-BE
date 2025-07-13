@@ -12,7 +12,7 @@ public class TokenResponse {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class TokenInfo {
+	public static class TokenInfoResponseDto {
 		private String accessToken;
 		private String refreshToken;
 		private Long userId;

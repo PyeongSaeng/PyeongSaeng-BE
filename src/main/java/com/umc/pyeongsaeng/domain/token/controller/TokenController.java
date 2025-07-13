@@ -32,11 +32,11 @@ public class TokenController {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "TOKEN405", description = "유효하지 않은 인증 코드입니다.")
 	})
-	public ApiResponse<TokenResponse.TokenInfo> exchangeToken(
-		@RequestBody @Validated TokenRequest.AuthCodeExchange request) {
+	public ApiResponse<TokenResponse.TokenInfoResponseDto> exchangeToken(
+		@RequestBody @Validated TokenRequest.AuthCodeExchangeRequestDto request) {
 
 		// Authorization Code로 토큰 교환
-		TokenResponse.TokenInfo response = tokenService.exchangeAuthorizationCode(request.getCode());
+		TokenResponse.TokenInfoResponseDto response = tokenService.exchangeAuthorizationCode(request.getCode());
 
 		return ApiResponse.onSuccess(response);
 	}

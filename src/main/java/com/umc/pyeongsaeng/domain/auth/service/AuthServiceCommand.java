@@ -10,21 +10,21 @@ public interface AuthServiceCommand {
 	 * @param request 로그인 요청 정보
 	 * @return 토큰 정보
 	 */
-	TokenResponse.TokenInfo login(AuthRequest.Login request);
+	TokenResponse.TokenInfoResponseDto login(AuthRequest.LoginRequestDto request);
 
 	/**
 	 * 보호자 회원가입
 	 * @param request 회원가입 요청 정보
 	 * @return 토큰 정보
 	 */
-	TokenResponse.TokenInfo signupProtector(AuthRequest.ProtectorSignup request);
+	TokenResponse.TokenInfoResponseDto signupProtector(AuthRequest.ProtectorSignupRequestDto request);
 
 	/**
 	 * 시니어 회원가입
 	 * @param request 회원가입 요청 정보
 	 * @return 토큰 정보
 	 */
-	TokenResponse.TokenInfo signupSenior(AuthRequest.SeniorSignup request);
+	TokenResponse.TokenInfoResponseDto signupSenior(AuthRequest.SeniorSignupRequestDto request);
 
 	/**
 	 * 로그아웃 처리

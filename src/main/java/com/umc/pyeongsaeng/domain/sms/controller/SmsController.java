@@ -28,7 +28,7 @@ public class SmsController {
 	@Operation(summary = "SMS 인증번호 발송", description = "입력된 전화번호로 인증번호를 발송합니다.")
 	@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SMS201", description = "인증번호가 발송되었습니다.")
 	public ApiResponse<String> sendSmsVerification(
-		@Validated @RequestBody SmsRequest.SmsVerification request) {
+		@Validated @RequestBody SmsRequest.SmsVerificationRequestDto request) {
 
 		smsService.sendVerificationCode(request.getPhone());
 		return ApiResponse.onSuccess(SuccessStatus.SMS_SENT.getMessage());
@@ -42,7 +42,7 @@ public class SmsController {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SMS401", description = "SMS 인증에 실패했습니다. 인증번호를 다시 확인하거나 재발송 해주세요.")
 	})
 	public ApiResponse<String> verifySmsCode(
-		@Validated @RequestBody SmsRequest.SmsVerificationConfirm request) {
+		@Validated @RequestBody SmsRequest.SmsVerificationConfirmRequestDto request) {
 
 		smsService.verifyCode(request.getPhone(), request.getVerificationCode());
 		return ApiResponse.onSuccess(SuccessStatus.SMS_VERIFIED.getMessage());
