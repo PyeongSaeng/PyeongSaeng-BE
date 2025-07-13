@@ -16,6 +16,9 @@ import lombok.*;
 public class SeniorProfile extends BaseEntity {
 
 	@Id
+	private Long seniorId;
+
+	@MapsId
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "senior_id")
 	private User senior;
