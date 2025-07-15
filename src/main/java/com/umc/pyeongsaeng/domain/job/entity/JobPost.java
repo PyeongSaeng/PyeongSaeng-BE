@@ -39,7 +39,7 @@ public class JobPost extends BaseEntity {
 	private List<JobPostImage> images = new ArrayList<>();
 
 	private String title;
-	private String location;
+	private String address;
 	private String distanceFromHome;
 	private Integer hourlyWage;
 	private Integer monthlySalary;

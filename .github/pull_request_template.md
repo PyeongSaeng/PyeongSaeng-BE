@@ -5,7 +5,7 @@ fixed #<issue_number> : 버그 픽스나 핫 픽스 이슈 <br />
 resolved #<issue_number> : 문의나 요청사항에 대한 이슈 <br />
 
 어떤 변경사항이 있었나요?
-- [ ] 🐞 BugFix Something isn't working
+- [ ] 🐛 BugFix Something isn't working
 - [ ] 💻 CrossBrowsing Browser compatibility
 - [ ] 🌏 Deploy Deploy
 - [ ] 🎨 Design Markup & styling
