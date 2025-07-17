@@ -13,6 +13,7 @@ import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,7 @@ public class SmsController {
 	private final SmsService smsService;
 
 	@PostMapping("/send")
+	@SecurityRequirements
 	@Operation(summary = "SMS 인증번호 발송", description = "입력된 전화번호로 인증번호를 발송합니다.")
 	@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SMS201", description = "인증번호가 발송되었습니다.")
 	public ApiResponse<String> sendSmsVerification(
@@ -35,6 +37,7 @@ public class SmsController {
 	}
 
 	@PostMapping("/verify")
+	@SecurityRequirements
 	@Operation(summary = "SMS 인증번호 확인",
 		description = "SMS 인증번호를 확인합니다. 올바른 인증번호인 경우 성공 응답을 반환합니다.")
 	@ApiResponses({
