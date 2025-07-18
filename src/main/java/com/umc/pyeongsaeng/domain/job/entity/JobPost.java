@@ -26,6 +26,9 @@ public class JobPost extends BaseEntity {
 	@JoinColumn(name = "company_id")
 	private Company company;
 
+	@OneToOne(mappedBy = "jobPost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private JobPostField jobPostField;
+
 	@OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Application> applications = new ArrayList<>();
 
@@ -36,7 +39,7 @@ public class JobPost extends BaseEntity {
 	private List<JobPostImage> images = new ArrayList<>();
 
 	private String title;
-	private String location;
+	private String address;
 	private String distanceFromHome;
 	private Integer hourlyWage;
 	private Integer monthlySalary;
