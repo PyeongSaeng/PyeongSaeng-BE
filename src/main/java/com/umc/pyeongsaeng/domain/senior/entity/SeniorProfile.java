@@ -25,6 +25,7 @@ public class SeniorProfile extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "protector_id")
+	@Setter
 	private User protector;
 
 	@Column(length = 20)

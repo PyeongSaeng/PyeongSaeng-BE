@@ -1,6 +1,8 @@
 package com.umc.pyeongsaeng.domain.auth.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,13 +13,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.umc.pyeongsaeng.domain.auth.dto.AuthRequest;
+import com.umc.pyeongsaeng.domain.auth.dto.AuthResponse;
 import com.umc.pyeongsaeng.domain.auth.service.AuthServiceCommand;
 import com.umc.pyeongsaeng.domain.auth.service.AuthServiceQuery;
-import com.umc.pyeongsaeng.domain.token.dto.TokenResponse;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
+import com.umc.pyeongsaeng.global.util.AuthUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,29 +39,40 @@ public class AuthController {
 
 	private final AuthServiceCommand authServiceCommand;
 	private final AuthServiceQuery authServiceQuery;
+	private final AuthUtil authUtil;
 
 	@PostMapping("/login")
 	@SecurityRequirements
-	@Operation(summary = "일반 회원 로그인", description = "아이디와 비밀번호로 로그인합니다.")
+	@Operation(summary = "일반 회원 로그인", description = "아이디와 비밀번호로 로그인합니다. \n"
+			+ "Access와 Refresh 토큰을 발급받습니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH401", description = "아이디 또는 비밀번호가 올바르지 않습니다.")
 	})
-	public ApiResponse<TokenResponse.TokenInfoResponseDto> login(
+	public ResponseEntity<ApiResponse<AuthResponse.LoginResponseDto>> login(
 		@Validated @RequestBody AuthRequest.LoginRequestDto request) {
 
-		// 일반 회원 로그인 처리
-		TokenResponse.TokenInfoResponseDto response = authServiceCommand.login(request);
+		AuthResponse.LoginResponseDto response = authServiceCommand.login(request);
 
-		return ApiResponse.onSuccess(response);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie());
+
+		return ResponseEntity.ok()
+			.headers(headers)
+			.body(ApiResponse.onSuccess(response));
 	}
 
 	@GetMapping("/kakao/login")
 	@SecurityRequirements
 	@Operation(summary = "카카오 로그인",
-		description = "카카오 OAuth 로그인을 시작합니다.\n"
-			+ "브라우저에서 직접 접근하시면 됩니다. http://localhost:8080/oauth2/authorization/kakao \n"
-			+ "최초 로그인 시 회원가입이 진행됩니다.\n")
+		description = """
+    카카오 OAuth 로그인을 시작합니다.
+
+    브라우저에서 직접 아래 URL로 접근하시면 됩니다:
+    ➤ http://localhost:8080/oauth2/authorization/kakao
+
+    최초 로그인 시 자동으로 회원가입이 진행됩니다. (Kakao ID 기반)
+    """)
 	@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다")
 	public ApiResponse<String> kakaoLogin() {
 		return ApiResponse.onSuccess("접근 URL: http://localhost:8080/oauth2/authorization/kakao");
@@ -68,18 +82,18 @@ public class AuthController {
 	@SecurityRequirements
 	@ResponseStatus(HttpStatus.CREATED)
 	@Operation(summary = "보호자 회원가입",
-		description = "보호자 회원가입을 진행합니다.\n\n"
-			+ "**회원가입 절차:**\n"
-			+ "1. 아이디(username), 비밀번호(password) 입력 (일반 회원가입)\n"
-			+ "2. 카카오 회원가입의 경우:\n"
-			+ "   - providerType='KAKAO'\n"
-			+ "   - providerUserId에 카카오 ID 입력\n"
-			+ "   - username은 providerUserId와 동일하게 처리\n"
-			+ "   - password는 null 또는 빈 문자열\n\n"
-			+ "**주의사항:**\n"
-			+ "- role은 자동으로 PROTECTOR로 설정됩니다.\n"
-			+ "- 보호자 회원가입 완료 후 시니어 회원가입이 이어집니다.\n"
-			+ "- 보호자는 최대 3명의 시니어를 등록할 수 있습니다.\n")
+		description = """
+    보호자 회원가입을 진행합니다. 일반 가입 또는 카카오 가입이 가능합니다.
+
+    [일반 회원가입]
+    - username, password, name, phone만 입력
+    - providerType, providerUserId는 null
+
+    [카카오 회원가입]
+    - providerType: 'KAKAO'
+    - providerUserId: 카카오 사용자 ID (필수)
+    - password는 null
+    """)
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON201", description = "성공적으로 생성되었습니다"),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH402", description = "이미 사용중인 아이디입니다."),
@@ -125,39 +139,49 @@ public class AuthController {
 			}
 		)
 	)
-	public ApiResponse<TokenResponse.TokenInfoResponseDto> signupProtector(
+	public ResponseEntity<ApiResponse<AuthResponse.LoginResponseDto>> signupProtector(
 		@Validated @RequestBody AuthRequest.ProtectorSignupRequestDto request) {
 
-		// 보호자 회원가입 처리
-		TokenResponse.TokenInfoResponseDto response = authServiceCommand.signupProtector(request);
+		AuthResponse.LoginResponseDto response = authServiceCommand.signupProtector(request);
 
-		return ApiResponse.onSuccess(response);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie());
+
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.headers(headers)
+			.body(ApiResponse.onSuccess(response));
 	}
 
 	@PostMapping("/signup/senior")
 	@SecurityRequirements
 	@ResponseStatus(HttpStatus.CREATED)
 	@Operation(summary = "시니어 회원가입",
-		description = "시니어 회원가입을 진행합니다.\n\n"
-			+ "**회원가입 절차:**\n"
-			+ "1. 아이디(username), 비밀번호(password) 입력 (일반 회원가입)\n"
-			+ "2. 카카오 회원가입의 경우:\n"
-			+ "   - providerType='KAKAO'\n"
-			+ "   - providerUserId에 카카오 ID 입력\n"
-			+ "   - username은 providerUserId와 동일하게 처리\n"
-			+ "   - password는 null 또는 빈 문자열\n\n"
-			+ "**프로필 정보:**\n"
-			+ "- 성별(gender): MALE 또는 FEMALE\n"
-			+ "- 직업(job): HOUSEWIFE, EMPLOYEE, PUBLIC_OFFICER, PROFESSIONAL, ARTIST, BUSINESS_OWNER, ETC\n"
-			+ "- 경력기간(experiencePeriod): LESS_THAN_6_MONTHS, SIX_MONTHS_TO_1_YEAR, ONE_TO_THREE_YEARS, THREE_TO_FIVE_YEARS, FIVE_TO_TEN_YEARS, OVER_TEN_YEARS\n\n"
-			+ "**주소 정보:**\n"
-			+ "- zipcode: 우편번호 (필수)\n"
-			+ "- roadAddress: 도로명 주소 (필수)\n"
-			+ "- detailAddress: 상세 주소 (선택)\n\n"
-			+ "**보호자 연결:**\n"
-			+ "- 독립적인 시니어 회원가입의 경우 protectorId가 null\n"
-			+ "- 보호자와 연결일 경우 protectorId가 null 아님.\n"
-			+ "- relation: 보호자와의 관계\n")
+		description = """
+    시니어 회원가입을 진행합니다. 보호자 연결 회원가입, 독립적인 회원가입 가능합니다.
+
+    > 일반 회원가입:
+    - username, password, name, age, gender 기본 정보 입력
+
+    > 카카오 회원가입
+    - providerType: 'KAKAO'
+    - `providerUserId`: 카카오 사용자 고유 ID
+    - `username`: providerUserId로 자동 설정
+    - `password`: null
+
+    > 프로필 정보:
+    - gender: MALE, FEMALE
+    - job: HOUSEWIFE, EMPLOYEE, PUBLIC_OFFICER, PROFESSIONAL, ARTIST, BUSINESS_OWNER, ETC
+    - experiencePeriod: LESS_THAN_6_MONTHS, SIX_MONTHS_TO_1_YEAR, ONE_TO_THREE_YEARS, THREE_TO_FIVE_YEARS, FIVE_TO_TEN_YEARS, OVER_TEN_YEARS
+
+    > 주소 정보:
+    - zipcode: 필수
+    - roadAddress: 필수
+    - detailAddress: 선택
+
+    > 보호자 연결:
+    - 독립 가입: protectorId = null
+    - 보호자 연결 가입: protectorId 필수, relation 입력 필요
+    """)
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON201", description = "성공적으로 생성되었습니다"),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH402", description = "이미 사용중인 아이디입니다."),
@@ -224,13 +248,17 @@ public class AuthController {
 			}
 		)
 	)
-	public ApiResponse<TokenResponse.TokenInfoResponseDto> signupSenior(
+	public ResponseEntity<ApiResponse<AuthResponse.LoginResponseDto>> signupSenior(
 		@Validated @RequestBody AuthRequest.SeniorSignupRequestDto request) {
 
-		// 시니어 회원가입 처리
-		TokenResponse.TokenInfoResponseDto response = authServiceCommand.signupSenior(request);
+		AuthResponse.LoginResponseDto response = authServiceCommand.signupSenior(request);
 
-		return ApiResponse.onSuccess(response);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie());
+
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.headers(headers)
+			.body(ApiResponse.onSuccess(response));
 	}
 
 	@GetMapping("/check-username")
@@ -241,8 +269,6 @@ public class AuthController {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH402", description = "이미 사용중인 아이디입니다.")
 	})
 	public ApiResponse<String> checkUsername(@RequestParam String username) {
-
-		// 아이디 사용 가능 여부 확인
 		if (!authServiceQuery.isUsernameAvailable(username)) {
 			throw new GeneralException(ErrorStatus.USERNAME_DUPLICATED);
 		}
@@ -251,13 +277,18 @@ public class AuthController {
 	}
 
 	@PostMapping("/logout")
-	@Operation(summary = "로그아웃", description = "사용자 로그아웃 처리입니다.")
+	@Operation(summary = "로그아웃", description = "사용자의 리프레시 토큰을 삭제하여 로그아웃 처리합니다.")
 	@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH201", description = "로그아웃되었습니다.")
-	public ApiResponse<String> logout(@RequestParam Long userId) {
+	public ResponseEntity<ApiResponse<String>> logout() {
+		Long userId = authUtil.getCurrentUserId();
 
-		// 로그아웃 처리
 		authServiceCommand.logout(userId);
 
-		return ApiResponse.onSuccess(SuccessStatus.LOGOUT_SUCCESS.getMessage());
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.SET_COOKIE, authServiceCommand.getLogoutCookie());
+
+		return ResponseEntity.ok()
+			.headers(headers)
+			.body(ApiResponse.onSuccess(SuccessStatus.LOGOUT_SUCCESS.getMessage()));
 	}
 }
