@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +38,7 @@ public class AuthController {
 	private final AuthServiceQuery authServiceQuery;
 
 	@PostMapping("/login")
+	@SecurityRequirements
 	@Operation(summary = "일반 회원 로그인", description = "아이디와 비밀번호로 로그인합니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
@@ -52,6 +54,7 @@ public class AuthController {
 	}
 
 	@GetMapping("/kakao/login")
+	@SecurityRequirements
 	@Operation(summary = "카카오 로그인",
 		description = "카카오 OAuth 로그인을 시작합니다.\n"
 			+ "브라우저에서 직접 접근하시면 됩니다. http://localhost:8080/oauth2/authorization/kakao \n"
@@ -62,6 +65,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/signup/protector")
+	@SecurityRequirements
 	@ResponseStatus(HttpStatus.CREATED)
 	@Operation(summary = "보호자 회원가입",
 		description = "보호자 회원가입을 진행합니다.\n\n"
@@ -131,6 +135,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/signup/senior")
+	@SecurityRequirements
 	@ResponseStatus(HttpStatus.CREATED)
 	@Operation(summary = "시니어 회원가입",
 		description = "시니어 회원가입을 진행합니다.\n\n"
@@ -229,6 +234,7 @@ public class AuthController {
 	}
 
 	@GetMapping("/check-username")
+	@SecurityRequirements
 	@Operation(summary = "아이디 중복 확인", description = "아이디 중복 여부를 확인합니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),

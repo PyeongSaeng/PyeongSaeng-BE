@@ -1,5 +1,6 @@
 package com.umc.pyeongsaeng.global.common;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +20,7 @@ public class HealthController {
 	}
 
 	@GetMapping("/health")
+	@SecurityRequirements
 	public Status health() {
 		Status healthStatus = new Status("UP");
 		return healthStatus;

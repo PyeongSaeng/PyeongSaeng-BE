@@ -14,6 +14,7 @@ import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +27,7 @@ public class TokenController {
 	private final TokenService tokenService;
 
 	@PostMapping("/exchange")
+	@SecurityRequirements
 	@Operation(summary = "Authorization Code로 토큰 교환",
 		description = "OAuth 로그인 후 받은 Authorization Code(5분 유효)를 실제 토큰(access, refresh)으로 교환합니다.")
 	@ApiResponses({
@@ -42,6 +44,7 @@ public class TokenController {
 	}
 
 	@PostMapping("/refresh")
+	@SecurityRequirements
 	@Operation(summary = "토큰 갱신", description = "Refresh Token을 사용하여 Access Token을 갱신합니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
