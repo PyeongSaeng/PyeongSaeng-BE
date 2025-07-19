@@ -5,12 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.umc.pyeongsaeng.global.security.CustomUserDetailsService;
 import com.umc.pyeongsaeng.global.util.JwtUtil;
 
 import jakarta.servlet.FilterChain;
@@ -29,6 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private static final String BEARER_PREFIX = "Bearer ";
 
 	private final JwtUtil jwtUtil;
+	private final CustomUserDetailsService customUserDetailsService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -36,23 +38,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		String token = resolveToken(request);
 
-		// 토큰이 유효한 경우 인증 정보 설정
 		if (StringUtils.hasText(token) && jwtUtil.validateToken(token)) {
 			try {
-				// 토큰에서 사용자 정보 추출
 				Long userId = jwtUtil.getUserIdFromToken(token);
-				String role = jwtUtil.getRoleFromToken(token);
 
-				// Spring Security 인증 정보 생성
+				UserDetails userDetails = customUserDetailsService.loadUserById(userId);
+
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-					userId,
+					userDetails,
 					null,
-					List.of(new SimpleGrantedAuthority("ROLE_" + role))
+					userDetails.getAuthorities()
 				);
-
-				// SecurityContext에 인증 정보 저장
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			} catch (Exception e) {
+				log.error("인증 정보 설정 실패: {}", e.getMessage());
 				SecurityContextHolder.clearContext();
 			}
 		}
@@ -60,7 +59,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		filterChain.doFilter(request, response);
 	}
 
-	// HTTP 요청에서 JWT 토큰 추출
 	private String resolveToken(HttpServletRequest request) {
 		String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
 
@@ -73,14 +71,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-		// 인증이 필요 없는 경로는 필터를 적용하지 않음
 		String path = request.getRequestURI();
 
 		List<String> excludedPaths = Arrays.asList(
 			"/api/auth/login",
 			"/api/auth/signup",
 			"/api/auth/refresh",
-			"/api/auth/exchange-token",
+			"/api/token/exchange",
+			"/api/token/refresh",
 			"/api/auth/check-username",
 			"/api/auth/sms",
 			"/api/auth/kakao",
