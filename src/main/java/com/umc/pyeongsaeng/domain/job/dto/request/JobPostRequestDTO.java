@@ -26,7 +26,7 @@ public class JobPostRequestDTO {
 		@NotNull(message = "detailAddress(상세주소) 필수 입력 값입니다.")
 		String detailAddress;
 
-		@NotNull(message = "roadDetail(도로명주소) 필수 입력 값입니다")
+		@NotNull(message = "roadAddress(도로명주소) 필수 입력 값입니다")
 		String roadAddress;
 
 		@NotNull(message = "zipcode(우편번호) 필수 입력 값입니다")
