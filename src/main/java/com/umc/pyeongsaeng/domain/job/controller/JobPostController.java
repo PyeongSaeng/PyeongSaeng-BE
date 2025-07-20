@@ -69,7 +69,6 @@ public class JobPostController {
 				}
 			)
 		),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "채용공고 생성 성공"),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패",
 			content = @Content(
 				mediaType = "application/json",
