@@ -33,7 +33,7 @@ public class JobPostField {
 	@JoinColumn(name = "job_post_id")
 	private JobPost jobPost;
 
-	@OneToMany(mappedBy = "formField", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "jobPostField", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<FormField> formFieldList = new ArrayList<>();
 
 }

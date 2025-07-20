@@ -1,2 +1,8 @@
-package com.umc.pyeongsaeng.domain.job.repository;public interface JobPostImageRepository {
+package com.umc.pyeongsaeng.domain.job.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.umc.pyeongsaeng.domain.job.entity.JobPostImage;
+
+public interface JobPostImageRepository extends JpaRepository<JobPostImage, Long> {
 }

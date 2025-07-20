@@ -29,7 +29,7 @@ public class SecurityConfig {
 		"/api/auth/**",
 		"/api/sms/**",
 		"/api/token/**",
-		"/actuator/health",
+		"/actuator/**",
 		"/oauth2/authorization/**",
 		"/login/oauth2/**",
 		"/swagger-ui/**",
@@ -38,7 +38,7 @@ public class SecurityConfig {
 		"/webjars/**",
 		"/login",
 		"/error",
-		"/favicon.ico"
+		"/favicon.ico",
 	};
 
 	// CORS 설정

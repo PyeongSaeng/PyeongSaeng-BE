@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -40,7 +41,7 @@ public class JobPost extends BaseEntity {
 
 	private String title;
 	private String address;
-	private String distanceFromHome;
+	// private String distanceFromHome;
 	private Integer hourlyWage;
 	private Integer monthlySalary;
 	private Integer yearSalary;
@@ -57,12 +58,15 @@ public class JobPost extends BaseEntity {
 
 	private String url;
 
+	//우편번호
 	@Column(nullable = false, length = 10)
 	private String zipcode;
 
+	// 도로명 주소
 	@Column(nullable = false, length = 255)
 	private String roadAddress;
 
+	// 상세 주소
 	@Column(length = 255)
 	private String detailAddress;
 }

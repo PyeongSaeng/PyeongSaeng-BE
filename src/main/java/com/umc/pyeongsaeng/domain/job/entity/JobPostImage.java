@@ -18,5 +18,5 @@ public class JobPostImage {
 	@JoinColumn(name = "job_post_id")
 	private JobPost jobPost;
 
-	private String imgUrl;
+	private String keyName;
 }
