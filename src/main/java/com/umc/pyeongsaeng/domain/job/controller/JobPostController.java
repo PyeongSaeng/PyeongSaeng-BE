@@ -85,7 +85,7 @@ public class JobPostController {
 		@RequestBody JobPostRequestDTO.CreateDTO requestDTO,
 		@Parameter(hidden = true) @AuthenticationPrincipal Long companyId) {
 		JobPost newJobPost = jobPostCommandService.createJobPost(requestDTO, companyId);
-		return ApiResponse.onSuccess(JobPostConverter.JobPostPreviewDTO(newJobPost));
+		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewDTO(newJobPost));
 	}
 }
 

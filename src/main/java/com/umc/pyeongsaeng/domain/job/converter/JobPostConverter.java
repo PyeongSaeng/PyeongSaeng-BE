@@ -2,7 +2,6 @@ package com.umc.pyeongsaeng.domain.job.converter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
@@ -32,10 +31,10 @@ public class JobPostConverter {
 			.build();
 	}
 
-	public static JobPostResponseDTO.JobPostPreviewDTO JobPostPreviewDTO(JobPost jobPost) {
+	public static JobPostResponseDTO.JobPostPreviewDTO toJobPostPreviewDTO(JobPost jobPost) {
 
 		List<JobPostImageResponseDTO.JobPostImagePreviewDTO> jobPostImagePreviewDTOList = jobPost.getImages().stream()
-			.map(JobPostImageConverter::jobPostImagePreViewDTO).collect(Collectors.toList());
+			.map(JobPostImageConverter::toJobPostImagePreViewDTO).collect(Collectors.toList());
 
 		return JobPostResponseDTO.JobPostPreviewDTO.builder()
 			.title(jobPost.getTitle())

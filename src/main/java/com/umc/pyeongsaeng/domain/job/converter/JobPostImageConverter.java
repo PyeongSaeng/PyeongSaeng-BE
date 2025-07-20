@@ -8,7 +8,7 @@ import com.umc.pyeongsaeng.domain.job.entity.JobPostImage;
 public class JobPostImageConverter {
 
 	// 출력을 위한 DTO
-	public static JobPostImageResponseDTO.JobPostImagePreviewDTO jobPostImagePreViewDTO(JobPostImage jobPostImage) {
+	public static JobPostImageResponseDTO.JobPostImagePreviewDTO toJobPostImagePreViewDTO(JobPostImage jobPostImage) {
 		return JobPostImageResponseDTO.JobPostImagePreviewDTO.builder()
 			.keyName(jobPostImage.getKeyName())
 			.jobPostId(jobPostImage.getJobPost().getId())
