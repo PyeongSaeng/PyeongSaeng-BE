@@ -36,6 +36,8 @@ public enum ErrorStatus implements BaseErrorCode {
 	INVALID_KAKAO_ID(HttpStatus.BAD_REQUEST, "AUTH404", "유효하지 않은 카카오 ID입니다."),
 	KAKAO_ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "AUTH405", "이미 등록된 카카오 계정입니다."),
 	INVALID_AUTH_TOKEN(HttpStatus.BAD_REQUEST, "AUTH406", "인증 정보의 주체가 유효하지 않습니다."),
+	INVALID_USER_TYPE(HttpStatus.BAD_REQUEST, "AUTH407", "User 계정이 아닙니다."),
+	INVALID_COMPANY_TYPE(HttpStatus.BAD_REQUEST, "AUTH408", "Company 계정이 아닙니다."),
 
 	// Token
 	INVALID_TOKEN_FORMAT(HttpStatus.UNAUTHORIZED, "TOKEN401", "잘못된 토큰 형식입니다."),

@@ -164,9 +164,9 @@ public class AuthController {
 
     > 카카오 회원가입
     - providerType: 'KAKAO'
-    - `providerUserId`: 카카오 사용자 고유 ID
-    - `username`: providerUserId로 자동 설정
-    - `password`: null
+    - providerUserId: 카카오 사용자 고유 ID
+    - username: providerUserId로 자동 설정
+    - password: null
 
     > 프로필 정보:
     - gender: MALE, FEMALE

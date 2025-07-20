@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.umc.pyeongsaeng.domain.company.entity.Company;
 import com.umc.pyeongsaeng.domain.user.entity.User;
 import com.umc.pyeongsaeng.domain.user.enums.UserStatus;
 
@@ -17,12 +18,18 @@ import lombok.Getter;
 @Builder
 public class CustomUserDetails implements UserDetails {
 
-	private final Long userId;
+	private final Long id;
 	private final String username;
 	private final String password;
 	private final String role;
 	private final boolean enabled;
 	private final User user;
+	private final Company company;
+	private final AccountType accountType;
+
+	public enum AccountType {
+		USER, COMPANY
+	}
 
 	/**
 	 * User 엔티티로부터 CustomUserDetails 생성
@@ -31,12 +38,32 @@ public class CustomUserDetails implements UserDetails {
 	 */
 	public static CustomUserDetails from(User user) {
 		return CustomUserDetails.builder()
-			.userId(user.getId())
+			.id(user.getId())
 			.username(user.getUsername())
 			.password(user.getPassword() != null ? user.getPassword() : "")
 			.role(user.getRole().name())
 			.enabled(user.getStatus() == UserStatus.ACTIVE)
 			.user(user)
+			.company(null)
+			.accountType(AccountType.USER)
+			.build();
+	}
+
+	/**
+	 * Company 엔티티로부터 CustomUserDetails 생성
+	 * @param company Company 엔티티
+	 * @return CustomUserDetails
+	 */
+	public static CustomUserDetails from(Company company) {
+		return CustomUserDetails.builder()
+			.id(company.getId())
+			.username(company.getUsername())
+			.password(company.getPassword())
+			.role("COMPANY")
+			.enabled(true)
+			.user(null)
+			.company(company)
+			.accountType(AccountType.COMPANY)
 			.build();
 	}
 
@@ -73,5 +100,13 @@ public class CustomUserDetails implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return enabled;
+	}
+
+	public boolean isUser() {
+		return accountType == AccountType.USER;
+	}
+
+	public boolean isCompany() {
+		return accountType == AccountType.COMPANY;
 	}
 }
