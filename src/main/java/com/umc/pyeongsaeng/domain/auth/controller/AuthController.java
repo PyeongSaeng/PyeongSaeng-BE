@@ -3,6 +3,7 @@ package com.umc.pyeongsaeng.domain.auth.controller;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,9 +18,8 @@ import com.umc.pyeongsaeng.domain.auth.dto.AuthResponse;
 import com.umc.pyeongsaeng.domain.auth.service.AuthServiceCommand;
 import com.umc.pyeongsaeng.domain.auth.service.AuthServiceQuery;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
-import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
-import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
+import com.umc.pyeongsaeng.global.security.CustomUserDetails;
 import com.umc.pyeongsaeng.global.util.AuthUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -71,6 +71,10 @@ public class AuthController {
     브라우저에서 직접 아래 URL로 접근하시면 됩니다:
     ➤ http://localhost:8080/oauth2/authorization/kakao
 
+    로그인 이후:
+    http://localhost:3000/auth/callback?code=6518a349-5129-4989-918e-f26be5a428e3&isFirstLogin=false
+    code 뒤에 허가코드가 나옵니다. 교환 api를 이용하여 로그인하시면 됩니다.
+
     최초 로그인 시 자동으로 회원가입이 진행됩니다. (Kakao ID 기반)
     """)
 	@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다")
@@ -91,8 +95,11 @@ public class AuthController {
 
     [카카오 회원가입]
     - providerType: 'KAKAO'
-    - providerUserId: 카카오 사용자 ID (필수)
+    - providerUserId==username: 카카오 사용자 ID (필수)
     - password는 null
+    - 접근 링크 ➤ http://localhost:8080/oauth2/authorization/kakao
+    - 카카오 회원가입 이후: http://localhost:3000/auth/signup/kakao?kakaoId=1234567890&nickname=이수진(%EC%9D%B4%EC%88%98%EC%A7%84)
+    - 카카오 아이디와 nickname을 활용하여 정상적인 회원가입 진행 (시니어 회원가입과 동일합니다.)
     """)
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON201", description = "성공적으로 생성되었습니다"),
@@ -269,18 +276,17 @@ public class AuthController {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH402", description = "이미 사용중인 아이디입니다.")
 	})
 	public ApiResponse<String> checkUsername(@RequestParam String username) {
-		if (!authServiceQuery.isUsernameAvailable(username)) {
-			throw new GeneralException(ErrorStatus.USERNAME_DUPLICATED);
-		}
-
+		authServiceQuery.checkUsernameAvailability(username);
 		return ApiResponse.onSuccess(SuccessStatus.USERNAME_AVAILABLE.getMessage());
 	}
 
 	@PostMapping("/logout")
 	@Operation(summary = "로그아웃", description = "사용자의 리프레시 토큰을 삭제하여 로그아웃 처리합니다.")
 	@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH201", description = "로그아웃되었습니다.")
-	public ResponseEntity<ApiResponse<String>> logout() {
-		Long userId = authUtil.getCurrentUserId();
+	public ResponseEntity<ApiResponse<String>> logout(
+		@AuthenticationPrincipal CustomUserDetails currentUser) {
+
+		Long userId = currentUser.getId();
 
 		authServiceCommand.logout(userId);
 

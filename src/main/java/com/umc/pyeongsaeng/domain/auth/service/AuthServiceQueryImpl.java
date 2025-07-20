@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,8 +18,9 @@ public class AuthServiceQueryImpl implements AuthServiceQuery {
 
 	// 아이디 중복 확인
 	@Override
-	public boolean isUsernameAvailable(String username) {
-		return !userRepository.existsByUsername(username);
+	public void checkUsernameAvailability(String username) {
+		if (userRepository.existsByUsername(username)) {
+			throw new GeneralException(ErrorStatus.USERNAME_DUPLICATED);
+		}
 	}
-
 }

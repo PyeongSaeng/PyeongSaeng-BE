@@ -2,6 +2,7 @@ package com.umc.pyeongsaeng.domain.user.controller;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,8 @@ import com.umc.pyeongsaeng.domain.token.service.TokenService;
 import com.umc.pyeongsaeng.domain.user.dto.UserRequest;
 import com.umc.pyeongsaeng.domain.user.service.UserService;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
+import com.umc.pyeongsaeng.global.security.CustomUserDetails;
 import com.umc.pyeongsaeng.global.util.AuthUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,9 +46,10 @@ public class UserController {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER406", description = "이미 탈퇴한 회원입니다.")
 	})
 	public ResponseEntity<ApiResponse<String>> withdrawUser(
-		@Validated @RequestBody UserRequest.WithdrawRequestDto request) {
+		@Validated @RequestBody UserRequest.WithdrawRequestDto request,
+		@AuthenticationPrincipal CustomUserDetails currentUser) {
 
-		Long userId = authUtil.getCurrentUserId();
+		Long userId = currentUser.getId();
 
 		userService.withdrawUser(userId, request.isConfirmed());
 
@@ -54,12 +58,12 @@ public class UserController {
 
 		return ResponseEntity.ok()
 			.headers(headers)
-			.body(ApiResponse.onSuccess("회원 탈퇴가 완료되었습니다. 7일 이내에 복구 가능합니다."));
+			.body(ApiResponse.onSuccess(SuccessStatus.WITHDRAW_SUCCESS.getMessage()));
 	}
 
 	@PostMapping("/withdraw/cancel")
 	@Operation(summary = "회원 탈퇴 취소",
-		description = "탈퇴한 회원을 복구합니다. 탈퇴 후 7일 후 관련 모든 데이터가 삭제됩니다. 문구 입력에 성공하면 탈퇴 의도인 것으로 판단합니다.")
+		description = "탈퇴한 회원을 복구합니다. 탈퇴 7일 후 관련 모든 데이터가 삭제됩니다. 문구 입력에 성공하면 탈퇴 의도인 것으로 판단합니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER401", description = "존재하지 않는 사용자입니다."),

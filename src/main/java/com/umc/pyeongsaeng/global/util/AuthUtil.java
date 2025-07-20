@@ -33,19 +33,6 @@ public class AuthUtil {
 	}
 
 	/**
-	 * 현재 인증된 사용자 ID 조회 (User만)
-	 * @return 사용자 ID
-	 * @throws GeneralException Company 계정인 경우
-	 */
-	public Long getCurrentUserId() {
-		CustomUserDetails userDetails = getCurrentUserDetails();
-		if (!userDetails.isUser()) {
-			throw new GeneralException(ErrorStatus.INVALID_USER_TYPE);
-		}
-		return userDetails.getId();
-	}
-
-	/**
 	 * 현재 인증된 회사 ID 조회 (Company만)
 	 * @return 회사 ID
 	 * @throws GeneralException User 계정인 경우
