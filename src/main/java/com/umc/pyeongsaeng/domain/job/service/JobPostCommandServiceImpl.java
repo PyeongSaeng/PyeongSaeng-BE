@@ -12,6 +12,11 @@ import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import com.umc.pyeongsaeng.domain.job.entity.JobPostImage;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostImageRepository;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
+import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
+import com.umc.pyeongsaeng.domain.job.search.repository.JobPostSearchRepository;
+
+import com.umc.pyeongsaeng.global.client.kakao.KakaoGeocodingClient;
+import com.umc.pyeongsaeng.global.client.kakao.KakaoGeocodingResult;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +30,8 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 
 	private final JobPostRepository jobPostRepository;
 	private final JobPostImageRepository jobPostImageRepository;
+	private final KakaoGeocodingClient kakaoGeocodingClient;
+	//private final JobPostSearchRepository jobPostSearchRepository;
 
 	@Override
 	public JobPost createJobPost(JobPostRequestDTO.CreateDTO requestDTO, Long companyId) {
@@ -42,7 +49,14 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 
 		newJobPost.getImages().addAll(savedImages);
 
+		//saveToElasticsearch(newJobPost);
 		// 이미지 정보까지 완전히 채워진 JobPost 객체를 반환
 		return newJobPost;
+	}
+
+	private void saveToElasticsearch(JobPost jobPost) {
+		KakaoGeocodingResult converted = kakaoGeocodingClient.convert(jobPost.getRoadAddress());
+		JobPostDocument jobPostDocument = JobPostConverter.toDocument(jobPost, converted);
+		//jobPostSearchRepository.save(jobPostDocument);
 	}
 }

@@ -1,5 +1,6 @@
 package com.umc.pyeongsaeng.domain.job.converter;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,7 +9,12 @@ import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
+import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
+import com.umc.pyeongsaeng.global.client.kakao.KakaoGeocodingResult;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class JobPostConverter {
 
 	public static JobPost toJobPost(JobPostRequestDTO.CreateDTO requestDTO) {
@@ -51,6 +57,30 @@ public class JobPostConverter {
 			.recruitCount(jobPost.getRecruitCount())
 			.jobPostImageId(jobPostImagePreviewDTOList)
 			.note(jobPost.getNote())
+			.build();
+	}
+
+	public static JobPostDocument toDocument(JobPost jobPost, KakaoGeocodingResult converted){
+
+		return JobPostDocument.builder()
+			.id(String.valueOf(jobPost.getId()))
+			.title(jobPost.getTitle())
+			.description(jobPost.getDescription())
+			.note(jobPost.getNote())
+			//.companyName(jobPost.getCompany().getName())
+			.hourlyWage(jobPost.getHourlyWage())
+			.monthlySalary(jobPost.getMonthlySalary())
+			.yearSalary(jobPost.getYearSalary())
+			.recruitCount(jobPost.getRecruitCount())
+			.address(jobPost.getAddress())
+			.sido(converted.sido())
+			.sigungu(converted.sigungu())
+			.bname(converted.bname())
+			.loc_cd(converted.locCode())
+			.deadline(jobPost.getDeadline())
+			.createdAt(jobPost.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())
+			.geoLocation(converted.geoPoint())
+			.applicationCount(jobPost.getApplications() != null ? jobPost.getApplications().size() : 0)
 			.build();
 	}
 }
