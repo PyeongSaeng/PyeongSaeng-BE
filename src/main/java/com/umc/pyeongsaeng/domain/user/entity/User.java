@@ -1,5 +1,6 @@
 package com.umc.pyeongsaeng.domain.user.entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import com.umc.pyeongsaeng.domain.token.entity.RefreshToken;
 import com.umc.pyeongsaeng.domain.user.enums.Role;
 import com.umc.pyeongsaeng.domain.user.enums.UserStatus;
 import com.umc.pyeongsaeng.global.common.BaseEntity;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -41,6 +43,7 @@ public class User extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(columnDefinition = "VARCHAR(20) DEFAULT 'ACTIVE'")
+	@Setter
 	private UserStatus status;
 
 	@OneToMany(mappedBy = "applicant")
@@ -57,4 +60,8 @@ public class User extends BaseEntity {
 
 	@OneToMany(mappedBy = "user")
 	private List<UserTerms> userTerms = new ArrayList<>();
+
+	@Column
+	@Setter
+	private LocalDateTime withdrawnAt;
 }

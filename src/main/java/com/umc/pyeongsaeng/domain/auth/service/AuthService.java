@@ -45,11 +45,13 @@ public class AuthService extends DefaultOAuth2UserService
 	private final SocialAccountRepository socialAccountRepository;
 	private final TokenService tokenService;
 
+	// 카카오 사용자 정보 로드
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 		return super.loadUser(userRequest);
 	}
 
+	// 소셜 로그인 성공 시 호출
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 		Authentication authentication) throws IOException, ServletException {
@@ -67,6 +69,7 @@ public class AuthService extends DefaultOAuth2UserService
 		}
 	}
 
+	// 로그인 실패 시 호출
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 		org.springframework.security.core.AuthenticationException exception)

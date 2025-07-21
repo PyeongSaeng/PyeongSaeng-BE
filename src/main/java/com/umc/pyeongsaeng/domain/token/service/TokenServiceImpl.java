@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import com.umc.pyeongsaeng.domain.user.entity.User;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
+import com.umc.pyeongsaeng.global.util.CookieUtil;
 import com.umc.pyeongsaeng.global.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -31,9 +33,10 @@ public class TokenServiceImpl implements TokenService {
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final UserRepository userRepository;
 	private final JwtUtil jwtUtil;
+	private final CookieUtil cookieUtil;
 	private final RedisTemplate<String, Object> redisTemplate;
 
-	// Refresh Token 저장
+	// 기존 거 지우고 Refresh Token 저장
 	@Override
 	public void saveRefreshToken(Long userId, String refreshToken) {
 		refreshTokenRepository.deleteByUser_Id(userId);
@@ -133,6 +136,53 @@ public class TokenServiceImpl implements TokenService {
 			.username(user.getUsername())
 			.role(user.getRole().name())
 			.isFirstLogin(isFirstLogin)
+			.build();
+	}
+
+	@Override
+	public ResponseCookie createRefreshTokenCookie(String refreshToken) {
+		return cookieUtil.createRefreshTokenCookie(refreshToken);
+	}
+
+	@Override
+	public ResponseCookie deleteRefreshTokenCookie() {
+		return cookieUtil.deleteRefreshTokenCookie();
+	}
+
+	// 인증 코드 기반으로 토큰 굫환 (쿠키 포함 응답)
+	@Override
+	public TokenResponse.TokenExchangeResponseDto processTokenExchange(String authCode) {
+		TokenResponse.TokenInfoResponseDto tokenInfo = exchangeAuthorizationCode(authCode);
+
+		return TokenResponse.TokenExchangeResponseDto.builder()
+			.accessToken(tokenInfo.getAccessToken())
+			.userId(tokenInfo.getUserId())
+			.username(tokenInfo.getUsername())
+			.role(tokenInfo.getRole())
+			.isFirstLogin(tokenInfo.isFirstLogin())
+			.refreshTokenCookie(createRefreshTokenCookie(tokenInfo.getRefreshToken()).toString())
+			.build();
+	}
+
+	// 유효한 Refresh 토큰으로 Access 재발급 + 새 Refresh 토큰도 갱신 (쿠키 포함)
+	@Override
+	public TokenResponse.RefreshTokenResponseDto processTokenRefresh(String refreshToken) {
+		if (!isValidRefreshToken(refreshToken)) {
+			throw new GeneralException(ErrorStatus.INVALID_REFRESH_TOKEN);
+		}
+
+		String newAccessToken = refreshAccessToken(refreshToken);
+
+		RefreshToken storedToken = refreshTokenRepository.findByRefreshToken(refreshToken)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_REFRESH_TOKEN));
+
+		User user = storedToken.getUser();
+		String newRefreshToken = jwtUtil.generateRefreshToken(user.getId(), user.getRole().name());
+		saveRefreshToken(user.getId(), newRefreshToken);
+
+		return TokenResponse.RefreshTokenResponseDto.builder()
+			.accessToken(newAccessToken)
+			.refreshTokenCookie(createRefreshTokenCookie(newRefreshToken).toString())
 			.build();
 	}
 }

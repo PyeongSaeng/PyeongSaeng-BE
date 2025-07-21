@@ -1,5 +1,7 @@
 package com.umc.pyeongsaeng.domain.token.service;
 
+import org.springframework.http.ResponseCookie;
+
 import com.umc.pyeongsaeng.domain.token.dto.TokenResponse;
 import com.umc.pyeongsaeng.domain.user.entity.User;
 
@@ -53,4 +55,31 @@ public interface TokenService {
 	 * @return 유효 여부
 	 */
 	boolean isValidRefreshToken(String refreshToken);
+
+	/**
+	 * Refresh Token HttpOnly 쿠키 생성
+	 * @param refreshToken 리프레시 토큰
+	 * @return ResponseCookie 객체
+	 */
+	ResponseCookie createRefreshTokenCookie(String refreshToken);
+
+	/**
+	 * Refresh Token HttpOnly 쿠키 삭제
+	 * @return 삭제용 ResponseCookie 객체
+	 */
+	ResponseCookie deleteRefreshTokenCookie();
+
+	/**
+	 * Authorization Code 교환 처리 (쿠키 포함)
+	 * @param authCode 인증 코드
+	 * @return 교환 응답 DTO
+	 */
+	TokenResponse.TokenExchangeResponseDto processTokenExchange(String authCode);
+
+	/**
+	 * 토큰 갱신 처리 (쿠키에서 읽기)
+	 * @param refreshToken 리프레시 토큰
+	 * @return 갱신 응답 DTO
+	 */
+	TokenResponse.RefreshTokenResponseDto processTokenRefresh(String refreshToken);
 }

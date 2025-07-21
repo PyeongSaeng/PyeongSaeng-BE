@@ -20,4 +20,34 @@ public class TokenResponse {
 		private String role;
 		private boolean isFirstLogin;
 	}
+
+	@Getter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class TokenExchangeResponseDto {
+		private String accessToken;
+		private Long userId;
+		private String username;
+		private String role;
+		private boolean isFirstLogin;
+		private String refreshTokenCookie;
+	}
+
+	@Getter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class AccessTokenResponseDto {
+		private String accessToken;
+	}
+
+	@Getter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class RefreshTokenResponseDto {
+		private String accessToken;
+		private String refreshTokenCookie;
+	}
 }

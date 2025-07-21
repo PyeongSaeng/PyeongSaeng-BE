@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.umc.pyeongsaeng.domain.auth.dto.AuthRequest;
+import com.umc.pyeongsaeng.domain.auth.dto.AuthResponse;
 import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
 import com.umc.pyeongsaeng.domain.senior.enums.ExperiencePeriod;
 import com.umc.pyeongsaeng.domain.senior.enums.Gender;
@@ -39,14 +40,16 @@ public class AuthServiceCommandImpl implements AuthServiceCommand {
 	private final SeniorProfileRepository seniorProfileRepository;
 	private final PasswordEncoder passwordEncoder;
 
+	// 로그인
 	@Override
-	public TokenResponse.TokenInfoResponseDto login(AuthRequest.LoginRequestDto request) {
+	public AuthResponse.LoginResponseDto login(AuthRequest.LoginRequestDto request) {
 		User user = validateAndGetUser(request.getUsername(), request.getPassword());
-		return tokenService.generateTokenResponse(user, false);
+		return createLoginResponse(user, false);
 	}
 
+	// 보호자 회원가입
 	@Override
-	public TokenResponse.TokenInfoResponseDto signupProtector(AuthRequest.ProtectorSignupRequestDto request) {
+	public AuthResponse.LoginResponseDto signupProtector(AuthRequest.ProtectorSignupRequestDto request) {
 		validateProtectorSignup(request);
 
 		User savedUser = createUser(
@@ -57,15 +60,17 @@ public class AuthServiceCommandImpl implements AuthServiceCommand {
 			Role.PROTECTOR
 		);
 
+		// 카카오면 소셜 계정 추가
 		if (isKakaoProvider(request.getProviderType()) && request.getProviderUserId() != null) {
 			createSocialAccount(savedUser, request.getProviderUserId());
 		}
 
-		return tokenService.generateTokenResponse(savedUser, true);
+		return createLoginResponse(savedUser, true);
 	}
 
+	// 시니어 회원가입
 	@Override
-	public TokenResponse.TokenInfoResponseDto signupSenior(AuthRequest.SeniorSignupRequestDto request) {
+	public AuthResponse.LoginResponseDto signupSenior(AuthRequest.SeniorSignupRequestDto request) {
 		validateSeniorSignup(request);
 
 		User savedUser = createUser(
@@ -76,19 +81,42 @@ public class AuthServiceCommandImpl implements AuthServiceCommand {
 			Role.SENIOR
 		);
 
+		// 카카오면 소셜 계정 추가
 		if (isKakaoProvider(request.getProviderType()) && request.getProviderUserId() != null) {
 			createSocialAccount(savedUser, request.getProviderUserId());
 		}
 
+		// protectorId가 있다면 보호자 유효성 검증 및 연결
 		User protector = validateProtectorIfExists(request.getProtectorId());
 		createSeniorProfile(savedUser, protector, request);
 
-		return tokenService.generateTokenResponse(savedUser, true);
+		return createLoginResponse(savedUser, true);
 	}
 
+	// 로그아웃
 	@Override
 	public void logout(Long userId) {
 		tokenService.deleteRefreshToken(userId);
+	}
+
+	// 로그아웃 시 전달할 쿠키 제거 명령 문자열 생성
+	@Override
+	public String getLogoutCookie() {
+		return tokenService.deleteRefreshTokenCookie().toString();
+	}
+
+	// 로그인 응답 생성 (토큰 + 쿠키)
+	private AuthResponse.LoginResponseDto createLoginResponse(User user, boolean isFirstLogin) {
+		TokenResponse.TokenInfoResponseDto tokenInfo = tokenService.generateTokenResponse(user, isFirstLogin);
+
+		return AuthResponse.LoginResponseDto.builder()
+			.accessToken(tokenInfo.getAccessToken())
+			.userId(tokenInfo.getUserId())
+			.username(tokenInfo.getUsername())
+			.role(tokenInfo.getRole())
+			.isFirstLogin(tokenInfo.isFirstLogin())
+			.refreshTokenCookie(tokenService.createRefreshTokenCookie(tokenInfo.getRefreshToken()).toString())
+			.build();
 	}
 
 	// 보호자 회원가입 유효성 검증

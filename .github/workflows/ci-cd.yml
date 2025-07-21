@@ -97,7 +97,7 @@ jobs:
 
             # Perform health check
             echo "Performing health check on the new container..."
-            HEALTH_CHECK_URL="http://127.0.0.1:8080/health"
+            HEALTH_CHECK_URL="http://127.0.0.1:8080/actuator/health"
             for i in {1..10}; do
               HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $HEALTH_CHECK_URL)
               if [ "$HEALTH_STATUS" == "200" ]; then

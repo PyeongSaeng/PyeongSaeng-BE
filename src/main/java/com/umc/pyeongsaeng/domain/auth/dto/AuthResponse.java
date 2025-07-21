@@ -16,4 +16,17 @@ public class AuthResponse {
 		private String email;
 		private String nickname;
 	}
+
+	@Getter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class LoginResponseDto {
+		private String accessToken;
+		private Long userId;
+		private String username;
+		private String role;
+		private boolean isFirstLogin;
+		private String refreshTokenCookie;
+	}
 }

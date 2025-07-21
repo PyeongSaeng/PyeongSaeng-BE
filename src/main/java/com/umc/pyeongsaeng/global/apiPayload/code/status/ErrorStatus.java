@@ -24,6 +24,10 @@ public enum ErrorStatus implements BaseErrorCode {
 	PROTECTOR_NOT_FOUND(HttpStatus.NOT_FOUND, "USER403", "존재하지 않는 보호자입니다."),
 	INVALID_PROTECTOR_ROLE(HttpStatus.BAD_REQUEST, "USER404", "보호자 권한이 없는 사용자입니다."),
 	PROTECTOR_SENIOR_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "USER405", "보호자는 최대 3명의 시니어만 등록할 수 있습니다."),
+	ALREADY_WITHDRAWN_USER(HttpStatus.BAD_REQUEST, "USER406", "이미 탈퇴한 회원입니다."),
+	NOT_WITHDRAWN_USER(HttpStatus.BAD_REQUEST, "USER407", "탈퇴하지 않은 회원입니다."),
+	WITHDRAWAL_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, "USER408", "탈퇴 후 7일이 경과하여 복구할 수 없습니다."),
+	USER_WITHDRAWAL_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "USER409", "탈퇴 의도가 확인되지 않았습니다."),
 
 	// Auth
 	LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH401", "아이디 또는 비밀번호가 올바르지 않습니다."),
@@ -31,6 +35,9 @@ public enum ErrorStatus implements BaseErrorCode {
 	INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH403", "비밀번호는 필수 입력값입니다."),
 	INVALID_KAKAO_ID(HttpStatus.BAD_REQUEST, "AUTH404", "유효하지 않은 카카오 ID입니다."),
 	KAKAO_ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "AUTH405", "이미 등록된 카카오 계정입니다."),
+	INVALID_AUTH_TOKEN(HttpStatus.BAD_REQUEST, "AUTH406", "인증 정보의 주체가 유효하지 않습니다."),
+	INVALID_USER_TYPE(HttpStatus.BAD_REQUEST, "AUTH407", "User 계정이 아닙니다."),
+	INVALID_COMPANY_TYPE(HttpStatus.BAD_REQUEST, "AUTH408", "Company 계정이 아닙니다."),
 
 	// Token
 	INVALID_TOKEN_FORMAT(HttpStatus.UNAUTHORIZED, "TOKEN401", "잘못된 토큰 형식입니다."),

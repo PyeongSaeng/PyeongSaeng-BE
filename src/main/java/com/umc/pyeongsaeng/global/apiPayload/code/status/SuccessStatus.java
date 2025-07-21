@@ -18,13 +18,17 @@ public enum SuccessStatus implements BaseCode {
 	ACCEPTED(HttpStatus.ACCEPTED, "COMMON202", "요청이 접수되었습니다."),
 	NO_CONTENT(HttpStatus.NO_CONTENT, "COMMON203", "성공적으로 처리되었습니다."),
 
-	// Auth 관련 성공
-	LOGOUT_SUCCESS(HttpStatus.OK, "AUTH201", "로그아웃되었습니다."),
-	USERNAME_AVAILABLE(HttpStatus.OK, "AUTH202", "사용 가능한 아이디입니다."),
+	// Auth
+	LOGIN_SUCCESS(HttpStatus.OK, "AUTH201", "로그인 되었습니다."),
+	LOGOUT_SUCCESS(HttpStatus.OK, "AUTH202", "로그아웃 되었습니다."),
+	USERNAME_AVAILABLE(HttpStatus.OK, "AUTH203", "사용 가능한 아이디입니다."),
 
-	// SMS 관련 성공
+	// SMS
 	SMS_SENT(HttpStatus.OK, "SMS201", "인증번호가 발송되었습니다."),
-	SMS_VERIFIED(HttpStatus.OK, "SMS202", "SMS 인증이 성공적으로 완료되었습니다.");
+	SMS_VERIFIED(HttpStatus.OK, "SMS202", "SMS 인증이 성공적으로 완료되었습니다."),
+
+	// User
+	WITHDRAW_SUCCESS(HttpStatus.OK, "USER201", "회원 탈퇴가 완료되었습니다. 7일 이내에 복구 가능합니다.");
 
 
 	private final HttpStatus httpStatus;
