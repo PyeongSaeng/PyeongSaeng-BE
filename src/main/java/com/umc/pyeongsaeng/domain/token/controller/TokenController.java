@@ -15,6 +15,7 @@ import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import com.umc.pyeongsaeng.global.util.CookieUtil;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -51,7 +52,7 @@ public class TokenController {
 
 		return ResponseEntity.ok()
 			.headers(headers)
-			.body(ApiResponse.onSuccess(response));
+			.body(ApiResponse.of(SuccessStatus._OK, response));
 	}
 
 	@PostMapping("/refresh")
@@ -77,6 +78,6 @@ public class TokenController {
 
 		return ResponseEntity.ok()
 			.headers(headers)
-			.body(ApiResponse.onSuccess(response));
+			.body(ApiResponse.of(SuccessStatus._OK, response));
 	}
 }

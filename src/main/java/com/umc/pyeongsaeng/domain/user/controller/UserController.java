@@ -19,7 +19,6 @@ import com.umc.pyeongsaeng.domain.user.service.UserService;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
 import com.umc.pyeongsaeng.global.security.CustomUserDetails;
-import com.umc.pyeongsaeng.global.util.AuthUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -35,7 +34,6 @@ public class UserController {
 	private final UserService userService;
 	private final AuthServiceCommand authServiceCommand;
 	private final TokenService tokenService;
-	private final AuthUtil authUtil;
 
 	@DeleteMapping("/withdraw")
 	@Operation(summary = "회원 탈퇴",
@@ -58,7 +56,7 @@ public class UserController {
 
 		return ResponseEntity.ok()
 			.headers(headers)
-			.body(ApiResponse.onSuccess(SuccessStatus.WITHDRAW_SUCCESS.getMessage()));
+			.body(ApiResponse.of(SuccessStatus.WITHDRAW_SUCCESS, SuccessStatus.WITHDRAW_SUCCESS.getMessage()));
 	}
 
 	@PostMapping("/withdraw/cancel")
@@ -82,6 +80,6 @@ public class UserController {
 
 		return ResponseEntity.ok()
 			.headers(headers)
-			.body(ApiResponse.onSuccess(response));
+			.body(ApiResponse.of(SuccessStatus._OK, response));
 	}
 }

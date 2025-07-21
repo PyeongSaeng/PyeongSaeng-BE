@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.umc.pyeongsaeng.domain.auth.dto.AuthRequest;
@@ -20,7 +19,6 @@ import com.umc.pyeongsaeng.domain.auth.service.AuthServiceQuery;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
 import com.umc.pyeongsaeng.global.security.CustomUserDetails;
-import com.umc.pyeongsaeng.global.util.AuthUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -39,7 +37,6 @@ public class AuthController {
 
 	private final AuthServiceCommand authServiceCommand;
 	private final AuthServiceQuery authServiceQuery;
-	private final AuthUtil authUtil;
 
 	@PostMapping("/login")
 	@SecurityRequirements
@@ -59,7 +56,7 @@ public class AuthController {
 
 		return ResponseEntity.ok()
 			.headers(headers)
-			.body(ApiResponse.onSuccess(response));
+			.body(ApiResponse.of(SuccessStatus._OK, response));
 	}
 
 	@GetMapping("/kakao/login")
@@ -79,12 +76,11 @@ public class AuthController {
     """)
 	@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다")
 	public ApiResponse<String> kakaoLogin() {
-		return ApiResponse.onSuccess("접근 URL: http://localhost:8080/oauth2/authorization/kakao");
+		return ApiResponse.of(SuccessStatus._OK, null);
 	}
 
 	@PostMapping("/signup/protector")
 	@SecurityRequirements
-	@ResponseStatus(HttpStatus.CREATED)
 	@Operation(summary = "보호자 회원가입",
 		description = """
     보호자 회원가입을 진행합니다. 일반 가입 또는 카카오 가입이 가능합니다.
@@ -156,12 +152,11 @@ public class AuthController {
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.headers(headers)
-			.body(ApiResponse.onSuccess(response));
+			.body(ApiResponse.of(SuccessStatus.CREATED, response));
 	}
 
 	@PostMapping("/signup/senior")
 	@SecurityRequirements
-	@ResponseStatus(HttpStatus.CREATED)
 	@Operation(summary = "시니어 회원가입",
 		description = """
     시니어 회원가입을 진행합니다. 보호자 연결 회원가입, 독립적인 회원가입 가능합니다.
@@ -265,7 +260,7 @@ public class AuthController {
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.headers(headers)
-			.body(ApiResponse.onSuccess(response));
+			.body(ApiResponse.of(SuccessStatus.CREATED, response));
 	}
 
 	@GetMapping("/check-username")
@@ -295,6 +290,6 @@ public class AuthController {
 
 		return ResponseEntity.ok()
 			.headers(headers)
-			.body(ApiResponse.onSuccess(SuccessStatus.LOGOUT_SUCCESS.getMessage()));
+			.body(ApiResponse.of(SuccessStatus.LOGOUT_SUCCESS, SuccessStatus.LOGOUT_SUCCESS.getMessage()));
 	}
 }
