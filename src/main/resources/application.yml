@@ -1,6 +1,7 @@
 spring:
   profiles:
-    default: local
+    active: local
+    #default: local
 
   config:
     import: optional:file:.env[.properties]
@@ -41,3 +42,9 @@ cloud:
     credentials:
       accessKey: ${S3_IAM_ACCESS_KEY}
       secretKey: ${S3_IAM_SECRET_KEY}
+
+kakao:
+  local:
+    rest-api-key: ${KAKAO_REST_API_KEY}
+
+
