@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JobPostConverter {
 
-	public static JobPost toJobPost(JobPostRequestDTO.CreateDTO requestDTO) {
+	public static JobPost toJobPost(JobPostRequestDTO.CreateDTO requestDTO, GoogleGeocodingResult convertedAddress) {
 
 		return JobPost.builder()
 			.title(requestDTO.getTitle())
@@ -34,6 +34,8 @@ public class JobPostConverter {
 			.recruitCount(requestDTO.getRecruitCount())
 			.images(new ArrayList<>())
 			.note(requestDTO.getNote())
+			.latitude(convertedAddress.geoPoint().getLat())
+			.longitude(convertedAddress.geoPoint().getLon())
 			.build();
 	}
 
@@ -60,7 +62,7 @@ public class JobPostConverter {
 			.build();
 	}
 
-	public static JobPostDocument toDocument(JobPost jobPost, GoogleGeocodingResult converted){
+	public static JobPostDocument toDocument(JobPost jobPost, GoogleGeocodingResult convertedAddress){
 
 		return JobPostDocument.builder()
 			.id(String.valueOf(jobPost.getId()))
@@ -73,13 +75,13 @@ public class JobPostConverter {
 			.yearSalary(jobPost.getYearSalary())
 			.recruitCount(jobPost.getRecruitCount())
 			.address(jobPost.getAddress())
-			.sido(converted.sido())
-			.sigungu(converted.sigungu())
-			.bname(converted.bname())
+			.sido(convertedAddress.sido())
+			.sigungu(convertedAddress.sigungu())
+			.bname(convertedAddress.bname())
 			//.loc_cd(converted.locCode())
 			.deadline(jobPost.getDeadline())
 			.createdAt(jobPost.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())
-			.geoLocation(converted.geoPoint())
+			.geoLocation(convertedAddress.geoPoint())
 			.applicationCount(jobPost.getApplications() != null ? jobPost.getApplications().size() : 0)
 			.build();
 	}

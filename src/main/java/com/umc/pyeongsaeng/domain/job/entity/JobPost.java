@@ -69,4 +69,11 @@ public class JobPost extends BaseEntity {
 	// 상세 주소
 	@Column(length = 255)
 	private String detailAddress;
+
+	// 위도
+	private Double latitude;
+
+	// 경도
+	private Double longitude;
+
 }

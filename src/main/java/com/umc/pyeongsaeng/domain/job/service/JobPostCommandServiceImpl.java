@@ -14,6 +14,7 @@ import com.umc.pyeongsaeng.domain.job.repository.JobPostImageRepository;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
 import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
 
+import com.umc.pyeongsaeng.domain.job.search.repository.JobPostSearchRepository;
 import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingClient;
 import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingResult;
 
@@ -35,7 +36,8 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 	@Override
 	public JobPost createJobPost(JobPostRequestDTO.CreateDTO requestDTO, Long companyId) {
 
-		JobPost requestedJobPost = JobPostConverter.toJobPost(requestDTO);
+		GoogleGeocodingResult convertedAddress = googleGeocodingClient.convert(requestDTO.getRoadAddress());
+		JobPost requestedJobPost = JobPostConverter.toJobPost(requestDTO, convertedAddress);
 
 		JobPost newJobPost = jobPostRepository.save(requestedJobPost);
 
@@ -48,14 +50,13 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 
 		newJobPost.getImages().addAll(savedImages);
 
-		//saveToElasticsearch(newJobPost);
+		//saveToElasticsearch(newJobPost, convertedAddress);
 		// 이미지 정보까지 완전히 채워진 JobPost 객체를 반환
 		return newJobPost;
 	}
 
-	private void saveToElasticsearch(JobPost jobPost) {
-		GoogleGeocodingResult converted = googleGeocodingClient.convert(jobPost.getRoadAddress());
-		JobPostDocument jobPostDocument = JobPostConverter.toDocument(jobPost, converted);
+	private void saveToElasticsearch(JobPost jobPost, GoogleGeocodingResult convertedAddress) {
+		JobPostDocument jobPostDocument = JobPostConverter.toDocument(jobPost, convertedAddress);
 		//jobPostSearchRepository.save(jobPostDocument);
 	}
 }
