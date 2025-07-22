@@ -10,7 +10,7 @@ import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
-import com.umc.pyeongsaeng.global.client.kakao.KakaoGeocodingResult;
+import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingResult;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,7 +60,7 @@ public class JobPostConverter {
 			.build();
 	}
 
-	public static JobPostDocument toDocument(JobPost jobPost, KakaoGeocodingResult converted){
+	public static JobPostDocument toDocument(JobPost jobPost, GoogleGeocodingResult converted){
 
 		return JobPostDocument.builder()
 			.id(String.valueOf(jobPost.getId()))
@@ -76,7 +76,7 @@ public class JobPostConverter {
 			.sido(converted.sido())
 			.sigungu(converted.sigungu())
 			.bname(converted.bname())
-			.loc_cd(converted.locCode())
+			//.loc_cd(converted.locCode())
 			.deadline(jobPost.getDeadline())
 			.createdAt(jobPost.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())
 			.geoLocation(converted.geoPoint())

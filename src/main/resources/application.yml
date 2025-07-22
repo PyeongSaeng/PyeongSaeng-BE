@@ -43,8 +43,9 @@ cloud:
       accessKey: ${S3_IAM_ACCESS_KEY}
       secretKey: ${S3_IAM_SECRET_KEY}
 
-kakao:
-  local:
-    rest-api-key: ${KAKAO_REST_API_KEY}
+google:
+  geocoding:
+    api-key: ${GOOGLE_GEO_API_KEY}
+
 
 
