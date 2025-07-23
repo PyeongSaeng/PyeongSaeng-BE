@@ -49,7 +49,10 @@ public enum ErrorStatus implements BaseErrorCode {
 	EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "TOKEN407", "만료된 리프레시 토큰입니다."),
 
 	// SMS
-	SMS_VERIFICATION_FAILED(HttpStatus.BAD_REQUEST, "SMS401", "SMS 인증에 실패했습니다. 인증번호를 다시 확인하거나 재발송 해주세요.");
+	SMS_VERIFICATION_FAILED(HttpStatus.BAD_REQUEST, "SMS401", "SMS 인증에 실패했습니다. 인증번호를 다시 확인하거나 재발송 해주세요."),
+
+	// Recommendation
+	GOOGLE_DIRECTIONS_API_FAILED(HttpStatus.BAD_GATEWAY, "RECOMMEND401", "Google Directions API 호출에 실패했습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

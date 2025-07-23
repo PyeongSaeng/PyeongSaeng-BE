@@ -80,6 +80,7 @@ public class SecurityConfig {
 			// 요청별 인증 설정
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+				.requestMatchers("/api/job/**").permitAll()
 				.requestMatchers("/api/protector/**").hasRole("PROTECTOR")
 				.requestMatchers("/api/senior/**").hasRole("SENIOR")
 				.anyRequest().authenticated()
