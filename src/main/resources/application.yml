@@ -1,6 +1,7 @@
 spring:
   profiles:
-    default: local
+    active: local
+    #default: local
 
   config:
     import: optional:file:.env[.properties]
@@ -43,5 +44,7 @@ cloud:
       secretKey: ${S3_IAM_SECRET_KEY}
 
 google:
+  geocoding:
+    api-key: ${GOOGLE_GEO_API_KEY}
   maps:
     api-key: ${GOOGLE_MAPS_API_KEY}

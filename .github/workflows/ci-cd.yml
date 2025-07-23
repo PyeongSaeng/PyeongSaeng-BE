@@ -24,6 +24,7 @@ env:
   S3_REGION : ${{ secrets.S3_REGION }}
   JWT_SECRET: ${{ secrets.JWT_SECRET }}
   KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+  GOOGLE_GEO_API_KEY: ${{secrets.GOOGLE_GEO_API_KEY}}
   GOOGLE_MAPS_API_KEY: ${{secrets.GOOGLE_MAPS_API_KEY}}
 
 jobs:
@@ -94,6 +95,7 @@ jobs:
               -e "JWT_SECRET=${{ env.JWT_SECRET }}" \
               -e "KAKAO_CLIENT_ID=${{ env.KAKAO_CLIENT_ID }}" \
               -e "GOOGLE_MAPS_API_KEY=${{ env.GOOGLE_MAPS_API_KEY }}" \
+              -e "GOOGLE_GEO_API_KEY=${{ env.GOOGLE_GEO_API_KEY }}" \
               -e TZ=Asia/Seoul \
               ${{ env.DOCKER_IMAGE_NAME }}:latest
 
