@@ -77,12 +77,12 @@ public class SmsServiceImpl implements SmsService {
 	}
 
 	// CoolSMS API를 사용하여 실제 sms 전송
-	private void sendSms(String to, String verificationCode) {
+	private void sendSms(String phoneNumber, String verificationCode) {
 		DefaultMessageService messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
 
 		Message message = new Message();
 		message.setFrom(fromNumber);
-		message.setTo(to);
+		message.setTo(phoneNumber);
 		message.setText("[평생] 인증번호 [" + verificationCode + "]를 입력해주세요. 5분 유효합니다.");
 
 		try {
