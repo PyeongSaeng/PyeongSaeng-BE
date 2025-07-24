@@ -15,6 +15,7 @@ import net.nurigo.sdk.message.service.DefaultMessageService;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,6 +25,8 @@ public class SmsServiceImpl implements SmsService {
 	private static final String SMS_PREFIX = "sms:";
 	private static final int VERIFICATION_CODE_LENGTH = 6;
 	private static final int EXPIRY_MINUTES = 5;
+	private static final String SMS_COUNT_PREFIX = "sms:count:";
+	private static final int MAX_SMS_PER_DAY = 10;
 
 	private final RedisTemplate<String, Object> redisTemplate;
 
@@ -36,9 +39,29 @@ public class SmsServiceImpl implements SmsService {
 	@Value("${coolsms.from-number}")
 	private String fromNumber;
 
+	private DefaultMessageService messageService;
+
+	@PostConstruct
+	private void initCoolSmsService() {
+		this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
+	}
+
 	// 인증 코드 저장 후 발송
 	@Override
 	public void sendVerificationCode(String phone) {
+		String countKey = SMS_COUNT_PREFIX + phone;
+		Integer count = (Integer) redisTemplate.opsForValue().get(countKey);
+
+		if (count == null) {
+			redisTemplate.opsForValue().set(countKey, 1, Duration.ofHours(24));
+			return;
+		}
+
+		if (count >= MAX_SMS_PER_DAY) {
+			throw new GeneralException(ErrorStatus.SMS_RESEND_LIMIT_EXCEEDED);
+		}
+
+		redisTemplate.opsForValue().increment(countKey);
 		String code = generateVerificationCode();
 		String redisKey = SMS_PREFIX + phone;
 
@@ -78,7 +101,6 @@ public class SmsServiceImpl implements SmsService {
 
 	// CoolSMS API를 사용하여 실제 sms 전송
 	private void sendSms(String phoneNumber, String verificationCode) {
-		DefaultMessageService messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
 
 		Message message = new Message();
 		message.setFrom(fromNumber);
