@@ -50,6 +50,12 @@ public class SeniorProfile extends BaseEntity {
 	@Column(length = 255)
 	private String detailAddress;
 
+	@Column(nullable = true)
+	private Double latitude;
+
+	@Column(nullable = true)
+	private Double longitude;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 30)
 	private JobType job;
@@ -57,6 +63,12 @@ public class SeniorProfile extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 30)
 	private ExperiencePeriod experiencePeriod;
+
+	//위도 경도 업데이트
+	public void updateLocation(Double latitude, Double longitude) {
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
 
 }
 
