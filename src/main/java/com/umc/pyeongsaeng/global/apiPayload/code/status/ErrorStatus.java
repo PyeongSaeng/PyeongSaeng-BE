@@ -24,10 +24,11 @@ public enum ErrorStatus implements BaseErrorCode {
 	PROTECTOR_NOT_FOUND(HttpStatus.NOT_FOUND, "USER403", "존재하지 않는 보호자입니다."),
 	INVALID_PROTECTOR_ROLE(HttpStatus.BAD_REQUEST, "USER404", "보호자 권한이 없는 사용자입니다."),
 	PROTECTOR_SENIOR_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "USER405", "보호자는 최대 3명의 시니어만 등록할 수 있습니다."),
-	ALREADY_WITHDRAWN_USER(HttpStatus.BAD_REQUEST, "USER406", "이미 탈퇴한 회원입니다."),
-	NOT_WITHDRAWN_USER(HttpStatus.BAD_REQUEST, "USER407", "탈퇴하지 않은 회원입니다."),
-	WITHDRAWAL_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, "USER408", "탈퇴 후 7일이 경과하여 복구할 수 없습니다."),
-	USER_WITHDRAWAL_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "USER409", "탈퇴 의도가 확인되지 않았습니다."),
+	SENIOR_NOT_FOUND(HttpStatus.NOT_FOUND, "USER406", "해당 시니어를 찾을 수 없습니다."),
+	ALREADY_WITHDRAWN_USER(HttpStatus.BAD_REQUEST, "USER407", "이미 탈퇴한 회원입니다."),
+	NOT_WITHDRAWN_USER(HttpStatus.BAD_REQUEST, "USER408", "탈퇴하지 않은 회원입니다."),
+	WITHDRAWAL_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, "USER409", "탈퇴 후 7일이 경과하여 복구할 수 없습니다."),
+	USER_WITHDRAWAL_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "USER410", "탈퇴 의도가 확인되지 않았습니다."),
 
 	// Auth
 	LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH401", "아이디 또는 비밀번호가 올바르지 않습니다."),
@@ -50,6 +51,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
 	// SMS
 	SMS_VERIFICATION_FAILED(HttpStatus.BAD_REQUEST, "SMS401", "SMS 인증에 실패했습니다. 인증번호를 다시 확인하거나 재발송 해주세요."),
+	SMS_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SMS402", "SMS 발송에 실패했습니다."),
+	SMS_RESEND_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "SMS403", "하루 인증 요청 가능 횟수를 초과했습니다. 제한 10회."),
 
 	// Recommendation
 	GOOGLE_DIRECTIONS_API_FAILED(HttpStatus.BAD_GATEWAY, "RECOMMEND401", "Google Directions API 호출에 실패했습니다."),
