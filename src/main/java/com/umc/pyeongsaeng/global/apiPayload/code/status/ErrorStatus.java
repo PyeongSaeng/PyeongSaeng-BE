@@ -51,10 +51,12 @@ public enum ErrorStatus implements BaseErrorCode {
 	// SMS
 	SMS_VERIFICATION_FAILED(HttpStatus.BAD_REQUEST, "SMS401", "SMS 인증에 실패했습니다. 인증번호를 다시 확인하거나 재발송 해주세요."),
 
+	// Recommendation
+	GOOGLE_DIRECTIONS_API_FAILED(HttpStatus.BAD_GATEWAY, "RECOMMEND401", "Google Directions API 호출에 실패했습니다."),
+
 	// ADDRESS
 	GOOGLE_API_ERROR(HttpStatus.BAD_GATEWAY, "ADDRESS401", "구글 API 호출 중 오류 발생"),
 	ADDRESS_CONVERSION_FAILED(HttpStatus.BAD_REQUEST, "ADDRESS402", "주소 변환 실패");
-
 
 	private final HttpStatus httpStatus;
 	private final String code;

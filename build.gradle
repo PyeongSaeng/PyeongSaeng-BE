@@ -63,7 +63,10 @@ dependencies {
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.0'
 
+    implementation 'org.json:json:20231013'
+
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'org.springframework.data:spring-data-elasticsearch:5.1.0'
 
 }
 
