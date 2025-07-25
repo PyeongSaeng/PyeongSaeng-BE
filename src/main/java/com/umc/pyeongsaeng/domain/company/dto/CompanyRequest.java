@@ -61,7 +61,6 @@ public class CompanyRequest {
 		private String name;
 
 		private String phone;
-
 		private String currentPassword;
 
 		@Size(min = 6, max = 100)
