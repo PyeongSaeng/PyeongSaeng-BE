@@ -1,4 +1,4 @@
-package com.umc.pyeongsaeng.domain.job.recommendation.dto;
+package com.umc.pyeongsaeng.domain.job.recommendation.dto.response;
 
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 
@@ -6,7 +6,7 @@ public record RecommendationResponse(
 	Long jobPostId,
 	String title,
 	String companyName,
-	String address,
+	String roadAddress,
 	Integer hourlyWage,
 	String workingTime,
 	Integer monthlySalary,

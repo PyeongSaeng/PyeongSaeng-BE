@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
-import com.umc.pyeongsaeng.domain.job.recommendation.dto.RecommendationResponse;
+import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.RecommendationResponse;
 import com.umc.pyeongsaeng.domain.job.recommendation.util.DistanceUtil;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
 import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class JobPostRecommendationService {
+public class RecommendationService {
 
 	private final JobPostRepository jobPostRepository;
 	private final SeniorProfileRepository seniorProfileRepository;

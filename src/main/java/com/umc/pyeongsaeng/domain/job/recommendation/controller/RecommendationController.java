@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.umc.pyeongsaeng.domain.job.recommendation.dto.RecommendationResponse;
+import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.RecommendationResponse;
 import com.umc.pyeongsaeng.domain.job.recommendation.service.JobPostRecommendationService;
 import com.umc.pyeongsaeng.domain.job.recommendation.service.TravelTimeService;
 import com.umc.pyeongsaeng.domain.user.entity.User;
@@ -35,14 +35,6 @@ public class RecommendationController {
 		List<RecommendationResponse> recommendations = jobpostRecommendationService.recommendJobsByDistance(userId);
 		return ApiResponse.of(SuccessStatus._OK, recommendations);
 	}
-
-	/** 테스트용
-	@GetMapping("/recommendations/test")
-	public ApiResponse<List<RecommendationResponse>> recommendJobsByDistanceTest(@RequestParam Long userId) {
-		List<RecommendationResponse> recommendations = jobpostRecommendationService.recommendJobsByDistance(userId);
-		return ApiResponse.of(SuccessStatus._OK, recommendations);
-	}
-	 **/
 
 	@GetMapping("/travel-time")
 	public ResponseEntity<Map<String, String>> getTravelTime(
