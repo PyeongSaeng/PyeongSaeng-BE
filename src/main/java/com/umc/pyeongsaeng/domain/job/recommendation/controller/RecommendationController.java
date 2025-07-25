@@ -6,12 +6,16 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.umc.pyeongsaeng.domain.job.recommendation.dto.request.TravelTimeRequest;
 import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.RecommendationResponse;
-import com.umc.pyeongsaeng.domain.job.recommendation.service.JobPostRecommendationService;
+import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.TravelTimeResponse;
+import com.umc.pyeongsaeng.domain.job.recommendation.service.RecommendationService;
 import com.umc.pyeongsaeng.domain.job.recommendation.service.TravelTimeService;
 import com.umc.pyeongsaeng.domain.user.entity.User;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
@@ -24,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/job")
 public class RecommendationController {
 	private final TravelTimeService travelTimeService;
-	private final JobPostRecommendationService jobpostRecommendationService;
+	private final RecommendationService recommendationService;
 
 	//직선 거리 기반 추천
 	@GetMapping("/recommendations")
@@ -32,18 +36,22 @@ public class RecommendationController {
 		@AuthenticationPrincipal User user
 	) {
 		Long userId = user.getId();
-		List<RecommendationResponse> recommendations = jobpostRecommendationService.recommendJobsByDistance(userId);
+		List<RecommendationResponse> recommendations = recommendationService.recommendJobsByDistance(userId);
 		return ApiResponse.of(SuccessStatus._OK, recommendations);
 	}
 
-	@GetMapping("/travel-time")
-	public ResponseEntity<Map<String, String>> getTravelTime(
-		@RequestParam double originLat,
-		@RequestParam double originLng,
-		@RequestParam double destLat,
-		@RequestParam double destLng
+	@PostMapping("/travel-time")
+	public ResponseEntity<ApiResponse<TravelTimeResponse>> getTravelTime(
+		@RequestBody TravelTimeRequest request
 	) {
-		String travelSummary = travelTimeService.getTravelTime(originLat, originLng, destLat, destLng);
-		return ResponseEntity.ok(Map.of("travelSummary", travelSummary));
+		String travelSummary = travelTimeService.getTravelTime(
+			request.originLat(),
+			request.originLng(),
+			request.destLat(),
+			request.destLng()
+		);
+
+		TravelTimeResponse response = new TravelTimeResponse(travelSummary);
+		return ResponseEntity.ok(ApiResponse.of(SuccessStatus._OK, response));
 	}
 }
