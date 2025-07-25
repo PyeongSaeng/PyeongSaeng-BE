@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.umc.pyeongsaeng.domain.company.entity.Company;
+import com.umc.pyeongsaeng.domain.company.enums.CompanyStatus;
 import com.umc.pyeongsaeng.domain.user.entity.User;
 import com.umc.pyeongsaeng.domain.user.enums.UserStatus;
 
@@ -60,7 +61,7 @@ public class CustomUserDetails implements UserDetails {
 			.username(company.getUsername())
 			.password(company.getPassword())
 			.role("COMPANY")
-			.enabled(true)
+			.enabled(company.getStatus() == CompanyStatus.ACTIVE)
 			.user(null)
 			.company(company)
 			.accountType(AccountType.COMPANY)

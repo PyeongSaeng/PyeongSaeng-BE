@@ -29,6 +29,7 @@ public class SecurityConfig {
 		"/api/auth/**",
 		"/api/sms/**",
 		"/api/token/**",
+		"/api/companies/**",
 		"/actuator/**",
 		"/oauth2/authorization/**",
 		"/login/oauth2/**",

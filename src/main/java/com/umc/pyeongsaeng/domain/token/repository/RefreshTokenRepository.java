@@ -11,4 +11,5 @@ import com.umc.pyeongsaeng.domain.token.entity.RefreshToken;
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 	Optional<RefreshToken> findByRefreshToken(String refreshToken);
 	void deleteByUser_Id(Long userId);
+	void deleteByCompany_Id(Long companyId);
 }

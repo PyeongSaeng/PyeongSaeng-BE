@@ -82,4 +82,12 @@ public interface TokenService {
 	 * @return 갱신 응답 DTO
 	 */
 	TokenResponse.RefreshTokenResponseDto processTokenRefresh(String refreshToken);
+
+	/**
+	 * 기업(Company)의 리프레시 토큰을 저장
+	 * @param companyId 기업의 ID
+	 * @param refreshToken 저장할 토큰
+	 */
+	void saveCompanyRefreshToken(Long companyId, String refreshToken);
+
 }

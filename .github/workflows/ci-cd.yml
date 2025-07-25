@@ -31,7 +31,7 @@ env:
   SMS_FROM_NUMBER: ${{ secrets.SMS_FROM_NUMBER }}
   ES_HOST : ${{secrets.ES_HOST}}
   ES_PASSWORD : ${{secrets.ES_PASSWORD}}
-
+  ODCLOUD_SERVICE_KEY: ${{secrets.ODCLOUD_SERVICE_KEY}}
 
 jobs:
   build-and-push-docker:
@@ -107,6 +107,8 @@ jobs:
               -e "SMS_FROM_NUMBER=${{ env.SMS_FROM_NUMBER }}" \
               -e "ES_HOST=${{ env.ES_HOST  }}" \
               -e "ES_PASSWORD=${{ env.ES_PASSWORD }}" \
+              -e "SMS_FROM_NUMBER=${{ env.SMS_FROM_NUMBER  }}" \
+              -e "ODCLOUD_SERVICE_KEY=${{ env.ODCLOUD_SERVICE_KEY }}" \
               -e TZ=Asia/Seoul \
               ${{ env.DOCKER_IMAGE_NAME }}:latest
 

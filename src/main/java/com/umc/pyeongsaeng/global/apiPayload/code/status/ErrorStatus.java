@@ -33,7 +33,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	// Auth
 	LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH401", "아이디 또는 비밀번호가 올바르지 않습니다."),
 	USERNAME_DUPLICATED(HttpStatus.BAD_REQUEST, "AUTH402", "이미 사용중인 아이디입니다."),
-	INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH403", "비밀번호는 필수 입력값입니다."),
+	INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH403", "비밀번호가 유효하지 않습니다."),
 	INVALID_KAKAO_ID(HttpStatus.BAD_REQUEST, "AUTH404", "유효하지 않은 카카오 ID입니다."),
 	KAKAO_ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "AUTH405", "이미 등록된 카카오 계정입니다."),
 	INVALID_AUTH_TOKEN(HttpStatus.BAD_REQUEST, "AUTH406", "인증 정보의 주체가 유효하지 않습니다."),
@@ -60,6 +60,19 @@ public enum ErrorStatus implements BaseErrorCode {
 	// ADDRESS
 	GOOGLE_API_ERROR(HttpStatus.BAD_GATEWAY, "ADDRESS401", "구글 API 호출 중 오류 발생"),
 	ADDRESS_CONVERSION_FAILED(HttpStatus.BAD_REQUEST, "ADDRESS402", "주소 변환 실패"),
+
+	// Company
+	DUPLICATE_USERNAME(HttpStatus.CONFLICT, "COMPANY401", "이미 사용중인 아이디입니다."),
+	DUPLICATE_BUSINESS_NO(HttpStatus.CONFLICT, "COMPANY402", "이미 가입한 사업자등록번호입니다."),
+	INVALID_BUSINESS_NO(HttpStatus.BAD_REQUEST, "COMPANY403", "유효하지 않거나 활성화되지 않은 사업자등록번호입니다."),
+	COMPANY_NOT_FOUND(HttpStatus.NOT_FOUND, "COMPANY404", "존재하지 않는 기업 계정입니다."),
+	WITHDRAWN_COMPANY(HttpStatus.BAD_REQUEST, "COMPANY405", "탈퇴한 기업 계정입니다."),
+	ALREADY_WITHDRAWN_COMPANY(HttpStatus.BAD_REQUEST, "COMPANY406", "이미 탈퇴한 기업 계정입니다."),
+	NOT_WITHDRAWN_COMPANY(HttpStatus.BAD_REQUEST, "COMPANY407", "탈퇴하지 않은 기업 계정입니다."),
+	COMPANY_WITHDRAWAL_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "COMPANY408", "탈퇴 의도가 확인되지 않았습니다."),
+
+	// External API
+	EXTERNAL_API_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "EXTERNAL401", "외부 API 호출 중 오류가 발생했습니다."),
 
 	// Page
 	PAGE_NUMBER_NOT_NUMBER(HttpStatus.BAD_REQUEST, "PAGE400", "페이지는 숫자만 가능합니다."),

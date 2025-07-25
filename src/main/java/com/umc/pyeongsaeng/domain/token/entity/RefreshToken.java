@@ -2,6 +2,7 @@ package com.umc.pyeongsaeng.domain.token.entity;
 
 import java.time.LocalDateTime;
 
+import com.umc.pyeongsaeng.domain.company.entity.Company;
 import com.umc.pyeongsaeng.domain.user.entity.User;
 import com.umc.pyeongsaeng.global.common.entity.BaseEntity;
 
@@ -42,4 +43,8 @@ public class RefreshToken extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "company_id")
+	private Company company;
 }
