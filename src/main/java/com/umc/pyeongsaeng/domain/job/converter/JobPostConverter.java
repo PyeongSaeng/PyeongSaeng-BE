@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+
 import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
@@ -83,6 +85,20 @@ public class JobPostConverter {
 			.createdAt(jobPost.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())
 			.geoLocation(convertedAddress.geoPoint())
 			.applicationCount(jobPost.getApplications() != null ? jobPost.getApplications().size() : 0)
+			.build();
+	}
+
+	public static JobPostResponseDTO.JobPostPreviewListDTO toJobPostPreviewListDTO(Page<JobPost> jobPostList) {
+		List<JobPostResponseDTO.JobPostPreviewDTO> jobPostPreViewDTOList = jobPostList.stream()
+			.map(JobPostConverter::toJobPostPreviewDTO).collect(Collectors.toList());
+
+		return JobPostResponseDTO.JobPostPreviewListDTO.builder()
+			.jobPostList(jobPostPreViewDTOList)
+			.isFirst(jobPostList.isFirst())
+			.isLast(jobPostList.isLast())
+			.totalElements(jobPostList.getTotalElements())
+			.totalPage(jobPostList.getTotalPages())
+			.listSize(jobPostPreViewDTOList.size())
 			.build();
 	}
 }

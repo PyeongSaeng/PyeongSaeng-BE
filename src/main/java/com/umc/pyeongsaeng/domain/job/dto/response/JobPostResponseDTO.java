@@ -15,33 +15,32 @@ public class JobPostResponseDTO {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class JobPostPreviewDTO {
-
 		String title;
-
 		String address;
-
 		String detailAddress;
-
 		String roadAddress;
-
 		String zipcode;
-
 		Integer hourlyWage;
-
 		Integer monthlySalary;
-
 		Integer yearSalary;
-
 		String description;
-
 		String workingTime;
-
 		LocalDate deadline;
-
 		Integer recruitCount;
-
 		String note;
-
 		List<JobPostImageResponseDTO.JobPostImagePreviewDTO> jobPostImageId;
+	}
+
+	@Builder
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class JobPostPreviewListDTO {
+		List<JobPostPreviewDTO> jobPostList;
+		Integer listSize;
+		Integer totalPage;
+		Long totalElements;
+		Boolean isFirst;
+		Boolean isLast;
 	}
 }
