@@ -77,8 +77,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	// 연관 데이터, 사용자 데이터 모두 삭제
-	@Override
-	@Scheduled(cron = "0 0 3 * * *")
+	@Scheduled(cron = "0 30 0 * * *")
 	public void deleteExpiredWithdrawnUsers() {
 		LocalDateTime expiryDate = LocalDateTime.now().minusDays(WITHDRAWAL_GRACE_DAYS);
 

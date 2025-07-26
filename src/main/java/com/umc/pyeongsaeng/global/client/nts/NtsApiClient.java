@@ -1,4 +1,4 @@
-package com.umc.pyeongsaeng.domain.company.client;
+package com.umc.pyeongsaeng.global.client.nts;
 
 import java.net.URI;
 import java.util.Collections;
@@ -73,6 +73,7 @@ public class NtsApiClient {
 			}
 
 			if (body.getData() == null || body.getData().isEmpty()) {
+				log.warn("NTS API 응답에 사업자 데이터가 없습니다. (사업자등록번호: {})", businessNo);
 				return false;
 			}
 

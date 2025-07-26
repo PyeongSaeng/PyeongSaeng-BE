@@ -14,9 +14,4 @@ public interface UserService {
 	 * @param username 사용자명
 	 */
 	void cancelWithdrawal(String username);
-
-	/**
-	 * 탈퇴 후 7일 지난 회원 영구 삭제
-	 */
-	void deleteExpiredWithdrawnUsers();
 }

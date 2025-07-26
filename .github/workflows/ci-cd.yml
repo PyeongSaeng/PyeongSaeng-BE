@@ -32,6 +32,7 @@ env:
   ES_HOST : ${{secrets.ES_HOST}}
   ES_PASSWORD : ${{secrets.ES_PASSWORD}}
   ODCLOUD_SERVICE_KEY: ${{secrets.ODCLOUD_SERVICE_KEY}}
+  ODCLOUD_FULL_URL_KEY: ${{secrets.ODCLOUD_FULL_URL_KEY}}
 
 jobs:
   build-and-push-docker:
@@ -109,6 +110,7 @@ jobs:
               -e "ES_PASSWORD=${{ env.ES_PASSWORD }}" \
               -e "SMS_FROM_NUMBER=${{ env.SMS_FROM_NUMBER  }}" \
               -e "ODCLOUD_SERVICE_KEY=${{ env.ODCLOUD_SERVICE_KEY }}" \
+              -e "ODCLOUD_FULL_URL_KEY=${{ env.ODCLOUD_FULL_URL_KEY }}" \
               -e TZ=Asia/Seoul \
               ${{ env.DOCKER_IMAGE_NAME }}:latest
 

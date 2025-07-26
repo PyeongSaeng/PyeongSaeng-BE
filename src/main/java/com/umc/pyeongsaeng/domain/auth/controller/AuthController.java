@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Tag(name = "인증", description = "user 회원가입, 로그인 관련 API")
+@Tag(name = "User 인증", description = "user 회원가입, 로그인 관련 API")
 public class AuthController {
 
 	private final AuthServiceCommand authServiceCommand;
