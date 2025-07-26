@@ -64,8 +64,9 @@ public class JobPostSearchService {
 
 			if (!getJobPost.shards().failures().isEmpty()) {
 				getJobPost.shards().failures().forEach(failure -> {
-					log.error("[ES] Shard failure reason: {}", failure.reason());
+					log.error("[ES] Shard 실패 이유: {}", failure.reason());
 				});
+				throw new GeneralException(ErrorStatus.ES_PARTIAL_SHARD_FAILURE);
 			}
 
 			List<Hit<JobPostDocument>> hits = getJobPost.hits().hits();
