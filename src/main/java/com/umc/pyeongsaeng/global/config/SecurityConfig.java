@@ -2,6 +2,8 @@ package com.umc.pyeongsaeng.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -11,6 +13,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import com.umc.pyeongsaeng.global.filter.JwtAuthenticationFilter;
 import com.umc.pyeongsaeng.global.filter.JwtExceptionFilter;
 
@@ -24,12 +29,16 @@ public class SecurityConfig {
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	private final JwtExceptionFilter jwtExceptionFilter;
 	private final OAuth2Config oAuth2Config;
+	private final ObjectMapper objectMapper;
 
-	private static final String[] PUBLIC_ENDPOINTS = {
+	public static final String[] PUBLIC_ENDPOINTS = {
 		"/api/auth/**",
 		"/api/sms/**",
 		"/api/token/**",
-		"/api/companies/**",
+		"/api/companies/sign-up",
+		"/api/companies/login",
+		"/api/companies/check-username",
+		"/api/companies/withdraw/cancel",
 		"/actuator/**",
 		"/oauth2/authorization/**",
 		"/login/oauth2/**",
@@ -39,7 +48,7 @@ public class SecurityConfig {
 		"/webjars/**",
 		"/login",
 		"/error",
-		"/favicon.ico",
+		"/favicon.ico"
 	};
 
 	// CORS 설정
@@ -74,10 +83,30 @@ public class SecurityConfig {
 
 			.exceptionHandling(exception -> exception
 				.authenticationEntryPoint((request, response, authException) -> {
-					response.sendError(401, "Unauthorized");
+					response.setStatus(HttpStatus.UNAUTHORIZED.value());
+					response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+					response.setCharacterEncoding("UTF-8");
+
+					ApiResponse<Object> errorResponse = ApiResponse.onFailure(
+						ErrorStatus._UNAUTHORIZED.getCode(),
+						ErrorStatus._UNAUTHORIZED.getMessage(),
+						null
+					);
+
+					response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
 				})
 				.accessDeniedHandler((request, response, accessDeniedException) -> {
-					response.sendError(403, "Access Denied");
+					response.setStatus(HttpStatus.FORBIDDEN.value());
+					response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+					response.setCharacterEncoding("UTF-8");
+
+					ApiResponse<Object> errorResponse = ApiResponse.onFailure(
+						ErrorStatus._FORBIDDEN.getCode(),
+						ErrorStatus._FORBIDDEN.getMessage(),
+						null
+					);
+
+					response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
 				})
 			)
 
@@ -86,6 +115,7 @@ public class SecurityConfig {
 				.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
 				.requestMatchers("/api/protector/**").hasRole("PROTECTOR")
 				.requestMatchers("/api/senior/**").hasRole("SENIOR")
+				.requestMatchers("/api/companies/**").hasRole("COMPANY")
 				.anyRequest().authenticated()
 			)
 

@@ -2,15 +2,16 @@ package com.umc.pyeongsaeng.global.filter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.umc.pyeongsaeng.global.config.SecurityConfig;
 import com.umc.pyeongsaeng.global.security.CustomUserDetailsService;
 import com.umc.pyeongsaeng.global.util.JwtUtil;
 
@@ -31,6 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
 	private final CustomUserDetailsService customUserDetailsService;
+	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -40,9 +42,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		if (StringUtils.hasText(token) && jwtUtil.validateToken(token)) {
 			try {
-				Long userId = jwtUtil.getUserIdFromToken(token);
+				Long id = jwtUtil.getUserIdFromToken(token);
+				String role = jwtUtil.getRoleFromToken(token);
 
-				UserDetails userDetails = customUserDetailsService.loadUserById(userId);
+				UserDetails userDetails;
+
+				// role에 따라 User 또는 Company 조회
+				if ("COMPANY".equals(role)) {
+					userDetails = customUserDetailsService.loadCompanyById(id);
+				} else {
+					userDetails = customUserDetailsService.loadUserById(id);
+				}
 
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 					userDetails,
@@ -73,22 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 		String path = request.getRequestURI();
 
-		List<String> excludedPaths = Arrays.asList(
-			"/api/auth/login",
-			"/api/auth/signup",
-			"/api/auth/refresh",
-			"/api/token/exchange",
-			"/api/token/refresh",
-			"/api/auth/check-username",
-			"/api/auth/sms",
-			"/api/auth/kakao",
-			"/oauth2",
-			"/login",
-			"/swagger-ui",
-			"/v3/api-docs"
-		);
-
-		return excludedPaths.stream()
-			.anyMatch(excludePath -> path.startsWith(excludePath));
+		return Arrays.stream(SecurityConfig.PUBLIC_ENDPOINTS)
+			.anyMatch(pattern -> pathMatcher.match(pattern, path));
 	}
 }

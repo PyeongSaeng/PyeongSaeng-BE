@@ -32,11 +32,6 @@ public class CustomUserDetails implements UserDetails {
 		USER, COMPANY
 	}
 
-	/**
-	 * User 엔티티로부터 CustomUserDetails 생성
-	 * @param user User 엔티티
-	 * @return CustomUserDetails
-	 */
 	public static CustomUserDetails from(User user) {
 		return CustomUserDetails.builder()
 			.id(user.getId())
@@ -50,11 +45,6 @@ public class CustomUserDetails implements UserDetails {
 			.build();
 	}
 
-	/**
-	 * Company 엔티티로부터 CustomUserDetails 생성
-	 * @param company Company 엔티티
-	 * @return CustomUserDetails
-	 */
 	public static CustomUserDetails from(Company company) {
 		return CustomUserDetails.builder()
 			.id(company.getId())
