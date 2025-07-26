@@ -11,6 +11,7 @@ import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
+//import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
 import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
 import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingResult;
 
@@ -36,8 +37,8 @@ public class JobPostConverter {
 			.recruitCount(requestDTO.getRecruitCount())
 			.images(new ArrayList<>())
 			.note(requestDTO.getNote())
-			.latitude(convertedAddress.geoPoint().getLat())
-			.longitude(convertedAddress.geoPoint().getLon())
+			.latitude(convertedAddress.lat())
+			.longitude(convertedAddress.lon())
 			.build();
 	}
 
@@ -83,7 +84,7 @@ public class JobPostConverter {
 			//.loc_cd(converted.locCode())
 			.deadline(jobPost.getDeadline())
 			.createdAt(jobPost.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())
-			.geoLocation(convertedAddress.geoPoint())
+			.geoPoint(convertedAddress.lat()+","+convertedAddress.lon())
 			.applicationCount(jobPost.getApplications() != null ? jobPost.getApplications().size() : 0)
 			.build();
 	}

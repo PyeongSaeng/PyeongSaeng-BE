@@ -24,6 +24,6 @@ public class SeniorProfileCommandServiceImpl implements SeniorProfileCommandServ
 			.orElseThrow(() -> new GeneralException(ErrorStatus.ADDRESS_CONVERSION_FAILED));
 
 		GoogleGeocodingResult result = googleGeocodingClient.convert(roadAddress);
-		profile.updateLocation(result.geoPoint().getLat(), result.geoPoint().getLon());
+		profile.updateLocation(result.lat(), result.lon());
 	}
 }
