@@ -14,6 +14,7 @@ import com.umc.pyeongsaeng.domain.company.entity.Company;
 import com.umc.pyeongsaeng.domain.company.enums.CompanyStatus;
 import com.umc.pyeongsaeng.domain.company.repository.CompanyRepository;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
+import com.umc.pyeongsaeng.domain.sms.service.SmsService;
 import com.umc.pyeongsaeng.domain.token.repository.RefreshTokenRepository;
 import com.umc.pyeongsaeng.domain.token.service.TokenService;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
@@ -27,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CompanyServiceImpl implements CompanyService {
-	private static final int WITHDRAWAL_GRACE_DAYS = 0;
+	private static final int WITHDRAWAL_GRACE_DAYS = 7;
 
 	private final TokenService tokenService;
 	private final CompanyRepository companyRepository;
@@ -36,13 +37,13 @@ public class CompanyServiceImpl implements CompanyService {
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final JobPostRepository jobPostRepository;
 	private final JwtUtil jwtUtil;
-	//private final SmsService smsService;
+	private final SmsService smsService;
 
 	// 회원가입
 	@Override
 	@Transactional
 	public CompanyResponse.CompanySignUpResponseDto signUp(CompanyRequest.CompanySignUpRequestDto request) {
-		//smsService.verifyCode(request.getPhone(), request.getVerificationCode(), "COMPANY");
+		smsService.verifyCode(request.getPhone(), request.getVerificationCode());
 
 		validateDuplicateUsername(request.getUsername());
 		validateDuplicateBusinessNo(request.getBusinessNo());
@@ -228,7 +229,7 @@ public class CompanyServiceImpl implements CompanyService {
 
 	// 연관 데이터, 사용자 데이터 모두 삭제
 	@Transactional
-	@Scheduled(cron = "0 30 0 * * *")
+	@Scheduled(cron = "0 0 3 * * *")
 	public void deleteExpiredWithdrawnCompanies() {
 		LocalDateTime expiryDate = LocalDateTime.now().minusDays(WITHDRAWAL_GRACE_DAYS);
 

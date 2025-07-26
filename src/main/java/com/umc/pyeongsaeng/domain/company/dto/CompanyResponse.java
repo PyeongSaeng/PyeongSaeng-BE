@@ -39,6 +39,7 @@ public class CompanyResponse {
 		private String username;
 		private String businessNo;
 		private String name;
+		private String phone;
 		private String companyName;
 	}
 

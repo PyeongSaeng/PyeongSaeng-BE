@@ -35,7 +35,18 @@ public class CompanyController {
 
 	@PostMapping("/sign-up")
 	@SecurityRequirements
-	@Operation(summary = "기업 회원가입", description = "사업자 등록번호 상태를 확인하고 회원가입합니다. 등록번호가 옳지 않으면 회원가입 불가.")
+	@Operation(summary = "기업 회원가입",
+	description = """
+    사업자 등록번호 상태를 확인하고 회원가입합니다.
+
+    등록번호가 옳지 않으면 회원가입 불가.
+
+    인증번호의 경우, 번호를 보내기 위해 /api/sms/send SMS 인증 api를 활용하셔야 합니다.
+
+    인증번호가 옳은지 확인하기 위해 /api/sms/verify를 따로 이용하실 필요는 없습니다.
+
+    인증 번호를 옳게 적었다면 회원가입이 진행됩니다.
+    """)
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON201", description = "회원가입이 성공적으로 완료되었습니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "이미 사용중인 아이디입니다."),

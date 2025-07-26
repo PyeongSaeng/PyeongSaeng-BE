@@ -23,9 +23,9 @@ import lombok.RequiredArgsConstructor;
 public class SmsServiceImpl implements SmsService {
 
 	private static final String SMS_PREFIX = "sms:";
+	private static final String SMS_COUNT_PREFIX = "sms:count:";
 	private static final int VERIFICATION_CODE_LENGTH = 6;
 	private static final int EXPIRY_MINUTES = 5;
-	private static final String SMS_COUNT_PREFIX = "sms:count:";
 	private static final int MAX_SMS_PER_DAY = 10;
 
 	private final RedisTemplate<String, Object> redisTemplate;
