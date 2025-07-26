@@ -7,7 +7,6 @@ public interface CompanyService {
 	void logout(Long companyId);
 	void withdrawCompany(Long companyId, boolean confirmed);
 	void cancelWithdrawal(String username);
-	void deleteExpiredWithdrawnCompanies();
 	String getLogoutCookie();
 
 	/**

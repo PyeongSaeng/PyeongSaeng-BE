@@ -63,6 +63,6 @@ elasticsearch:
 
 odcloud:
   api:
-    base-url: https://api.odcloud.kr/api
+    base-url: https://api.odcloud.kr/api/nts-businessman/v1/status
     service-key: ${ODCLOUD_SERVICE_KEY}
-    status-path: /nts-businessman/v1/status
+    return-type: JSON

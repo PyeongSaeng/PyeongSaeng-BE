@@ -8,7 +8,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.umc.pyeongsaeng.domain.company.client.NtsApiClient;
 import com.umc.pyeongsaeng.domain.company.dto.CompanyRequest;
 import com.umc.pyeongsaeng.domain.company.dto.CompanyResponse;
 import com.umc.pyeongsaeng.domain.company.entity.Company;
@@ -19,6 +18,7 @@ import com.umc.pyeongsaeng.domain.token.repository.RefreshTokenRepository;
 import com.umc.pyeongsaeng.domain.token.service.TokenService;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
+import com.umc.pyeongsaeng.global.client.nts.NtsApiClient;
 import com.umc.pyeongsaeng.global.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CompanyServiceImpl implements CompanyService {
-	private static final int WITHDRAWAL_GRACE_DAYS = 7;
+	private static final int WITHDRAWAL_GRACE_DAYS = 0;
 
 	private final TokenService tokenService;
 	private final CompanyRepository companyRepository;
@@ -36,13 +36,18 @@ public class CompanyServiceImpl implements CompanyService {
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final JobPostRepository jobPostRepository;
 	private final JwtUtil jwtUtil;
+	//private final SmsService smsService;
 
 	// 회원가입
 	@Override
 	@Transactional
 	public CompanyResponse.CompanySignUpResponseDto signUp(CompanyRequest.CompanySignUpRequestDto request) {
+		//smsService.verifyCode(request.getPhone(), request.getVerificationCode(), "COMPANY");
+
 		validateDuplicateUsername(request.getUsername());
 		validateDuplicateBusinessNo(request.getBusinessNo());
+		validateDuplicatePhone(request.getPhone());
+
 		validateBusinessNumber(request.getBusinessNo());
 
 		Company company = createCompany(request);
@@ -52,7 +57,17 @@ public class CompanyServiceImpl implements CompanyService {
 			.companyId(savedCompany.getId())
 			.username(savedCompany.getUsername())
 			.businessNo(savedCompany.getBusinessNo())
+			.companyName(savedCompany.getCompanyName())
+			.name(savedCompany.getName())
+			.phone(savedCompany.getPhone())
 			.build();
+	}
+
+	// 전화번호 중복 여부 확인
+	private void validateDuplicatePhone(String phone) {
+		if (companyRepository.existsByPhone(phone)) {
+			throw new GeneralException(ErrorStatus.DUPLICATE_PHONE);
+		}
 	}
 
 	// id 중복 여부 확인
@@ -79,11 +94,13 @@ public class CompanyServiceImpl implements CompanyService {
 	// company 객체 생성
 	private Company createCompany(CompanyRequest.CompanySignUpRequestDto request) {
 		return Company.builder()
+			.name(request.getName())
+			.phone(request.getPhone())
+			.companyName(request.getCompanyName())
 			.businessNo(request.getBusinessNo())
 			.username(request.getUsername())
 			.password(passwordEncoder.encode(request.getPassword()))
-			.name(request.getName())
-			.phone("")
+			.status(CompanyStatus.ACTIVE)
 			.build();
 	}
 
@@ -105,7 +122,6 @@ public class CompanyServiceImpl implements CompanyService {
 		String accessToken = jwtUtil.generateAccessToken(company.getId(), "COMPANY");
 		String refreshToken = jwtUtil.generateRefreshToken(company.getId(), "COMPANY");
 
-		// Company 전용 메서드 사용
 		tokenService.saveCompanyRefreshToken(company.getId(), refreshToken);
 
 		String refreshTokenCookie = tokenService.createRefreshTokenCookie(refreshToken).toString();
@@ -138,8 +154,16 @@ public class CompanyServiceImpl implements CompanyService {
 		Company company = companyRepository.findById(companyId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
 
+		if (request.getCompanyName() != null) {
+			company.setCompanyName(request.getCompanyName());
+		}
+
 		if (request.getName() != null) {
 			company.setName(request.getName());
+		}
+
+		if (request.getPhone() != null) {
+			company.setPhone(request.getPhone());
 		}
 
 		if (request.isPasswordChangeRequested()) {
@@ -151,6 +175,7 @@ public class CompanyServiceImpl implements CompanyService {
 			.companyId(company.getId())
 			.username(company.getUsername())
 			.businessNo(company.getBusinessNo())
+			.companyName(company.getCompanyName())
 			.name(company.getName())
 			.build();
 	}
@@ -202,9 +227,8 @@ public class CompanyServiceImpl implements CompanyService {
 	}
 
 	// 연관 데이터, 사용자 데이터 모두 삭제
-	@Override
 	@Transactional
-	@Scheduled(cron = "0 0 3 * * *")
+	@Scheduled(cron = "0 30 0 * * *")
 	public void deleteExpiredWithdrawnCompanies() {
 		LocalDateTime expiryDate = LocalDateTime.now().minusDays(WITHDRAWAL_GRACE_DAYS);
 
@@ -243,9 +267,10 @@ public class CompanyServiceImpl implements CompanyService {
 			.companyId(company.getId())
 			.username(company.getUsername())
 			.businessNo(company.getBusinessNo())
+			.companyName(company.getCompanyName())
 			.name(company.getName())
-			.email(company.getEmail())
 			.phone(company.getPhone())
+			.email(company.getEmail())
 			.status(company.getStatus())
 			.build();
 	}

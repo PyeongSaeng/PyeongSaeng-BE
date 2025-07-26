@@ -41,7 +41,6 @@ public class NtsResponse {
 			private String businessStatusCode;
 
 			@JsonProperty("tax_type")
-			@Getter
 			private String taxType;
 		}
 	}

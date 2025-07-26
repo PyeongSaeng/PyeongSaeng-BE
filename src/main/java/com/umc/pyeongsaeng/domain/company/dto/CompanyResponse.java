@@ -15,6 +15,9 @@ public class CompanyResponse {
 		private Long companyId;
 		private String username;
 		private String businessNo;
+		private String companyName;
+		private String name;
+		private String phone;
 	}
 
 	@Getter
@@ -36,6 +39,7 @@ public class CompanyResponse {
 		private String username;
 		private String businessNo;
 		private String name;
+		private String companyName;
 	}
 
 	@Getter
@@ -45,6 +49,7 @@ public class CompanyResponse {
 		private Long companyId;
 		private String username;
 		private String businessNo;
+		private String companyName;
 		private String name;
 		private String email;
 		private String phone;

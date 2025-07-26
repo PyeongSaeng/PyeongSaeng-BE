@@ -36,6 +36,10 @@ public class Company extends BaseEntity {
 
 	@Column(nullable = false, length = 100)
 	@Setter
+	private String companyName;
+
+	@Column(nullable = false, length = 100)
+	@Setter
 	private String name;
 
 	@Column(nullable = false, length = 20, unique = true)
@@ -52,6 +56,7 @@ public class Company extends BaseEntity {
 	private String email;
 
 	@Column(nullable = false, length = 20)
+	@Setter
 	private String phone;
 
 	@Enumerated(EnumType.STRING)

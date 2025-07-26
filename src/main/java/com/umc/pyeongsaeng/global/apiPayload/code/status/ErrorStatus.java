@@ -70,6 +70,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	ALREADY_WITHDRAWN_COMPANY(HttpStatus.BAD_REQUEST, "COMPANY406", "이미 탈퇴한 기업 계정입니다."),
 	NOT_WITHDRAWN_COMPANY(HttpStatus.BAD_REQUEST, "COMPANY407", "탈퇴하지 않은 기업 계정입니다."),
 	COMPANY_WITHDRAWAL_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "COMPANY408", "탈퇴 의도가 확인되지 않았습니다."),
+	DUPLICATE_PHONE(HttpStatus.CONFLICT, "COMPANY409", "이미 사용중인 전화번호입니다."),
 
 	// External API
 	EXTERNAL_API_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "EXTERNAL401", "외부 API 호출 중 오류가 발생했습니다."),
