@@ -3,37 +3,74 @@ package com.umc.pyeongsaeng.domain.sms.service;
 import java.time.Duration;
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
+import net.nurigo.sdk.NurigoApp;
+import net.nurigo.sdk.message.model.Message;
+import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
+import net.nurigo.sdk.message.service.DefaultMessageService;
 
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class SmsServiceImpl implements SmsService {
 
 	private static final String SMS_PREFIX = "sms:";
 	private static final int VERIFICATION_CODE_LENGTH = 6;
 	private static final int EXPIRY_MINUTES = 5;
-	private static final int MAX_CODE_VALUE = 1000000;
+	private static final String SMS_COUNT_PREFIX = "sms:count:";
+	private static final int MAX_SMS_PER_DAY = 10;
 
 	private final RedisTemplate<String, Object> redisTemplate;
 
+	@Value("${coolsms.api-key}")
+	private String apiKey;
+
+	@Value("${coolsms.api-secret}")
+	private String apiSecret;
+
+	@Value("${coolsms.from-number}")
+	private String fromNumber;
+
+	private DefaultMessageService messageService;
+
+	@PostConstruct
+	private void initCoolSmsService() {
+		this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
+	}
+
+	// 인증 코드 저장 후 발송
 	@Override
 	public void sendVerificationCode(String phone) {
+		String countKey = SMS_COUNT_PREFIX + phone;
+		Integer count = (Integer) redisTemplate.opsForValue().get(countKey);
+
+		if (count == null) {
+			redisTemplate.opsForValue().set(countKey, 1, Duration.ofHours(24));
+			return;
+		}
+
+		if (count >= MAX_SMS_PER_DAY) {
+			throw new GeneralException(ErrorStatus.SMS_RESEND_LIMIT_EXCEEDED);
+		}
+
+		redisTemplate.opsForValue().increment(countKey);
 		String code = generateVerificationCode();
 		String redisKey = SMS_PREFIX + phone;
 
 		redisTemplate.opsForValue().set(redisKey, code, Duration.ofMinutes(EXPIRY_MINUTES));
 
-		log.info("SMS 발송 - 전화번호: {}, 인증번호: {}", phone, code);
+		sendSms(phone, code);
 	}
 
+	// 입력 코드 검증
 	@Override
 	public void verifyCode(String phone, String code) {
 		String redisKey = SMS_PREFIX + phone;
@@ -50,9 +87,30 @@ public class SmsServiceImpl implements SmsService {
 		redisTemplate.delete(redisKey);
 	}
 
+	// 랜덤 코드 생성 6자리
 	private String generateVerificationCode() {
 		Random random = new Random();
-		return String.format("%0" + VERIFICATION_CODE_LENGTH + "d",
-			random.nextInt(MAX_CODE_VALUE));
+		StringBuilder code = new StringBuilder();
+
+		for (int i = 0; i < VERIFICATION_CODE_LENGTH; i++) {
+			code.append(random.nextInt(10));
+		}
+
+		return code.toString();
+	}
+
+	// CoolSMS API를 사용하여 실제 sms 전송
+	private void sendSms(String phoneNumber, String verificationCode) {
+
+		Message message = new Message();
+		message.setFrom(fromNumber);
+		message.setTo(phoneNumber);
+		message.setText("[평생] 인증번호 [" + verificationCode + "]를 입력해주세요. 5분 유효합니다.");
+
+		try {
+			messageService.sendOne(new SingleMessageSendingRequest(message));
+		} catch (Exception e) {
+			throw new GeneralException(ErrorStatus.SMS_SEND_FAILED);
+		}
 	}
 }

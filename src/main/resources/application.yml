@@ -43,9 +43,13 @@ cloud:
       accessKey: ${S3_IAM_ACCESS_KEY}
       secretKey: ${S3_IAM_SECRET_KEY}
 
+coolsms:
+  api-key: ${SMS_API_KEY}
+  api-secret: ${SMS_SECRET_KEY}
+  from-number: ${SMS_FROM_NUMBER}
+
 google:
   geocoding:
     api-key: ${GOOGLE_GEO_API_KEY}
-
-
-
+  maps:
+    api-key: ${GOOGLE_MAPS_API_KEY}
