@@ -53,3 +53,10 @@ google:
     api-key: ${GOOGLE_GEO_API_KEY}
   maps:
     api-key: ${GOOGLE_MAPS_API_KEY}
+
+elasticsearch:
+  host: ${ES_HOST}
+  port: 9200
+  scheme: http
+  username: elastic
+  password: ${ES_PASSWORD}
