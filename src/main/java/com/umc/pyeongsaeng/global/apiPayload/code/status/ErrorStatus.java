@@ -59,7 +59,11 @@ public enum ErrorStatus implements BaseErrorCode {
 
 	// ADDRESS
 	GOOGLE_API_ERROR(HttpStatus.BAD_GATEWAY, "ADDRESS401", "구글 API 호출 중 오류 발생"),
-	ADDRESS_CONVERSION_FAILED(HttpStatus.BAD_REQUEST, "ADDRESS402", "주소 변환 실패");
+	ADDRESS_CONVERSION_FAILED(HttpStatus.BAD_REQUEST, "ADDRESS402", "주소 변환 실패"),
+
+	// Page
+	PAGE_NUMBER_NOT_NUMBER(HttpStatus.BAD_REQUEST, "PAGE400", "페이지는 숫자만 가능합니다."),
+	PAGE_NUMBER_NEGATIVE(HttpStatus.BAD_REQUEST, "PAGE400", "페이지 숫자는 양수만 가능합니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;
