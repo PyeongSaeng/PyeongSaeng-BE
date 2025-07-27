@@ -59,7 +59,7 @@ public class CompanyServiceImpl implements CompanyService {
 			.username(savedCompany.getUsername())
 			.businessNo(savedCompany.getBusinessNo())
 			.companyName(savedCompany.getCompanyName())
-			.name(savedCompany.getName())
+			.ownerName(savedCompany.getOwnerName())
 			.phone(savedCompany.getPhone())
 			.build();
 	}
@@ -95,7 +95,7 @@ public class CompanyServiceImpl implements CompanyService {
 	// company 객체 생성
 	private Company createCompany(CompanyRequest.CompanySignUpRequestDto request) {
 		return Company.builder()
-			.name(request.getName())
+			.ownerName(request.getOwnerName())
 			.phone(request.getPhone())
 			.companyName(request.getCompanyName())
 			.businessNo(request.getBusinessNo())
@@ -159,8 +159,8 @@ public class CompanyServiceImpl implements CompanyService {
 			company.setCompanyName(request.getCompanyName());
 		}
 
-		if (request.getName() != null) {
-			company.setName(request.getName());
+		if (request.getOwnerName() != null) {
+			company.setOwnerName(request.getOwnerName());
 		}
 
 		if (request.getPhone() != null) {
@@ -176,8 +176,9 @@ public class CompanyServiceImpl implements CompanyService {
 			.companyId(company.getId())
 			.username(company.getUsername())
 			.businessNo(company.getBusinessNo())
+			.phone(company.getPhone())
 			.companyName(company.getCompanyName())
-			.name(company.getName())
+			.ownerName(company.getOwnerName())
 			.build();
 	}
 
@@ -269,7 +270,7 @@ public class CompanyServiceImpl implements CompanyService {
 			.username(company.getUsername())
 			.businessNo(company.getBusinessNo())
 			.companyName(company.getCompanyName())
-			.name(company.getName())
+			.ownerName(company.getOwnerName())
 			.phone(company.getPhone())
 			.email(company.getEmail())
 			.status(company.getStatus())

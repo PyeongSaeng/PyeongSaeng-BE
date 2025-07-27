@@ -8,6 +8,7 @@ public interface CompanyService {
 	void withdrawCompany(Long companyId, boolean confirmed);
 	void cancelWithdrawal(String username);
 	String getLogoutCookie();
+	void checkUsernameAvailability(String username);
 
 	/**
 	 * 기업 회원가입을 처리합니다.
@@ -37,11 +38,4 @@ public interface CompanyService {
 	 * @return 기업 상세 정보
 	 */
 	CompanyResponse.CompanyDetailDto getCompanyDetail(Long companyId);
-
-	/**
-	 * 아이디 중복 확인
-	 * @param username 확인할 아이디
-	 */
-	void checkUsernameAvailability(String username);
-
 }

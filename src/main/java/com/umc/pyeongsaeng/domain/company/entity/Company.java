@@ -40,7 +40,7 @@ public class Company extends BaseEntity {
 
 	@Column(nullable = false, length = 100)
 	@Setter
-	private String name;
+	private String ownerName;
 
 	@Column(nullable = false, length = 20, unique = true)
 	private String businessNo;
