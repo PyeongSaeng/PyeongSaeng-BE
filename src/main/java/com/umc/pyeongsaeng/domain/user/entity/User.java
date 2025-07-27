@@ -29,12 +29,15 @@ public class User extends BaseEntity {
 	private String username;
 
 	@Column(length = 100)
+	@Setter
 	private String password;
 
 	@Column(nullable = false, length = 50)
+	@Setter
 	private String name;
 
 	@Column(nullable = false, length = 20)
+	@Setter
 	private String phone;
 
 	@Enumerated(EnumType.STRING)

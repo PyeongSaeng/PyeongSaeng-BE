@@ -29,6 +29,8 @@ public enum ErrorStatus implements BaseErrorCode {
 	NOT_WITHDRAWN_USER(HttpStatus.BAD_REQUEST, "USER408", "탈퇴하지 않은 회원입니다."),
 	WITHDRAWAL_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, "USER409", "탈퇴 후 7일이 경과하여 복구할 수 없습니다."),
 	USER_WITHDRAWAL_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "USER410", "탈퇴 의도가 확인되지 않았습니다."),
+	SENIOR_PROFILE_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER411", "유효하지 않은 시니어 프로필입니다."),
+	INVALID_USER_ROLE(HttpStatus.BAD_REQUEST, "USER412", "유효하지 않은 Role입니다."),
 
 	// Auth
 	LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH401", "아이디 또는 비밀번호가 올바르지 않습니다."),

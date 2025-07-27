@@ -2,8 +2,10 @@ package com.umc.pyeongsaeng.domain.user.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +15,10 @@ import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
 import com.umc.pyeongsaeng.domain.terms.repository.UserTermsRepository;
 import com.umc.pyeongsaeng.domain.token.repository.RefreshTokenRepository;
 import com.umc.pyeongsaeng.domain.token.service.TokenService;
+import com.umc.pyeongsaeng.domain.user.dto.UserRequest;
+import com.umc.pyeongsaeng.domain.user.dto.UserResponse;
 import com.umc.pyeongsaeng.domain.user.entity.User;
+import com.umc.pyeongsaeng.domain.user.enums.Role;
 import com.umc.pyeongsaeng.domain.user.enums.UserStatus;
 import com.umc.pyeongsaeng.domain.user.repository.SocialAccountRepository;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
@@ -38,6 +43,7 @@ public class UserServiceImpl implements UserService {
 	private final UserTermsRepository userTermsRepository;
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final SeniorProfileRepository seniorProfileRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	// confirmed로 의도 확인 후 UserStatus WITHDRAWN으로 변경
 	@Override
@@ -122,6 +128,138 @@ public class UserServiceImpl implements UserService {
 		for (SeniorProfile profile : protectedProfiles) {
 			profile.setProtector(null);
 			seniorProfileRepository.save(profile);
+		}
+	}
+
+	@Override
+	public UserResponse.ProtectorInfoDto getProtectorInfo(Long userId) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		if (user.getRole() != Role.PROTECTOR) {
+			throw new GeneralException(ErrorStatus.INVALID_USER_ROLE);
+		}
+
+		return UserResponse.ProtectorInfoDto.from(user);
+	}
+
+	@Override
+	public UserResponse.SeniorInfoDto getSeniorInfo(Long userId) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		if (user.getRole() != Role.SENIOR) {
+			throw new GeneralException(ErrorStatus.INVALID_USER_ROLE);
+		}
+
+		SeniorProfile seniorProfile = seniorProfileRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_PROFILE_NOT_FOUND));
+
+		return UserResponse.SeniorInfoDto.of(user, seniorProfile);
+	}
+
+	@Override
+	@Transactional
+	public UserResponse.ProtectorInfoDto updateProtectorInfo(Long userId, UserRequest.UpdateProtectorDto request) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		if (user.getStatus() != UserStatus.ACTIVE) {
+			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN_USER);
+		}
+
+		if (user.getRole() != Role.PROTECTOR) {
+			throw new GeneralException(ErrorStatus.INVALID_USER_ROLE);
+		}
+
+		if (request.getName() != null) {
+			user.setName(request.getName());
+		}
+
+		if (request.getPhone() != null) {
+			user.setPhone(request.getPhone());
+		}
+
+		if (request.isPasswordChangeRequested()) {
+			validateCurrentPassword(user, request.getCurrentPassword());
+			user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+		}
+
+		return UserResponse.ProtectorInfoDto.from(user);
+	}
+
+	@Override
+	@Transactional
+	public UserResponse.SeniorInfoDto updateSeniorInfo(Long userId, UserRequest.UpdateSeniorDto request) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		if (user.getStatus() != UserStatus.ACTIVE) {
+			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN_USER);
+		}
+
+		if (user.getRole() != Role.SENIOR) {
+			throw new GeneralException(ErrorStatus.INVALID_USER_ROLE);
+		}
+
+		SeniorProfile seniorProfile = seniorProfileRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_PROFILE_NOT_FOUND));
+
+		if (request.getName() != null) {
+			user.setName(request.getName());
+		}
+
+		if (request.getPhone() != null) {
+			user.setPhone(request.getPhone());
+		}
+
+		if (request.isPasswordChangeRequested()) {
+			validateCurrentPassword(user, request.getCurrentPassword());
+			user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+		}
+
+		if (request.getRoadAddress() != null) {
+			seniorProfile.setRoadAddress(request.getRoadAddress());
+		}
+
+		if (request.getDetailAddress() != null) {
+			seniorProfile.setDetailAddress(request.getDetailAddress());
+		}
+
+		if (request.getJob() != null) {
+			seniorProfile.setJob(request.getJob());
+		}
+
+		if (request.getExperiencePeriod() != null) {
+			seniorProfile.setExperiencePeriod(request.getExperiencePeriod());
+		}
+
+		return UserResponse.SeniorInfoDto.of(user, seniorProfile);
+	}
+
+	@Override
+	public List<UserResponse.ConnectedSeniorDto> getConnectedSeniors(Long protectorId) {
+		User protector = userRepository.findById(protectorId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		if (protector.getRole() != Role.PROTECTOR) {
+			throw new GeneralException(ErrorStatus.INVALID_USER_ROLE);
+		}
+
+		List<SeniorProfile> seniorProfiles = seniorProfileRepository.findByProtectorId(protectorId);
+
+		return seniorProfiles.stream()
+			.map(profile -> UserResponse.ConnectedSeniorDto.of(
+				profile.getSenior(),
+				profile.getPhoneNum(),
+				profile.getRelation()
+			))
+			.collect(Collectors.toList());
+	}
+
+	private void validateCurrentPassword(User user, String currentPassword) {
+		if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+			throw new GeneralException(ErrorStatus.INVALID_PASSWORD);
 		}
 	}
 }
