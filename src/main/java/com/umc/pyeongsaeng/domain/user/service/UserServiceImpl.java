@@ -131,6 +131,7 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	// 보호자 정보 조회
 	@Override
 	public UserResponse.ProtectorInfoDto getProtectorInfo(Long userId) {
 		User user = userRepository.findById(userId)
@@ -143,6 +144,7 @@ public class UserServiceImpl implements UserService {
 		return UserResponse.ProtectorInfoDto.from(user);
 	}
 
+	// 시니어 정보 조회
 	@Override
 	public UserResponse.SeniorInfoDto getSeniorInfo(Long userId) {
 		User user = userRepository.findById(userId)
@@ -158,6 +160,7 @@ public class UserServiceImpl implements UserService {
 		return UserResponse.SeniorInfoDto.of(user, seniorProfile);
 	}
 
+	// 보호자 정보 업데이트
 	@Override
 	@Transactional
 	public UserResponse.ProtectorInfoDto updateProtectorInfo(Long userId, UserRequest.UpdateProtectorDto request) {
@@ -188,6 +191,7 @@ public class UserServiceImpl implements UserService {
 		return UserResponse.ProtectorInfoDto.from(user);
 	}
 
+	// 시니어 정보 업데이트
 	@Override
 	@Transactional
 	public UserResponse.SeniorInfoDto updateSeniorInfo(Long userId, UserRequest.UpdateSeniorDto request) {
@@ -237,6 +241,7 @@ public class UserServiceImpl implements UserService {
 		return UserResponse.SeniorInfoDto.of(user, seniorProfile);
 	}
 
+	// 특정 보호자와 연결된 시니어 목록 조회
 	@Override
 	public List<UserResponse.ConnectedSeniorDto> getConnectedSeniors(Long protectorId) {
 		User protector = userRepository.findById(protectorId)

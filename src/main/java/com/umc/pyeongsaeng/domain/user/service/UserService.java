@@ -43,7 +43,17 @@ public interface UserService {
 	 */
 	List<UserResponse.ConnectedSeniorDto> getConnectedSeniors(Long protectorId);
 
+	/**
+	 * 특정 보호자 회원의 정보 조회
+	 * @param userId 조회할 보호자 회원의 ID
+	 * @return 조회된 보호자 정보 DTO
+	 */
 	UserResponse.ProtectorInfoDto getProtectorInfo(Long userId);
 
+	/**
+	 * 특정 시니어 회원의 정보 조회
+	 * @param userId 조회할 시니어 회원의 ID
+	 * @return 조회된 시니어 정보 DTO
+	 */
 	UserResponse.SeniorInfoDto getSeniorInfo(Long userId);
 }

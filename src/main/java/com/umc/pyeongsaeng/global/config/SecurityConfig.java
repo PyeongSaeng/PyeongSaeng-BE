@@ -32,7 +32,10 @@ public class SecurityConfig {
 	private final ObjectMapper objectMapper;
 
 	public static final String[] PUBLIC_ENDPOINTS = {
-		"/api/auth/**",
+		"/api/auth/login",
+		"/api/auth/signup/**",
+		"/api/auth/kakao/login",
+		"/api/auth/check-username",
 		"/api/sms/**",
 		"/api/token/**",
 		"/api/companies/sign-up",
@@ -113,6 +116,9 @@ public class SecurityConfig {
 			// 요청별 인증 설정
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+				.requestMatchers("/api/user/withdraw/cancel").permitAll()
+				.requestMatchers("/api/user/protector/**").hasRole("PROTECTOR")
+				.requestMatchers("/api/user/senior/**").hasRole("SENIOR")
 				.requestMatchers("/api/protector/**").hasRole("PROTECTOR")
 				.requestMatchers("/api/senior/**").hasRole("SENIOR")
 				.requestMatchers("/api/companies/**").hasRole("COMPANY")

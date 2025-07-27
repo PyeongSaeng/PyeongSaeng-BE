@@ -60,6 +60,7 @@ public class CompanyRequest {
 		@Size(max = 100)
 		private String name;
 
+		@Pattern(regexp = "^010\\d{8}$", message = "올바른 전화번호 형식이 아닙니다.")
 		private String phone;
 		private String currentPassword;
 
