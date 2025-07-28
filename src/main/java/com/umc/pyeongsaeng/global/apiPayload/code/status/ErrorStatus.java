@@ -69,7 +69,10 @@ public enum ErrorStatus implements BaseErrorCode {
 	INVALID_SORT_TYPE(HttpStatus.BAD_REQUEST, "SEARCH401", "지원하지 않는 정렬 타입입니다."),
 	ES_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"SEARCH402", "Elasticsearch 연결에 실패했습니다."),
 	ES_REQUEST_ERROR(HttpStatus.BAD_REQUEST,"SEARCH403", "Elasticsearch 요청 처리 중 오류가 발생했습니다. 인덱스나 쿼리를 확인해주세요."),
-	ES_PARTIAL_SHARD_FAILURE(HttpStatus.BAD_GATEWAY,"SEARCH403", "Elasticsearch 일부 샤드에서 오류가 발생했습니다. 검색 결과가 누락되었을 수 있습니다.");
+	ES_PARTIAL_SHARD_FAILURE(HttpStatus.BAD_GATEWAY,"SEARCH403", "Elasticsearch 일부 샤드에서 오류가 발생했습니다. 검색 결과가 누락되었을 수 있습니다."),
+
+	// JOB
+	INVALID_JOB_POST_ID(HttpStatus.BAD_REQUEST, "JOB401", "유효하지 않은 채용공고 ID입니다.");
 
 
 	private final HttpStatus httpStatus;

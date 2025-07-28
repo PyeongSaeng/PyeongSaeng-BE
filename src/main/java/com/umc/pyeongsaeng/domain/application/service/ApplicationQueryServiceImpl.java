@@ -26,7 +26,7 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 	public Page<Application> findCompanyApplications(Long jobPostId, Integer page) {
 
 		JobPost jobPost = jobPostRepository.findById(jobPostId)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_Id));
+			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
 
 		Page<Application> applicationPage = applicationRepository.findAllByJobPost(jobPost, PageRequest.of(page, 10));
 
