@@ -36,7 +36,7 @@ public class OpenAiService {
 		);
 
 		// 요청 보내기
-		ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, request, String.class);
+		ResponseEntity<String> response = restTemplate.postForEntity(openAiUrl, request, String.class);
 
 		// 응답 파싱
 		ObjectMapper mapper = new ObjectMapper();
