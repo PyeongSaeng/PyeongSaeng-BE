@@ -12,9 +12,9 @@ import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import com.umc.pyeongsaeng.domain.job.entity.JobPostImage;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostImageRepository;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
-import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
 
-import com.umc.pyeongsaeng.domain.job.search.repository.JobPostSearchRepository;
+import com.umc.pyeongsaeng.domain.job.search.elkoperation.ElasticOperationServiceImpl;
+import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
 import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingClient;
 import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingResult;
 
@@ -32,6 +32,7 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 	private final JobPostImageRepository jobPostImageRepository;
 	private final GoogleGeocodingClient googleGeocodingClient;
 	//private final JobPostSearchRepository jobPostSearchRepository;
+	private final ElasticOperationServiceImpl elasticOperationServiceImpl;
 
 	@Override
 	public JobPost createJobPost(JobPostRequestDTO.CreateDTO requestDTO, Long companyId) {
@@ -50,13 +51,21 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 
 		newJobPost.getImages().addAll(savedImages);
 
-		//saveToElasticsearch(newJobPost, convertedAddress);
+		saveToElasticsearch(newJobPost, convertedAddress);
 		// 이미지 정보까지 완전히 채워진 JobPost 객체를 반환
 		return newJobPost;
 	}
 
 	private void saveToElasticsearch(JobPost jobPost, GoogleGeocodingResult convertedAddress) {
-		JobPostDocument jobPostDocument = JobPostConverter.toDocument(jobPost, convertedAddress);
-		//jobPostSearchRepository.save(jobPostDocument);
+		try {
+			JobPostDocument jobPostDocument = JobPostConverter.toDocument(jobPost, convertedAddress);
+			String result = elasticOperationServiceImpl.insertDocumentGeneric(jobPostDocument);
+			log.info("ES 저장 성공 - id={}, result={}", jobPostDocument.getId(), result);
+		} catch (Exception e) {
+			log.error("ES 저장 실패 - id={}", jobPost.getId(), e);
+		}
 	}
+
+
+
 }

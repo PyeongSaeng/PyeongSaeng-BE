@@ -29,6 +29,9 @@ env:
   SMS_API_KEY: ${{ secrets.SMS_API_KEY }}
   SMS_SECRET_KEY: ${{ secrets.SMS_SECRET_KEY }}
   SMS_FROM_NUMBER: ${{ secrets.SMS_FROM_NUMBER }}
+  ES_HOST : ${{secrets.ES_HOST}}
+  ES_PASSWORD : ${{secrets.ES_PASSWORD}}
+
 
 jobs:
   build-and-push-docker:
@@ -101,7 +104,9 @@ jobs:
               -e "GOOGLE_GEO_API_KEY=${{ env.GOOGLE_GEO_API_KEY }}" \
               -e "SMS_API_KEY=${{ env.SMS_API_KEY }}" \
               -e "SMS_SECRET_KEY=${{ env.SMS_SECRET_KEY }}" \
-              -e "SMS_FROM_NUMBER=${{ env.SMS_FROM_NUMBER  }}" \
+              -e "SMS_FROM_NUMBER=${{ env.SMS_FROM_NUMBER }}" \
+              -e "ES_HOST=${{ env.ES_HOST  }}" \
+              -e "ES_PASSWORD=${{ env.ES_PASSWORD }}" \
               -e TZ=Asia/Seoul \
               ${{ env.DOCKER_IMAGE_NAME }}:latest
 

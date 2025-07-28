@@ -10,10 +10,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.elasticsearch.core.geo.GeoPoint;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -74,7 +75,7 @@ public class GoogleGeocodingClient {
 				.filter(Objects::nonNull)
 				.collect(Collectors.joining(" "));
 
-			return new GoogleGeocodingResult(sido, sigungu, bname, new GeoPoint(lat, lon));
+			return new GoogleGeocodingResult(sido, sigungu, bname, lat, lon);
 
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
 			log.error("[GoogleAPI][GEOCODING_FAILED] 외부 API 호출 오류 - roadAddress={}", roadAddress, e);
