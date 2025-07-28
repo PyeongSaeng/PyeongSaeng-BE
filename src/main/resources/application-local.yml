@@ -16,3 +16,6 @@ spring:
 logging:
   level:
     org.hibernate.SQL: INFO
+
+swagger:
+  server-url: http://localhost:8080

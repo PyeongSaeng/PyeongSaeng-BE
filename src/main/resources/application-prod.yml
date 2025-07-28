@@ -14,3 +14,7 @@ logging:
   level:
     org.hibernate.SQL: INFO
     com.your.package: INFO
+
+swagger:
+  server-url: https://api.pyeongsaeng.site
+
