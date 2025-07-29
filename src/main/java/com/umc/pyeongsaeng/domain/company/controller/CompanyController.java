@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.umc.pyeongsaeng.domain.company.dto.CompanyRequest;
 import com.umc.pyeongsaeng.domain.company.dto.CompanyResponse;
-import com.umc.pyeongsaeng.domain.company.service.CompanyService;
+import com.umc.pyeongsaeng.domain.company.service.*;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
 import com.umc.pyeongsaeng.global.security.CustomUserDetails;
@@ -31,7 +31,8 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Company", description = "company 회원가입, 로그인 등 관련 API")
 public class CompanyController {
 
-	private final CompanyService companyService;
+	private final CompanyCommandServiceImpl companyCommandServiceImpl;
+	private final CompanyQueryServiceImpl companyQueryServiceImpl;
 
 	@PostMapping("/sign-up")
 	@SecurityRequirements
@@ -57,7 +58,7 @@ public class CompanyController {
 	})
 	public ApiResponse<CompanyResponse.CompanySignUpResponseDto> signUp(
 		@Valid @RequestBody CompanyRequest.CompanySignUpRequestDto request) {
-		CompanyResponse.CompanySignUpResponseDto response = companyService.signUp(request);
+		CompanyResponse.CompanySignUpResponseDto response = companyCommandServiceImpl.signUp(request);
 		return ApiResponse.of(SuccessStatus.CREATED, response);
 	}
 
@@ -74,7 +75,7 @@ public class CompanyController {
 	public ResponseEntity<ApiResponse<CompanyResponse.LoginResponseDto>> login(
 		@Valid @RequestBody CompanyRequest.LoginRequestDto request) {
 
-		CompanyResponse.LoginResponseDto response = companyService.login(request);
+		CompanyResponse.LoginResponseDto response = companyCommandServiceImpl.login(request);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie());
@@ -91,10 +92,10 @@ public class CompanyController {
 	})
 	public ResponseEntity<ApiResponse<Void>> logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
 		Long companyId = userDetails.getId();
-		companyService.logout(companyId);
+		companyCommandServiceImpl.logout(companyId);
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.SET_COOKIE, companyService.getLogoutCookie());
+		headers.add(HttpHeaders.SET_COOKIE, companyCommandServiceImpl.getLogoutCookie());
 
 		return ResponseEntity.ok()
 			.headers(headers)
@@ -115,7 +116,7 @@ public class CompanyController {
 		@Valid @RequestBody CompanyRequest.UpdateProfileRequestDto request) {
 
 		Long companyId = userDetails.getId();
-		CompanyResponse.CompanyInfoDto response = companyService.updateProfile(companyId, request);
+		CompanyResponse.CompanyInfoDto response = companyCommandServiceImpl.updateProfile(companyId, request);
 		return ApiResponse.of(SuccessStatus._OK, response);
 	}
 
@@ -134,7 +135,7 @@ public class CompanyController {
 		@Valid @RequestBody CompanyRequest.WithdrawRequestDto request) {
 
 		Long companyId = userDetails.getId();
-		companyService.withdrawCompany(companyId, request.isConfirmed());
+		companyCommandServiceImpl.withdrawCompany(companyId, request.isConfirmed());
 		return ApiResponse.of(SuccessStatus._OK, null);
 	}
 
@@ -149,9 +150,9 @@ public class CompanyController {
 	public ResponseEntity<ApiResponse<CompanyResponse.LoginResponseDto>> cancelWithdrawal(
 		@Valid @RequestBody CompanyRequest.LoginRequestDto request) {
 
-		companyService.cancelWithdrawal(request.getUsername());
+		companyCommandServiceImpl.cancelWithdrawal(request.getUsername());
 
-		CompanyResponse.LoginResponseDto response = companyService.login(request);
+		CompanyResponse.LoginResponseDto response = companyCommandServiceImpl.login(request);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie());
@@ -172,7 +173,7 @@ public class CompanyController {
 		@AuthenticationPrincipal CustomUserDetails userDetails) {
 
 		Long companyId = userDetails.getId();
-		CompanyResponse.CompanyDetailDto response = companyService.getCompanyDetail(companyId);
+		CompanyResponse.CompanyDetailDto response = companyQueryServiceImpl.getCompanyDetail(companyId);
 		return ApiResponse.of(SuccessStatus._OK, response);
 	}
 
@@ -185,7 +186,7 @@ public class CompanyController {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "이미 사용중인 아이디입니다.")
 	})
 	public ApiResponse<String> checkUsername(@RequestParam String username) {
-		companyService.checkUsernameAvailability(username);
+		companyQueryServiceImpl.checkUsernameAvailability(username);
 		return ApiResponse.of(SuccessStatus._OK, "사용 가능한 아이디입니다.");
 	}
 }

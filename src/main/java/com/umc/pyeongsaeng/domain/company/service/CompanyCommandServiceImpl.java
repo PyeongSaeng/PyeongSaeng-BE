@@ -26,8 +26,8 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class CompanyServiceImpl implements CompanyService {
+@Transactional
+public class CompanyCommandServiceImpl implements CompanyCommandService {
 	private static final int WITHDRAWAL_GRACE_DAYS = 7;
 
 	private final TokenService tokenService;
@@ -41,7 +41,6 @@ public class CompanyServiceImpl implements CompanyService {
 
 	// 회원가입
 	@Override
-	@Transactional
 	public CompanyResponse.CompanySignUpResponseDto signUp(CompanyRequest.CompanySignUpRequestDto request) {
 		smsService.verifyCode(request.getPhone(), request.getVerificationCode());
 
@@ -62,6 +61,121 @@ public class CompanyServiceImpl implements CompanyService {
 			.ownerName(savedCompany.getOwnerName())
 			.phone(savedCompany.getPhone())
 			.build();
+	}
+
+	// 로그인
+	@Override
+	public CompanyResponse.LoginResponseDto login(CompanyRequest.LoginRequestDto request) {
+		Company company = companyRepository.findByUsername(request.getUsername())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
+
+		if (company.getStatus() == CompanyStatus.WITHDRAWN) {
+			throw new GeneralException(ErrorStatus.WITHDRAWN_COMPANY);
+		}
+
+		if (!passwordEncoder.matches(request.getPassword(), company.getPassword())) {
+			throw new GeneralException(ErrorStatus.INVALID_PASSWORD);
+		}
+
+		String accessToken = jwtUtil.generateAccessToken(company.getId(), "COMPANY");
+		String refreshToken = jwtUtil.generateRefreshToken(company.getId(), "COMPANY");
+
+		tokenService.saveCompanyRefreshToken(company.getId(), refreshToken);
+
+		String refreshTokenCookie = tokenService.createRefreshTokenCookie(refreshToken).toString();
+
+		return CompanyResponse.LoginResponseDto.builder()
+			.companyId(company.getId())
+			.username(company.getUsername())
+			.businessNo(company.getBusinessNo())
+			.accessToken(accessToken)
+			.refreshTokenCookie(refreshTokenCookie)
+			.build();
+	}
+
+	// 로그아웃
+	@Override
+	public void logout(Long companyId) {
+		refreshTokenRepository.deleteByCompany_Id(companyId);
+	}
+
+	// 로그아웃 시 리프레시 토큰 쿠키 제거 명령 생성
+	@Override
+	public String getLogoutCookie() {
+		return tokenService.deleteRefreshTokenCookie().toString();
+	}
+
+	// 프로필 수정
+	@Override
+	public CompanyResponse.CompanyInfoDto updateProfile(Long companyId, CompanyRequest.UpdateProfileRequestDto request) {
+		Company company = companyRepository.findById(companyId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
+
+		company.updateProfile(request.getCompanyName(), request.getOwnerName(), request.getPhone());
+
+		if (request.isPasswordChangeRequested()) {
+			validateCurrentPassword(company, request.getCurrentPassword());
+			company.changePassword(passwordEncoder.encode(request.getNewPassword()));
+		}
+
+		return CompanyResponse.CompanyInfoDto.builder()
+			.companyId(company.getId())
+			.username(company.getUsername())
+			.businessNo(company.getBusinessNo())
+			.phone(company.getPhone())
+			.companyName(company.getCompanyName())
+			.ownerName(company.getOwnerName())
+			.build();
+	}
+
+	// confirmed로 의도 확인 후 UserStatus WITHDRAWN으로 변경
+	@Override
+	public void withdrawCompany(Long companyId, boolean confirmed) {
+		Company company = companyRepository.findById(companyId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
+
+		if (company.getStatus() == CompanyStatus.WITHDRAWN) {
+			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN_COMPANY);
+		}
+
+		validateWithdrawalIntent(confirmed);
+
+		company.withdraw();
+		tokenService.deleteRefreshToken(companyId);
+	}
+
+	// UserStatus를 Active로 변경
+	@Override
+	public void cancelWithdrawal(String username) {
+		Company company = companyRepository.findByUsername(username)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
+
+		if (company.getStatus() != CompanyStatus.WITHDRAWN) {
+			throw new GeneralException(ErrorStatus.NOT_WITHDRAWN_COMPANY);
+		}
+
+		if (company.getWithdrawnAt() != null &&
+			company.getWithdrawnAt().plusDays(WITHDRAWAL_GRACE_DAYS).isBefore(LocalDateTime.now())) {
+			throw new GeneralException(ErrorStatus.WITHDRAWAL_PERIOD_EXPIRED);
+		}
+
+		company.cancelWithdrawal();
+	}
+
+	// 연관 데이터, 사용자 데이터 모두 삭제
+	@Scheduled(cron = "0 0 3 * * *")
+	public void deleteExpiredWithdrawnCompanies() {
+		LocalDateTime expiryDate = LocalDateTime.now().minusDays(WITHDRAWAL_GRACE_DAYS);
+
+		List<Company> expiredCompanies = companyRepository.findByStatusAndWithdrawnAtBefore(
+			CompanyStatus.WITHDRAWN, expiryDate);
+
+		if (!expiredCompanies.isEmpty()) {
+			for (Company company : expiredCompanies) {
+				deleteAllRelatedData(company.getId());
+				companyRepository.delete(company);
+			}
+		}
 	}
 
 	// 전화번호 중복 여부 확인
@@ -105,143 +219,10 @@ public class CompanyServiceImpl implements CompanyService {
 			.build();
 	}
 
-	// 로그인
-	@Override
-	@Transactional
-	public CompanyResponse.LoginResponseDto login(CompanyRequest.LoginRequestDto request) {
-		Company company = companyRepository.findByUsername(request.getUsername())
-			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
-
-		if (company.getStatus() == CompanyStatus.WITHDRAWN) {
-			throw new GeneralException(ErrorStatus.WITHDRAWN_COMPANY);
-		}
-
-		if (!passwordEncoder.matches(request.getPassword(), company.getPassword())) {
-			throw new GeneralException(ErrorStatus.INVALID_PASSWORD);
-		}
-
-		String accessToken = jwtUtil.generateAccessToken(company.getId(), "COMPANY");
-		String refreshToken = jwtUtil.generateRefreshToken(company.getId(), "COMPANY");
-
-		tokenService.saveCompanyRefreshToken(company.getId(), refreshToken);
-
-		String refreshTokenCookie = tokenService.createRefreshTokenCookie(refreshToken).toString();
-
-		return CompanyResponse.LoginResponseDto.builder()
-			.companyId(company.getId())
-			.username(company.getUsername())
-			.businessNo(company.getBusinessNo())
-			.accessToken(accessToken)
-			.refreshTokenCookie(refreshTokenCookie)
-			.build();
-	}
-
-	// 로그아웃
-	@Override
-	public void logout(Long companyId) {
-		refreshTokenRepository.deleteByCompany_Id(companyId);
-	}
-
-	// 로그아웃 시 리프레시 토큰 쿠키 제거 명령 생성
-	@Override
-	public String getLogoutCookie() {
-		return tokenService.deleteRefreshTokenCookie().toString();
-	}
-
-	// 프로필 수정
-	@Override
-	@Transactional
-	public CompanyResponse.CompanyInfoDto updateProfile(Long companyId, CompanyRequest.UpdateProfileRequestDto request) {
-		Company company = companyRepository.findById(companyId)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
-
-		if (request.getCompanyName() != null) {
-			company.setCompanyName(request.getCompanyName());
-		}
-
-		if (request.getOwnerName() != null) {
-			company.setOwnerName(request.getOwnerName());
-		}
-
-		if (request.getPhone() != null) {
-			company.setPhone(request.getPhone());
-		}
-
-		if (request.isPasswordChangeRequested()) {
-			validateCurrentPassword(company, request.getCurrentPassword());
-			company.setPassword(passwordEncoder.encode(request.getNewPassword()));
-		}
-
-		return CompanyResponse.CompanyInfoDto.builder()
-			.companyId(company.getId())
-			.username(company.getUsername())
-			.businessNo(company.getBusinessNo())
-			.phone(company.getPhone())
-			.companyName(company.getCompanyName())
-			.ownerName(company.getOwnerName())
-			.build();
-	}
-
 	// 현재 비밀번호 검증
 	private void validateCurrentPassword(Company company, String currentPassword) {
 		if (!passwordEncoder.matches(currentPassword, company.getPassword())) {
 			throw new GeneralException(ErrorStatus.INVALID_PASSWORD);
-		}
-	}
-
-	// confirmed로 의도 확인 후 UserStatus WITHDRAWN으로 변경
-	@Override
-	@Transactional
-	public void withdrawCompany(Long companyId, boolean confirmed) {
-		Company company = companyRepository.findById(companyId)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
-
-		if (company.getStatus() == CompanyStatus.WITHDRAWN) {
-			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN_COMPANY);
-		}
-
-		validateWithdrawalIntent(confirmed);
-
-		company.setStatus(CompanyStatus.WITHDRAWN);
-		company.setWithdrawnAt(LocalDateTime.now());
-
-		tokenService.deleteRefreshToken(companyId);
-	}
-
-	// UserStatus를 Active로 변경
-	@Override
-	@Transactional
-	public void cancelWithdrawal(String username) {
-		Company company = companyRepository.findByUsername(username)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
-
-		if (company.getStatus() != CompanyStatus.WITHDRAWN) {
-			throw new GeneralException(ErrorStatus.NOT_WITHDRAWN_COMPANY);
-		}
-
-		if (company.getWithdrawnAt() != null &&
-			company.getWithdrawnAt().plusDays(WITHDRAWAL_GRACE_DAYS).isBefore(LocalDateTime.now())) {
-			throw new GeneralException(ErrorStatus.WITHDRAWAL_PERIOD_EXPIRED);
-		}
-
-		company.setStatus(CompanyStatus.ACTIVE);
-		company.setWithdrawnAt(null);
-	}
-
-	// 연관 데이터, 사용자 데이터 모두 삭제
-	@Transactional
-	@Scheduled(cron = "0 0 3 * * *")
-	public void deleteExpiredWithdrawnCompanies() {
-		LocalDateTime expiryDate = LocalDateTime.now().minusDays(WITHDRAWAL_GRACE_DAYS);
-
-		List<Company> expiredCompanies = companyRepository.findByStatusAndWithdrawnAtBefore(
-			CompanyStatus.WITHDRAWN, expiryDate);
-
-		if (!expiredCompanies.isEmpty()) {
-			for (Company company : expiredCompanies) {
-				deleteAllRelatedData(company.getId());
-				companyRepository.delete(company);
-			}
 		}
 	}
 
@@ -256,33 +237,5 @@ public class CompanyServiceImpl implements CompanyService {
 	private void deleteAllRelatedData(Long companyId) {
 		jobPostRepository.deleteByCompanyId(companyId);
 		refreshTokenRepository.deleteByCompany_Id(companyId);
-	}
-
-	// 기업 상세 정보 조회
-	@Override
-	@Transactional(readOnly = true)
-	public CompanyResponse.CompanyDetailDto getCompanyDetail(Long companyId) {
-		Company company = companyRepository.findById(companyId)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
-
-		return CompanyResponse.CompanyDetailDto.builder()
-			.companyId(company.getId())
-			.username(company.getUsername())
-			.businessNo(company.getBusinessNo())
-			.companyName(company.getCompanyName())
-			.ownerName(company.getOwnerName())
-			.phone(company.getPhone())
-			.email(company.getEmail())
-			.status(company.getStatus())
-			.build();
-	}
-
-	// 아이디 중복 확인
-	@Override
-	@Transactional(readOnly = true)
-	public void checkUsernameAvailability(String username) {
-		if (companyRepository.existsByUsername(username)) {
-			throw new GeneralException(ErrorStatus.DUPLICATE_USERNAME);
-		}
 	}
 }

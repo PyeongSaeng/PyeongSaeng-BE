@@ -1,34 +1,26 @@
 package com.umc.pyeongsaeng.domain.user.controller;
 
-import java.util.List;
+import java.util.*;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.security.core.annotation.*;
+import org.springframework.validation.annotation.*;
+import org.springframework.web.bind.annotation.*;
 
-import com.umc.pyeongsaeng.domain.auth.dto.AuthRequest;
-import com.umc.pyeongsaeng.domain.auth.dto.AuthResponse;
-import com.umc.pyeongsaeng.domain.auth.service.AuthServiceCommand;
-import com.umc.pyeongsaeng.domain.token.service.TokenService;
-import com.umc.pyeongsaeng.domain.user.dto.UserRequest;
-import com.umc.pyeongsaeng.domain.user.dto.UserResponse;
-import com.umc.pyeongsaeng.domain.user.service.UserService;
+import com.umc.pyeongsaeng.domain.auth.dto.*;
+import com.umc.pyeongsaeng.domain.auth.service.*;
+import com.umc.pyeongsaeng.domain.token.service.*;
+import com.umc.pyeongsaeng.domain.user.dto.*;
+import com.umc.pyeongsaeng.domain.user.service.*;
+import com.umc.pyeongsaeng.global.apiPayload.*;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
-import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
-import com.umc.pyeongsaeng.global.security.CustomUserDetails;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
+import com.umc.pyeongsaeng.global.security.*;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import lombok.*;
 
 @RestController
 @RequestMapping("/api/user")
@@ -36,7 +28,8 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "User", description = "User 수정, 탈퇴 등 관련 API")
 public class UserController {
 
-	private final UserService userService;
+	private final UserCommandServiceImpl userCommandServiceImpl;
+	private final UserQueryServiceImpl userQueryServiceImpl;
 	private final AuthServiceCommand authServiceCommand;
 	private final TokenService tokenService;
 
@@ -55,7 +48,7 @@ public class UserController {
 
 		Long userId = currentUser.getId();
 
-		userService.withdrawUser(userId, request.isConfirmed());
+		userCommandServiceImpl.withdrawUser(userId, request.isConfirmed());
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.SET_COOKIE, tokenService.deleteRefreshTokenCookie().toString());
@@ -77,7 +70,7 @@ public class UserController {
 	public ResponseEntity<ApiResponse<AuthResponse.LoginResponseDto>> cancelWithdrawal(
 		@Validated @RequestBody AuthRequest.LoginRequestDto request) {
 
-		userService.cancelWithdrawal(request.getUsername());
+		userCommandServiceImpl.cancelWithdrawal(request.getUsername());
 
 		AuthResponse.LoginResponseDto response = authServiceCommand.login(request);
 
@@ -101,7 +94,7 @@ public class UserController {
 		@AuthenticationPrincipal CustomUserDetails currentUser) {
 
 		Long userId = currentUser.getId();
-		UserResponse.ProtectorInfoDto protectorInfo = userService.getProtectorInfo(userId);
+		UserResponse.ProtectorInfoDto protectorInfo = userQueryServiceImpl.getProtectorInfo(userId);
 
 		return ApiResponse.of(SuccessStatus._OK, protectorInfo);
 	}
@@ -119,7 +112,7 @@ public class UserController {
 		@AuthenticationPrincipal CustomUserDetails currentUser) {
 
 		Long userId = currentUser.getId();
-		UserResponse.SeniorInfoDto seniorInfo = userService.getSeniorInfo(userId);
+		UserResponse.SeniorInfoDto seniorInfo = userQueryServiceImpl.getSeniorInfo(userId);
 
 		return ApiResponse.of(SuccessStatus._OK, seniorInfo);
 	}
@@ -139,7 +132,7 @@ public class UserController {
 		@AuthenticationPrincipal CustomUserDetails currentUser) {
 
 		Long userId = currentUser.getId();
-		UserResponse.ProtectorInfoDto updatedInfo = userService.updateProtectorInfo(userId, request);
+		UserResponse.ProtectorInfoDto updatedInfo = userCommandServiceImpl.updateProtectorInfo(userId, request);
 
 		return ApiResponse.of(SuccessStatus._OK, updatedInfo);
 	}
@@ -160,7 +153,7 @@ public class UserController {
 		@AuthenticationPrincipal CustomUserDetails currentUser) {
 
 		Long userId = currentUser.getId();
-		UserResponse.SeniorInfoDto updatedInfo = userService.updateSeniorInfo(userId, request);
+		UserResponse.SeniorInfoDto updatedInfo = userCommandServiceImpl.updateSeniorInfo(userId, request);
 
 		return ApiResponse.of(SuccessStatus._OK, updatedInfo);
 	}
@@ -177,7 +170,7 @@ public class UserController {
 		@AuthenticationPrincipal CustomUserDetails currentUser) {
 
 		Long protectorId = currentUser.getId();
-		List<UserResponse.ConnectedSeniorDto> seniors = userService.getConnectedSeniors(protectorId);
+		List<UserResponse.ConnectedSeniorDto> seniors = userQueryServiceImpl.getConnectedSeniors(protectorId);
 
 		return ApiResponse.of(SuccessStatus._OK, seniors);
 	}

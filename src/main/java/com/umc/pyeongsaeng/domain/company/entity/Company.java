@@ -35,11 +35,9 @@ public class Company extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false, length = 100)
-	@Setter
 	private String companyName;
 
 	@Column(nullable = false, length = 100)
-	@Setter
 	private String ownerName;
 
 	@Column(nullable = false, length = 20, unique = true)
@@ -61,13 +59,41 @@ public class Company extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(columnDefinition = "VARCHAR(20) DEFAULT 'ACTIVE'")
-	@Setter
 	private CompanyStatus status = CompanyStatus.ACTIVE;
 
 	@Column
-	@Setter
 	private LocalDateTime withdrawnAt;
 
 	@OneToMany(mappedBy = "company")
 	private List<JobPost> jobPosts = new ArrayList<>();
+
+	// 프로필 정보 업데이트 메서드
+	public void updateProfile(String companyName, String ownerName, String phone) {
+		if (companyName != null) {
+			this.companyName = companyName;
+		}
+		if (ownerName != null) {
+			this.ownerName = ownerName;
+		}
+		if (phone != null) {
+			this.phone = phone;
+		}
+	}
+
+	// 비밀번호 변경 메서드
+	public void changePassword(String encodedPassword) {
+		this.password = encodedPassword;
+	}
+
+	// 탈퇴 처리 메서드
+	public void withdraw() {
+		this.status = CompanyStatus.WITHDRAWN;
+		this.withdrawnAt = LocalDateTime.now();
+	}
+
+	// 탈퇴 취소 메서드
+	public void cancelWithdrawal() {
+		this.status = CompanyStatus.ACTIVE;
+		this.withdrawnAt = null;
+	}
 }
