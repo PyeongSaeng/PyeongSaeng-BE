@@ -9,6 +9,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.umc.pyeongsaeng.domain.company.entity.Company;
+import com.umc.pyeongsaeng.domain.company.repository.CompanyRepository;
 import com.umc.pyeongsaeng.domain.token.dto.TokenResponse;
 import com.umc.pyeongsaeng.domain.token.entity.RefreshToken;
 import com.umc.pyeongsaeng.domain.token.repository.RefreshTokenRepository;
@@ -32,6 +34,7 @@ public class TokenServiceImpl implements TokenService {
 
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final UserRepository userRepository;
+	private final CompanyRepository companyRepository;
 	private final JwtUtil jwtUtil;
 	private final CookieUtil cookieUtil;
 	private final RedisTemplate<String, Object> redisTemplate;
@@ -149,7 +152,7 @@ public class TokenServiceImpl implements TokenService {
 		return cookieUtil.deleteRefreshTokenCookie();
 	}
 
-	// 인증 코드 기반으로 토큰 굫환 (쿠키 포함 응답)
+	// 인증 코드 기반으로 토큰 교환 (쿠키 포함 응답)
 	@Override
 	public TokenResponse.TokenExchangeResponseDto processTokenExchange(String authCode) {
 		TokenResponse.TokenInfoResponseDto tokenInfo = exchangeAuthorizationCode(authCode);
@@ -184,5 +187,25 @@ public class TokenServiceImpl implements TokenService {
 			.accessToken(newAccessToken)
 			.refreshTokenCookie(createRefreshTokenCookie(newRefreshToken).toString())
 			.build();
+	}
+
+	// Company 전용 기존 거 지우고 Refresh Token 저장
+	@Override
+	public void saveCompanyRefreshToken(Long companyId, String refreshToken) {
+		refreshTokenRepository.deleteByCompany_Id(companyId);
+
+		Company company = companyRepository.findById(companyId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
+
+		LocalDateTime now = LocalDateTime.now();
+		RefreshToken token = RefreshToken.builder()
+			.company(company)
+			.user(null)
+			.refreshToken(refreshToken)
+			.issuedAt(now)
+			.expiresAt(now.plusDays(REFRESH_TOKEN_EXPIRY_DAYS))
+			.build();
+
+		refreshTokenRepository.save(token);
 	}
 }

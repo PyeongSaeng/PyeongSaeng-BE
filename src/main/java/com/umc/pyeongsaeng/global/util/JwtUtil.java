@@ -71,6 +71,11 @@ public class JwtUtil {
 			.compact();
 	}
 
+	// company, user 구분 role
+	public String getRoleFromToken(String token) {
+		return getClaims(token).get("role", String.class);
+	}
+
 	/**
 	 * 토큰 유효성 검증
 	 * @param token JWT 토큰
@@ -113,16 +118,6 @@ public class JwtUtil {
 			log.error("토큰에서 유효하지 않은 사용자 ID를 추출했습니다: {}", e.getMessage());
 			throw new IllegalArgumentException("Invalid user ID in token", e);
 		}
-	}
-
-	/**
-	 * 토큰에서 사용자 권한 추출
-	 * @param token JWT 토큰
-	 * @return 사용자 권한
-	 */
-	public String getRoleFromToken(String token) {
-		Claims claims = getClaims(token);
-		return claims.get("role", String.class);
 	}
 
 	// JWT 토큰에서 Claims 추출

@@ -9,5 +9,6 @@ import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 
 public interface JobPostRepository extends JpaRepository<JobPost, Long> {
 	Page<JobPost> findAllByCompany(Company company, PageRequest pageRequest);
+	void deleteByCompanyId(Long companyId);
 }
 
