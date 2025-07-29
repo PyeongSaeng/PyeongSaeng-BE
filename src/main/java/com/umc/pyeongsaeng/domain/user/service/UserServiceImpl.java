@@ -57,9 +57,7 @@ public class UserServiceImpl implements UserService {
 
 		validateWithdrawalIntent(confirmed);
 
-		user.setStatus(UserStatus.WITHDRAWN);
-		user.setWithdrawnAt(LocalDateTime.now());
-
+		user.withdraw();
 		tokenService.deleteRefreshToken(userId);
 	}
 
@@ -78,8 +76,7 @@ public class UserServiceImpl implements UserService {
 			throw new GeneralException(ErrorStatus.WITHDRAWAL_PERIOD_EXPIRED);
 		}
 
-		user.setStatus(UserStatus.ACTIVE);
-		user.setWithdrawnAt(null);
+		user.cancelWithdrawal();
 	}
 
 	// 연관 데이터, 사용자 데이터 모두 삭제
@@ -126,7 +123,7 @@ public class UserServiceImpl implements UserService {
 
 		List<SeniorProfile> protectedProfiles = seniorProfileRepository.findByProtectorId(userId);
 		for (SeniorProfile profile : protectedProfiles) {
-			profile.setProtector(null);
+			profile.removeProtector();
 			seniorProfileRepository.save(profile);
 		}
 	}
@@ -175,19 +172,12 @@ public class UserServiceImpl implements UserService {
 			throw new GeneralException(ErrorStatus.INVALID_USER_ROLE);
 		}
 
-		if (request.getName() != null) {
-			user.setName(request.getName());
-		}
-
-		if (request.getPhone() != null) {
-			user.setPhone(request.getPhone());
-		}
+		user.updateBasicInfo(request.getName(), request.getPhone());
 
 		if (request.isPasswordChangeRequested()) {
 			validateCurrentPassword(user, request.getCurrentPassword());
-			user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+			user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
 		}
-
 		return UserResponse.ProtectorInfoDto.from(user);
 	}
 
@@ -209,34 +199,19 @@ public class UserServiceImpl implements UserService {
 		SeniorProfile seniorProfile = seniorProfileRepository.findById(userId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_PROFILE_NOT_FOUND));
 
-		if (request.getName() != null) {
-			user.setName(request.getName());
-		}
-
-		if (request.getPhone() != null) {
-			user.setPhone(request.getPhone());
-		}
+		user.updateBasicInfo(request.getName(), request.getPhone());
 
 		if (request.isPasswordChangeRequested()) {
 			validateCurrentPassword(user, request.getCurrentPassword());
-			user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+			user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
 		}
 
-		if (request.getRoadAddress() != null) {
-			seniorProfile.setRoadAddress(request.getRoadAddress());
-		}
-
-		if (request.getDetailAddress() != null) {
-			seniorProfile.setDetailAddress(request.getDetailAddress());
-		}
-
-		if (request.getJob() != null) {
-			seniorProfile.setJob(request.getJob());
-		}
-
-		if (request.getExperiencePeriod() != null) {
-			seniorProfile.setExperiencePeriod(request.getExperiencePeriod());
-		}
+		seniorProfile.updateProfileInfo(
+			request.getRoadAddress(),
+			request.getDetailAddress(),
+			request.getJob(),
+			request.getExperiencePeriod()
+		);
 
 		return UserResponse.SeniorInfoDto.of(user, seniorProfile);
 	}

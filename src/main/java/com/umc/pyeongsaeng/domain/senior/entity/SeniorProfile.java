@@ -25,7 +25,6 @@ public class SeniorProfile extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "protector_id")
-	@Setter
 	private User protector;
 
 	@Column(length = 20)
@@ -45,11 +44,9 @@ public class SeniorProfile extends BaseEntity {
 	private String zipcode;
 
 	@Column(nullable = false, length = 255)
-	@Setter
 	private String roadAddress;
 
 	@Column(length = 255)
-	@Setter
 	private String detailAddress;
 
 	@Column(nullable = true)
@@ -60,12 +57,10 @@ public class SeniorProfile extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 30)
-	@Setter
 	private JobType job;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 30)
-	@Setter
 	private ExperiencePeriod experiencePeriod;
 
 	//위도 경도 업데이트
@@ -74,5 +69,30 @@ public class SeniorProfile extends BaseEntity {
 		this.longitude = longitude;
 	}
 
+	// 프로필 정보 업데이트
+	public void updateProfileInfo(String roadAddress, String detailAddress, JobType job, ExperiencePeriod experiencePeriod) {
+		if (roadAddress != null) {
+			this.roadAddress = roadAddress;
+		}
+		if (detailAddress != null) {
+			this.detailAddress = detailAddress;
+		}
+		if (job != null) {
+			this.job = job;
+		}
+		if (experiencePeriod != null) {
+			this.experiencePeriod = experiencePeriod;
+		}
+	}
+
+	// 보호자 설정
+	public void updateProtector(User protector) {
+		this.protector = protector;
+	}
+
+	// 보호자 연결 해제
+	public void removeProtector() {
+		this.protector = null;
+	}
 }
 

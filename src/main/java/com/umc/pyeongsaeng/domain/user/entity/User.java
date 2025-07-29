@@ -29,15 +29,12 @@ public class User extends BaseEntity {
 	private String username;
 
 	@Column(length = 100)
-	@Setter
 	private String password;
 
 	@Column(nullable = false, length = 50)
-	@Setter
 	private String name;
 
 	@Column(nullable = false, length = 20)
-	@Setter
 	private String phone;
 
 	@Enumerated(EnumType.STRING)
@@ -46,7 +43,6 @@ public class User extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(columnDefinition = "VARCHAR(20) DEFAULT 'ACTIVE'")
-	@Setter
 	private UserStatus status;
 
 	@OneToMany(mappedBy = "applicant")
@@ -65,6 +61,31 @@ public class User extends BaseEntity {
 	private List<UserTerms> userTerms = new ArrayList<>();
 
 	@Column
-	@Setter
 	private LocalDateTime withdrawnAt;
+
+	// 기본 정보 업데이트
+	public void updateBasicInfo(String name, String phone) {
+		if (name != null) {
+			this.name = name;
+		}
+		if (phone != null) {
+			this.phone = phone;
+		}
+	}
+
+	// 비밀번호 업데이트
+	public void updatePassword(String encodedPassword) {
+		this.password = encodedPassword;
+	}
+
+	// 상태 변경
+	public void withdraw() {
+		this.status = UserStatus.WITHDRAWN;
+		this.withdrawnAt = LocalDateTime.now();
+	}
+
+	public void cancelWithdrawal() {
+		this.status = UserStatus.ACTIVE;
+		this.withdrawnAt = null;
+	}
 }
