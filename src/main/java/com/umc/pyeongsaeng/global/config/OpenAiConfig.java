@@ -1,17 +1,23 @@
 package com.umc.pyeongsaeng.global.config;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Configuration
 public class OpenAiConfig {
 
-	@Bean
-	public RestTemplate template() {
-		// Render 등 배포 환경에서도 잘 작동하도록 System.getenv 사용
-		String apiKey = System.getenv("OPENAI_API_KEY");
+	@Bean(name = "openAiRestTemplate")
+	public RestTemplate openAiRestTemplate() {
+		Dotenv dotenv = Dotenv.configure()
+			.ignoreIfMissing()
+			.load();
+
+		String apiKey = dotenv.get("OPENAI_API_KEY");
 
 		RestTemplate restTemplate = new RestTemplate();
 		restTemplate.getInterceptors().add((request, body, execution) -> {

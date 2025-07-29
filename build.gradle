@@ -66,10 +66,10 @@ dependencies {
     implementation 'net.nurigo:sdk:4.3.0'
     implementation 'org.json:json:20231013'
 
-    implementation 'co.elastic.clients:elasticsearch-java:8.18.1'
-    implementation 'jakarta.json:jakarta.json-api:2.1.1'
-    implementation 'org.glassfish:jakarta.json:2.0.1'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'org.springframework.data:spring-data-elasticsearch:5.1.0'
+
+    implementation 'io.github.cdimascio:java-dotenv:5.2.2'
 
 }
 

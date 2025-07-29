@@ -64,3 +64,9 @@ elasticsearch:
   scheme: http
   username: elastic
   password: ${ES_PASSWORD}
+
+openai:
+  model: gpt-4o
+  api:
+    key: ${OPENAI_API_KEY}
+    url: https://api.openai.com/v1/chat/completions
