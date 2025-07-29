@@ -19,4 +19,6 @@ public class JobPostImage {
 	private JobPost jobPost;
 
 	private String keyName;
+
+	private String originalFileName;
 }

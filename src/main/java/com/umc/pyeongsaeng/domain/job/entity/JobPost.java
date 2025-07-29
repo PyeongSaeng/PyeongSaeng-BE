@@ -2,6 +2,7 @@ package com.umc.pyeongsaeng.domain.job.entity;
 
 import com.umc.pyeongsaeng.domain.application.entity.Application;
 import com.umc.pyeongsaeng.domain.company.entity.Company;
+import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import com.umc.pyeongsaeng.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -49,6 +50,9 @@ public class JobPost extends BaseEntity {
 	private String workingTime;
 	private LocalDate deadline;
 	private Integer recruitCount;
+
+	@Enumerated(EnumType.STRING)
+	private JobPostState state;
 
 	@Column(columnDefinition = "TEXT")
 	private String note;

@@ -1,5 +1,6 @@
 package com.umc.pyeongsaeng.domain.application.entity;
 
+import com.umc.pyeongsaeng.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,14 +9,14 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class ApplicationFile {
+public class ApplicationFile extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "applicaion_answer_id")
+	@JoinColumn(name = "application_answer_id")
 	private ApplicationAnswer applicationAnswer;
 
 	@Column
