@@ -6,7 +6,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
-import com.umc.pyeongsaeng.domain.auth.service.AuthService;
+import com.umc.pyeongsaeng.domain.auth.service.OAuth2AuthService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @RequiredArgsConstructor
 public class OAuth2Config {
-	private final AuthService authService;
+	private final OAuth2AuthService OAuth2AuthService;
 
 	/**
 	 * OAuth2 사용자 서비스 커스터마이징
@@ -23,7 +23,7 @@ public class OAuth2Config {
 	 */
 	@Bean
 	public DefaultOAuth2UserService customOAuth2UserService() {
-		return authService;
+		return OAuth2AuthService;
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class OAuth2Config {
 	 */
 	@Bean
 	public AuthenticationSuccessHandler oauth2SuccessHandler() {
-		return authService;
+		return OAuth2AuthService;
 	}
 
 	/**
@@ -41,6 +41,6 @@ public class OAuth2Config {
 	 */
 	@Bean
 	public AuthenticationFailureHandler oauth2FailureHandler() {
-		return authService;
+		return OAuth2AuthService;
 	}
 }

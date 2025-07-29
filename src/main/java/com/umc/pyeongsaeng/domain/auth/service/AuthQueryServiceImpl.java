@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AuthServiceQueryImpl implements AuthServiceQuery {
+public class AuthQueryServiceImpl implements AuthQueryService {
 
 	private final UserRepository userRepository;
 

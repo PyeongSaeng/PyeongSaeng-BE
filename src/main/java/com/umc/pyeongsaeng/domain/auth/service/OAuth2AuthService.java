@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class AuthService extends DefaultOAuth2UserService
+public class OAuth2AuthService extends DefaultOAuth2UserService
 	implements AuthenticationSuccessHandler, AuthenticationFailureHandler {
 
 	private static final String KAKAO_PROVIDER = "KAKAO";

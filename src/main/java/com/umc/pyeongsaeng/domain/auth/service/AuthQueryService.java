@@ -2,7 +2,7 @@ package com.umc.pyeongsaeng.domain.auth.service;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 
 
-public interface AuthServiceQuery {
+public interface AuthQueryService {
 
 	/**
 	 * 아이디 중복 확인

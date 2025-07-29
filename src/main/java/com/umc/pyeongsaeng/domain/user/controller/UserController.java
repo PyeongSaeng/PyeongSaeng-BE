@@ -12,7 +12,6 @@ import com.umc.pyeongsaeng.domain.auth.service.*;
 import com.umc.pyeongsaeng.domain.token.service.*;
 import com.umc.pyeongsaeng.domain.user.dto.*;
 import com.umc.pyeongsaeng.domain.user.service.*;
-import com.umc.pyeongsaeng.global.apiPayload.*;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
 import com.umc.pyeongsaeng.global.security.*;
@@ -30,7 +29,7 @@ public class UserController {
 
 	private final UserCommandServiceImpl userCommandServiceImpl;
 	private final UserQueryServiceImpl userQueryServiceImpl;
-	private final AuthServiceCommand authServiceCommand;
+	private final AuthCommandService authCommandService;
 	private final TokenService tokenService;
 
 	@DeleteMapping("/withdraw")
@@ -72,7 +71,7 @@ public class UserController {
 
 		userCommandServiceImpl.cancelWithdrawal(request.getUsername());
 
-		AuthResponse.LoginResponseDto response = authServiceCommand.login(request);
+		AuthResponse.LoginResponseDto response = authCommandService.login(request);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie());
