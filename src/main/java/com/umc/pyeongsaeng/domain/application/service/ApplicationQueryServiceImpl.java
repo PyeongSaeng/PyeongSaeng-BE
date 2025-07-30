@@ -1,7 +1,11 @@
 package com.umc.pyeongsaeng.domain.application.service;
 
 import java.util.List;
+import java.util.Optional;
 
+import com.umc.pyeongsaeng.domain.application.converter.ApplicationConverter;
+import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDTO;
+import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +26,7 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
 	private final ApplicationRepository applicationRepository;
 	private final JobPostRepository jobPostRepository;
+	private final ApplicationConverter applicationConverter;
 
 	public Page<Application> findCompanyApplications(Long jobPostId, Integer page) {
 
@@ -31,5 +36,14 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 		Page<Application> applicationPage = applicationRepository.findAllByJobPost(jobPost, PageRequest.of(page, 10));
 
 		return applicationPage;
+	}
+
+	@Override
+	public ApplicationResponseDTO.ApplicationQnADetailPreViewDTO getApplicationQnADetail(Long applicationId) {
+
+		ApplicationRepositoryCustom.ApplicationDetailView queryResult = applicationRepository.findApplicationQnADetailById(applicationId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_APPLICATION_ID));
+
+		return applicationConverter.toApplicationQnADetailPreViewDTO(queryResult);
 	}
 }

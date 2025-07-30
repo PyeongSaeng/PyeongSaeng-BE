@@ -1,5 +1,6 @@
 package com.umc.pyeongsaeng.domain.application.service;
 
+import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDTO;
 import org.springframework.data.domain.Page;
 
 import com.umc.pyeongsaeng.domain.application.entity.Application;
@@ -7,4 +8,6 @@ import com.umc.pyeongsaeng.domain.application.entity.Application;
 public interface ApplicationQueryService {
 
 	Page<Application> findCompanyApplications(Long jobPostId,Integer page);
+
+	ApplicationResponseDTO.ApplicationQnADetailPreViewDTO getApplicationQnADetail(Long applicationId);
 }
