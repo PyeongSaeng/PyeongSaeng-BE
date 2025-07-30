@@ -1,21 +1,19 @@
 package com.umc.pyeongsaeng.domain.job.search.service;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.springframework.stereotype.Service;
 
 import com.umc.pyeongsaeng.domain.job.search.converter.JobPostDocumentConverter;
 import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
-import com.umc.pyeongsaeng.domain.job.search.dto.JobSearchRequest;
+import com.umc.pyeongsaeng.domain.job.search.dto.request.JobSearchRequest;
 import com.umc.pyeongsaeng.domain.job.search.enums.JobSortType;
-import com.umc.pyeongsaeng.domain.job.search.dto.JobSearchResponse;
-import com.umc.pyeongsaeng.domain.job.search.dto.JobSearchResult;
+import com.umc.pyeongsaeng.domain.job.search.dto.response.JobSearchResponse;
+import com.umc.pyeongsaeng.domain.job.search.dto.response.JobSearchResult;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 

@@ -1,4 +1,4 @@
-package com.umc.pyeongsaeng.domain.job.search.dto;
+package com.umc.pyeongsaeng.domain.job.search.dto.request;
 
 import java.util.List;
 
@@ -6,11 +6,6 @@ import com.umc.pyeongsaeng.domain.job.search.enums.JobSortType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
-
-import java.util.List;
 
 @Data
 @Schema(description = "채용공고 검색 요청 DTO")
