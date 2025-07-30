@@ -28,8 +28,11 @@ public enum SuccessStatus implements BaseCode {
 	SMS_VERIFIED(HttpStatus.OK, "SMS202", "SMS 인증이 성공적으로 완료되었습니다."),
 
 	// User
-	WITHDRAW_SUCCESS(HttpStatus.OK, "USER201", "회원 탈퇴가 완료되었습니다. 7일 이내에 복구 가능합니다.");
+	WITHDRAW_SUCCESS(HttpStatus.OK, "USER201", "회원 탈퇴가 완료되었습니다. 7일 이내에 복구 가능합니다."),
 
+	// Question
+	SENIOR_QUESTION_CREATED(HttpStatus.OK, "QUESTION201", "질문이 생성되었습니다."),
+	SENIOR_QUESTION_ANSWER_SELECTED(HttpStatus.OK, "QUESTION202", "답변이 선택되었습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;
