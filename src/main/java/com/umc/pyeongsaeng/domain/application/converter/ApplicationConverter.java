@@ -45,6 +45,14 @@ public class ApplicationConverter {
 			.build();
 	}
 
+	public static ApplicationResponseDTO.ApplicationStateResponseDTO toApplicationStateResponseDTO(Application application) {
+
+		return ApplicationResponseDTO.ApplicationStateResponseDTO.builder()
+			.applicationId(application.getId())
+			.applicationStatus(application.getApplicationStatus())
+			.build();
+	}
+
 	public ApplicationResponseDTO.ApplicationQnADetailPreViewDTO toApplicationQnADetailPreViewDTO(
 		ApplicationRepositoryCustom.ApplicationDetailView result
 	) {

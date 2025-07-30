@@ -1,9 +1,12 @@
 package com.umc.pyeongsaeng.domain.application.controller;
 
+import com.umc.pyeongsaeng.domain.application.dto.request.ApplicationRequestDTO;
+import com.umc.pyeongsaeng.domain.application.service.ApplicationCommandService;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class ApplicationController {
 
 	private final ApplicationQueryService applicationQueryService;
-	private final ApplicationConverter applicationConverter;
+	private final ApplicationCommandService applicationCommandService;
 
 	@GetMapping
 	@Operation(summary = "특정 공고의 지원서 목록 조회 API", description = "특정 채용 공고에 제출된 지원서 목록을 페이지별로 조회하는 API입니다.")
@@ -100,7 +103,7 @@ public class ApplicationController {
 				"            }\n" +
 				"        ],\n" +
 				"        \"postState\": \"ACTIVE\",\n" +
-				"        \"applicationState\": \"PENDING\"\n" +
+				"        \"applicationState\": \"DRAFT\"\n" +
 				"    }\n" +
 				"}"))),
 	})
@@ -111,5 +114,45 @@ public class ApplicationController {
 			applicationQueryService.getApplicationQnADetail(applicationId);
 
 		return ApiResponse.onSuccess(applicationQnADetailPreViewDTO);
+	}
+
+	@PatchMapping("/{applicationId}/state")
+	@Operation(summary = "지원서 상태 변경 API", description = "특정 지원서의 상태(합격, 불합격 등)를 변경하는 API입니다.")
+	@Parameters({
+		@Parameter(name = "applicationId", description = "상태를 변경할 지원서의 ID", required = true, in = ParameterIn.PATH)
+	})
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class), examples = @ExampleObject(value =
+				"{\n" +
+				"    \"isSuccess\": true,\n" +
+				"    \"code\": \"COMMON200\",\n" +
+				"    \"message\": \"성공입니다.\",\n" +
+				"    \"result\": {\n" +
+				"        \"applicationId\": 1,\n" +
+				"        \"status\": \"APPROVED\"\n" +
+				"    }\n" +
+				"}"))),
+	})
+	public ApiResponse<ApplicationResponseDTO.ApplicationStateResponseDTO> updateApplicationStatus(
+		@PathVariable(name = "applicationId") Long applicationId,
+		@io.swagger.v3.oas.annotations.parameters.RequestBody(
+			description = "지원서 상태 변경 요청",
+			required = true,
+			content = @Content(
+				mediaType = "application/json",
+				schema = @Schema(implementation = ApplicationRequestDTO.ApplicationStatusRequestDTO.class),
+				examples = @ExampleObject(
+					name = "상태 변경 예시",
+					value = "{\n" +
+						"  \"applicationStatus\": \"APPROVED\"\n" +
+						"}"
+				)
+			)
+		)
+		@RequestBody @Valid ApplicationRequestDTO.ApplicationStatusRequestDTO applicationStatusRequestDTO) {
+
+		Application updatedApplication = applicationCommandService.updateApplicationState(applicationId,applicationStatusRequestDTO);
+
+		return ApiResponse.onSuccess(ApplicationConverter.toApplicationStateResponseDTO(updatedApplication));
 	}
 }

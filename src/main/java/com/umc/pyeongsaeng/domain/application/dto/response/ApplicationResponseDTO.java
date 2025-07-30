@@ -2,6 +2,7 @@ package com.umc.pyeongsaeng.domain.application.dto.response;
 
 import java.util.List;
 
+import com.umc.pyeongsaeng.domain.application.enums.ApplicationStatus;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import lombok.*;
 
@@ -60,6 +61,15 @@ public class ApplicationResponseDTO {
 		List<ApplicationQnADTO> questionAndAnswerList;
 		JobPostState postState;
 		String applicationState;
+	}
+
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class ApplicationStateResponseDTO {
+		Long applicationId;
+		ApplicationStatus applicationStatus;
 	}
 
 }
