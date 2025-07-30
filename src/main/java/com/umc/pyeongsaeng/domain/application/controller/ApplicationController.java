@@ -34,7 +34,7 @@ public class ApplicationController {
 	@Operation(summary = "특정 공고의 지원서 목록 조회 API", description = "특정 채용 공고에 제출된 지원서 목록을 페이지별로 조회하는 API입니다.")
 	@Parameters({
 		@Parameter(name = "jobPostId", description = "조회할 채용 공고의 ID", required = true, in = ParameterIn.QUERY),
-		@Parameter(name = "page", description = "페이지 번호 (0부터 시작)", required = true, in = ParameterIn.QUERY)
+		@Parameter(name = "page", description = "페이지 번호 (1부터 시작)", required = true, in = ParameterIn.QUERY)
 	})
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class), examples = @ExampleObject(value =

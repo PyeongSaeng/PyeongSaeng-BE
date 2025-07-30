@@ -39,6 +39,7 @@ public class SecurityConfig {
 		"/login",
 		"/error",
 		"/favicon.ico",
+		"/api/**"
 	};
 
 	// CORS 설정
