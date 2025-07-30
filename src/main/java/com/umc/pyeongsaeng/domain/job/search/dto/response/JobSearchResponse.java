@@ -1,4 +1,4 @@
-package com.umc.pyeongsaeng.domain.job.search.dto;
+package com.umc.pyeongsaeng.domain.job.search.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
