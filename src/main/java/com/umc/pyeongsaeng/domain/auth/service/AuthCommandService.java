@@ -3,7 +3,7 @@ package com.umc.pyeongsaeng.domain.auth.service;
 import com.umc.pyeongsaeng.domain.auth.dto.AuthRequest;
 import com.umc.pyeongsaeng.domain.auth.dto.AuthResponse;
 
-public interface AuthServiceCommand {
+public interface AuthCommandService {
 
 	/**
 	 * 일반 로그인

@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.umc.pyeongsaeng.domain.auth.dto.AuthRequest;
 import com.umc.pyeongsaeng.domain.auth.dto.AuthResponse;
-import com.umc.pyeongsaeng.domain.auth.service.AuthServiceCommand;
-import com.umc.pyeongsaeng.domain.auth.service.AuthServiceQuery;
+import com.umc.pyeongsaeng.domain.auth.service.AuthCommandService;
+import com.umc.pyeongsaeng.domain.auth.service.AuthQueryService;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
 import com.umc.pyeongsaeng.global.security.CustomUserDetails;
@@ -35,8 +35,8 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "User 인증", description = "user 회원가입, 로그인 관련 API")
 public class AuthController {
 
-	private final AuthServiceCommand authServiceCommand;
-	private final AuthServiceQuery authServiceQuery;
+	private final AuthCommandService authCommandService;
+	private final AuthQueryService authQueryService;
 
 	@PostMapping("/login")
 	@SecurityRequirements
@@ -49,7 +49,7 @@ public class AuthController {
 	public ResponseEntity<ApiResponse<AuthResponse.LoginResponseDto>> login(
 		@Validated @RequestBody AuthRequest.LoginRequestDto request) {
 
-		AuthResponse.LoginResponseDto response = authServiceCommand.login(request);
+		AuthResponse.LoginResponseDto response = authCommandService.login(request);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie());
@@ -145,7 +145,7 @@ public class AuthController {
 	public ResponseEntity<ApiResponse<AuthResponse.LoginResponseDto>> signupProtector(
 		@Validated @RequestBody AuthRequest.ProtectorSignupRequestDto request) {
 
-		AuthResponse.LoginResponseDto response = authServiceCommand.signupProtector(request);
+		AuthResponse.LoginResponseDto response = authCommandService.signupProtector(request);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie());
@@ -253,7 +253,7 @@ public class AuthController {
 	public ResponseEntity<ApiResponse<AuthResponse.LoginResponseDto>> signupSenior(
 		@Validated @RequestBody AuthRequest.SeniorSignupRequestDto request) {
 
-		AuthResponse.LoginResponseDto response = authServiceCommand.signupSenior(request);
+		AuthResponse.LoginResponseDto response = authCommandService.signupSenior(request);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie());
@@ -271,7 +271,7 @@ public class AuthController {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH402", description = "이미 사용중인 아이디입니다.")
 	})
 	public ApiResponse<String> checkUsername(@RequestParam String username) {
-		authServiceQuery.checkUsernameAvailability(username);
+		authQueryService.checkUsernameAvailability(username);
 		return ApiResponse.onSuccess(SuccessStatus.USERNAME_AVAILABLE.getMessage());
 	}
 
@@ -283,10 +283,10 @@ public class AuthController {
 
 		Long userId = currentUser.getId();
 
-		authServiceCommand.logout(userId);
+		authCommandService.logout(userId);
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.SET_COOKIE, authServiceCommand.getLogoutCookie());
+		headers.add(HttpHeaders.SET_COOKIE, authCommandService.getLogoutCookie());
 
 		return ResponseEntity.ok()
 			.headers(headers)

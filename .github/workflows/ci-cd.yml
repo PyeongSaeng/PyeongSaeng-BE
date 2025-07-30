@@ -107,7 +107,6 @@ jobs:
               -e "SMS_FROM_NUMBER=${{ env.SMS_FROM_NUMBER }}" \
               -e "ES_HOST=${{ env.ES_HOST  }}" \
               -e "ES_PASSWORD=${{ env.ES_PASSWORD }}" \
-              -e "SMS_FROM_NUMBER=${{ env.SMS_FROM_NUMBER  }}" \
               -e "ODCLOUD_SERVICE_KEY=${{ env.ODCLOUD_SERVICE_KEY }}" \
               -e TZ=Asia/Seoul \
               ${{ env.DOCKER_IMAGE_NAME }}:latest

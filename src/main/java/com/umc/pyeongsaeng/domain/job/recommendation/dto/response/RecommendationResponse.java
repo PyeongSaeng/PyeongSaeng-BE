@@ -16,7 +16,7 @@ public record RecommendationResponse(
 		return new RecommendationResponse(
 			jobPost.getId(),
 			jobPost.getTitle(),
-			jobPost.getCompany().getName(),
+			jobPost.getCompany().getOwnerName(),
 			jobPost.getRoadAddress(),
 			jobPost.getHourlyWage(),
 			jobPost.getWorkingTime(),

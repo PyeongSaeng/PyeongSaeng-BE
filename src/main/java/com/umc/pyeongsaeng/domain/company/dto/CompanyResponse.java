@@ -16,7 +16,7 @@ public class CompanyResponse {
 		private String username;
 		private String businessNo;
 		private String companyName;
-		private String name;
+		private String ownerName;
 		private String phone;
 	}
 
@@ -38,7 +38,7 @@ public class CompanyResponse {
 		private Long companyId;
 		private String username;
 		private String businessNo;
-		private String name;
+		private String ownerName;
 		private String phone;
 		private String companyName;
 	}
@@ -51,7 +51,7 @@ public class CompanyResponse {
 		private String username;
 		private String businessNo;
 		private String companyName;
-		private String name;
+		private String ownerName;
 		private String email;
 		private String phone;
 		private CompanyStatus status;

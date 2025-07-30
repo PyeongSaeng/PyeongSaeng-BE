@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.umc.pyeongsaeng.domain.company.dto.CompanyRequest;
 import com.umc.pyeongsaeng.domain.company.dto.CompanyResponse;
-import com.umc.pyeongsaeng.domain.company.service.CompanyService;
+import com.umc.pyeongsaeng.domain.company.service.*;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
 import com.umc.pyeongsaeng.global.security.CustomUserDetails;
@@ -31,7 +31,8 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Company", description = "company 회원가입, 로그인 등 관련 API")
 public class CompanyController {
 
-	private final CompanyService companyService;
+	private final CompanyCommandService companyCommandService;
+	private final CompanyQueryService companyQueryService;
 
 	@PostMapping("/sign-up")
 	@SecurityRequirements
@@ -57,7 +58,7 @@ public class CompanyController {
 	})
 	public ApiResponse<CompanyResponse.CompanySignUpResponseDto> signUp(
 		@Valid @RequestBody CompanyRequest.CompanySignUpRequestDto request) {
-		CompanyResponse.CompanySignUpResponseDto response = companyService.signUp(request);
+		CompanyResponse.CompanySignUpResponseDto response = companyCommandService.signUp(request);
 		return ApiResponse.of(SuccessStatus.CREATED, response);
 	}
 
@@ -66,6 +67,7 @@ public class CompanyController {
 	@Operation(summary = "기업 로그인", description = "아이디와 비밀번호로 기업 로그인을 진행합니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "로그인이 성공적으로 완료되었습니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "존재하지 않는 기업 계정입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY405", description = "비밀번호가 일치하지 않습니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY406", description = "탈퇴한 기업 계정입니다.")
@@ -73,7 +75,7 @@ public class CompanyController {
 	public ResponseEntity<ApiResponse<CompanyResponse.LoginResponseDto>> login(
 		@Valid @RequestBody CompanyRequest.LoginRequestDto request) {
 
-		CompanyResponse.LoginResponseDto response = companyService.login(request);
+		CompanyResponse.LoginResponseDto response = companyCommandService.login(request);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie());
@@ -86,14 +88,14 @@ public class CompanyController {
 	@PostMapping("/logout")
 	@Operation(summary = "기업 로그아웃", description = "현재 로그인한 기업 계정을 로그아웃합니다.")
 	@ApiResponses({
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "로그아웃이 성공적으로 완료되었습니다.")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "로그아웃이 성공적으로 완료되었습니다."),
 	})
 	public ResponseEntity<ApiResponse<Void>> logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
 		Long companyId = userDetails.getId();
-		companyService.logout(companyId);
+		companyCommandService.logout(companyId);
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.SET_COOKIE, companyService.getLogoutCookie());
+		headers.add(HttpHeaders.SET_COOKIE, companyCommandService.getLogoutCookie());
 
 		return ResponseEntity.ok()
 			.headers(headers)
@@ -104,6 +106,8 @@ public class CompanyController {
 	@Operation(summary = "기업 정보 수정", description = "기업명과 비밀번호를 수정합니다. 비밀번호 변경 시 현재 비밀번호 확인이 필요합니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "정보 수정이 성공적으로 완료되었습니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH401", description = "인증되지 않은 사용자입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "존재하지 않는 기업 계정입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH403", description = "비밀번호가 유효하지 않습니다.")
 	})
@@ -112,7 +116,7 @@ public class CompanyController {
 		@Valid @RequestBody CompanyRequest.UpdateProfileRequestDto request) {
 
 		Long companyId = userDetails.getId();
-		CompanyResponse.CompanyInfoDto response = companyService.updateProfile(companyId, request);
+		CompanyResponse.CompanyInfoDto response = companyCommandService.updateProfile(companyId, request);
 		return ApiResponse.of(SuccessStatus._OK, response);
 	}
 
@@ -120,6 +124,8 @@ public class CompanyController {
 	@Operation(summary = "기업 탈퇴", description = "기업 계정을 탈퇴합니다. 탈퇴 후 7일 이내에 복구 가능합니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "탈퇴가 성공적으로 완료되었습니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH401", description = "인증되지 않은 사용자입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "존재하지 않는 기업 계정입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY407", description = "이미 탈퇴한 기업 계정입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY408", description = "탈퇴 의도가 확인되지 않았습니다.")
@@ -129,7 +135,7 @@ public class CompanyController {
 		@Valid @RequestBody CompanyRequest.WithdrawRequestDto request) {
 
 		Long companyId = userDetails.getId();
-		companyService.withdrawCompany(companyId, request.isConfirmed());
+		companyCommandService.withdrawCompany(companyId, request.isConfirmed());
 		return ApiResponse.of(SuccessStatus._OK, null);
 	}
 
@@ -144,9 +150,9 @@ public class CompanyController {
 	public ResponseEntity<ApiResponse<CompanyResponse.LoginResponseDto>> cancelWithdrawal(
 		@Valid @RequestBody CompanyRequest.LoginRequestDto request) {
 
-		companyService.cancelWithdrawal(request.getUsername());
+		companyCommandService.cancelWithdrawal(request.getUsername());
 
-		CompanyResponse.LoginResponseDto response = companyService.login(request);
+		CompanyResponse.LoginResponseDto response = companyCommandService.login(request);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie());
@@ -160,13 +166,14 @@ public class CompanyController {
 	@Operation(summary = "기업 정보 조회", description = "현재 로그인한 기업의 정보를 조회합니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "조회가 성공적으로 완료되었습니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH401", description = "인증되지 않은 사용자입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "존재하지 않는 기업 계정입니다.")
 	})
 	public ApiResponse<CompanyResponse.CompanyDetailDto> getProfile(
 		@AuthenticationPrincipal CustomUserDetails userDetails) {
 
 		Long companyId = userDetails.getId();
-		CompanyResponse.CompanyDetailDto response = companyService.getCompanyDetail(companyId);
+		CompanyResponse.CompanyDetailDto response = companyQueryService.getCompanyDetail(companyId);
 		return ApiResponse.of(SuccessStatus._OK, response);
 	}
 
@@ -175,10 +182,11 @@ public class CompanyController {
 	@Operation(summary = "기업 아이디 중복 확인", description = "기업 아이디 중복 여부를 확인합니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "사용 가능한 아이디입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "이미 사용중인 아이디입니다.")
 	})
 	public ApiResponse<String> checkUsername(@RequestParam String username) {
-		companyService.checkUsernameAvailability(username);
+		companyQueryService.checkUsernameAvailability(username);
 		return ApiResponse.of(SuccessStatus._OK, "사용 가능한 아이디입니다.");
 	}
 }

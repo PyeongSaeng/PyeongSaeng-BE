@@ -3,14 +3,9 @@ package com.umc.pyeongsaeng.domain.company.service;
 import com.umc.pyeongsaeng.domain.company.dto.CompanyRequest;
 import com.umc.pyeongsaeng.domain.company.dto.CompanyResponse;
 
-public interface CompanyService {
-	void logout(Long companyId);
-	void withdrawCompany(Long companyId, boolean confirmed);
-	void cancelWithdrawal(String username);
-	String getLogoutCookie();
-
+public interface CompanyCommandService {
 	/**
-	 * 기업 회원가입을 처리합니다.
+	 * 기업 회원가입을 처리.
 	 * @param request 기업 회원가입 요청 DTO
 	 * @return 회원가입 결과 응답 DTO
 	 */
@@ -24,6 +19,12 @@ public interface CompanyService {
 	CompanyResponse.LoginResponseDto login(CompanyRequest.LoginRequestDto request);
 
 	/**
+	 * 기업 로그아웃 처리.
+	 * @param companyId 기업 ID
+	 */
+	void logout(Long companyId);
+
+	/**
 	 * 기업 프로필 수정.
 	 * @param companyId 기업 ID
 	 * @param request 프로필 수정 요청 DTO
@@ -32,16 +33,21 @@ public interface CompanyService {
 	CompanyResponse.CompanyInfoDto updateProfile(Long companyId, CompanyRequest.UpdateProfileRequestDto request);
 
 	/**
-	 * 기업 상세 정보 조회
+	 * 기업 탈퇴 처리.
 	 * @param companyId 기업 ID
-	 * @return 기업 상세 정보
+	 * @param confirmed 탈퇴 의사 확인 여부
 	 */
-	CompanyResponse.CompanyDetailDto getCompanyDetail(Long companyId);
+	void withdrawCompany(Long companyId, boolean confirmed);
 
 	/**
-	 * 아이디 중복 확인
-	 * @param username 확인할 아이디
+	 * 기업 탈퇴 취소.
+	 * @param username 기업 아이디
 	 */
-	void checkUsernameAvailability(String username);
+	void cancelWithdrawal(String username);
 
+	/**
+	 * 로그아웃 시 리프레시 토큰 쿠키 제거 명령 생성.
+	 * @return 쿠키 제거 명령 문자열
+	 */
+	String getLogoutCookie();
 }

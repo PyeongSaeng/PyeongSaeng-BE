@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class AuthServiceCommandImpl implements AuthServiceCommand {
+public class AuthCommandServiceImpl implements AuthCommandService {
 
 	private static final String KAKAO_PROVIDER = "KAKAO";
 	private static final int MAX_SENIOR_COUNT = 3;

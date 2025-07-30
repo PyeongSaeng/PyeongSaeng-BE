@@ -30,7 +30,7 @@ public class CompanyRequest {
 
 		@NotBlank
 		@Size(max = 100)
-		private String name;
+		private String ownerName;
 
 		@NotBlank
 		@Pattern(regexp = "^010\\d{8}$", message = "올바른 전화번호 형식이 아닙니다.")
@@ -58,10 +58,10 @@ public class CompanyRequest {
 		private String companyName;
 
 		@Size(max = 100)
-		private String name;
+		private String ownerName;
 
+		@Pattern(regexp = "^010\\d{8}$", message = "올바른 전화번호 형식이 아닙니다.")
 		private String phone;
-
 		private String currentPassword;
 
 		@Size(min = 6, max = 100)

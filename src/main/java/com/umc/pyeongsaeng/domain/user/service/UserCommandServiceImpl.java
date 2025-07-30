@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +14,10 @@ import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
 import com.umc.pyeongsaeng.domain.terms.repository.UserTermsRepository;
 import com.umc.pyeongsaeng.domain.token.repository.RefreshTokenRepository;
 import com.umc.pyeongsaeng.domain.token.service.TokenService;
+import com.umc.pyeongsaeng.domain.user.dto.UserRequest;
+import com.umc.pyeongsaeng.domain.user.dto.UserResponse;
 import com.umc.pyeongsaeng.domain.user.entity.User;
+import com.umc.pyeongsaeng.domain.user.enums.Role;
 import com.umc.pyeongsaeng.domain.user.enums.UserStatus;
 import com.umc.pyeongsaeng.domain.user.repository.SocialAccountRepository;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
@@ -27,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserCommandServiceImpl implements UserCommandService {
 
 	private static final int WITHDRAWAL_GRACE_DAYS = 7;
 
@@ -38,6 +42,7 @@ public class UserServiceImpl implements UserService {
 	private final UserTermsRepository userTermsRepository;
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final SeniorProfileRepository seniorProfileRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	// confirmed로 의도 확인 후 UserStatus WITHDRAWN으로 변경
 	@Override
@@ -51,9 +56,7 @@ public class UserServiceImpl implements UserService {
 
 		validateWithdrawalIntent(confirmed);
 
-		user.setStatus(UserStatus.WITHDRAWN);
-		user.setWithdrawnAt(LocalDateTime.now());
-
+		user.withdraw();
 		tokenService.deleteRefreshToken(userId);
 	}
 
@@ -72,8 +75,55 @@ public class UserServiceImpl implements UserService {
 			throw new GeneralException(ErrorStatus.WITHDRAWAL_PERIOD_EXPIRED);
 		}
 
-		user.setStatus(UserStatus.ACTIVE);
-		user.setWithdrawnAt(null);
+		user.cancelWithdrawal();
+	}
+
+	// 보호자 정보 업데이트
+	@Override
+	public UserResponse.ProtectorInfoDto updateProtectorInfo(Long userId, UserRequest.UpdateProtectorDto request) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		validateActiveUser(user);
+		validateProtectorRole(user);
+
+		user.updateBasicInfo(request.getName(), request.getPhone());
+
+		if (request.isPasswordChangeRequested()) {
+			validateCurrentPassword(user, request.getCurrentPassword());
+			user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+		}
+
+		return UserResponse.ProtectorInfoDto.from(user);
+	}
+
+	// 시니어 정보 업데이트
+	@Override
+	public UserResponse.SeniorInfoDto updateSeniorInfo(Long userId, UserRequest.UpdateSeniorDto request) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		validateActiveUser(user);
+		validateSeniorRole(user);
+
+		SeniorProfile seniorProfile = seniorProfileRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_PROFILE_NOT_FOUND));
+
+		user.updateBasicInfo(request.getName(), request.getPhone());
+
+		if (request.isPasswordChangeRequested()) {
+			validateCurrentPassword(user, request.getCurrentPassword());
+			user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+		}
+
+		seniorProfile.updateProfileInfo(
+			request.getRoadAddress(),
+			request.getDetailAddress(),
+			request.getJob(),
+			request.getExperiencePeriod()
+		);
+
+		return UserResponse.SeniorInfoDto.of(user, seniorProfile);
 	}
 
 	// 연관 데이터, 사용자 데이터 모두 삭제
@@ -87,17 +137,9 @@ public class UserServiceImpl implements UserService {
 		if (!expiredUsers.isEmpty()) {
 			for (User user : expiredUsers) {
 				deleteAllRelatedData(user.getId());
-
 				userRepository.delete(user);
 				log.info("Permanently deleted expired withdrawn user {}", user.getId());
 			}
-		}
-	}
-
-	// 탈퇴 의도 확인
-	private void validateWithdrawalIntent(boolean confirmed) {
-		if (!confirmed) {
-			throw new GeneralException(ErrorStatus.USER_WITHDRAWAL_NOT_CONFIRMED);
 		}
 	}
 
@@ -114,14 +156,42 @@ public class UserServiceImpl implements UserService {
 	// role이 시니어인 경우, 보호자인 경우
 	private void handleSeniorProfileDeletion(Long userId) {
 		seniorProfileRepository.findBySeniorId(userId)
-			.ifPresent(profile -> {
-				seniorProfileRepository.delete(profile);
-			});
+			.ifPresent(profile -> seniorProfileRepository.delete(profile));
 
 		List<SeniorProfile> protectedProfiles = seniorProfileRepository.findByProtectorId(userId);
 		for (SeniorProfile profile : protectedProfiles) {
-			profile.setProtector(null);
+			profile.removeProtector();
 			seniorProfileRepository.save(profile);
+		}
+	}
+
+	private void validateWithdrawalIntent(boolean confirmed) {
+		if (!confirmed) {
+			throw new GeneralException(ErrorStatus.USER_WITHDRAWAL_NOT_CONFIRMED);
+		}
+	}
+
+	private void validateActiveUser(User user) {
+		if (user.getStatus() != UserStatus.ACTIVE) {
+			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN_USER);
+		}
+	}
+
+	private void validateProtectorRole(User user) {
+		if (user.getRole() != Role.PROTECTOR) {
+			throw new GeneralException(ErrorStatus.INVALID_USER_ROLE);
+		}
+	}
+
+	private void validateSeniorRole(User user) {
+		if (user.getRole() != Role.SENIOR) {
+			throw new GeneralException(ErrorStatus.INVALID_USER_ROLE);
+		}
+	}
+
+	private void validateCurrentPassword(User user, String currentPassword) {
+		if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+			throw new GeneralException(ErrorStatus.INVALID_PASSWORD);
 		}
 	}
 }
