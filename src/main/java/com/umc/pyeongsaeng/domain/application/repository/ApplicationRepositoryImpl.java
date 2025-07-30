@@ -63,14 +63,14 @@ public class ApplicationRepositoryImpl implements ApplicationRepositoryCustom {
 			"LEFT JOIN " +
 			"    form_field AS ff ON ans.form_field_id = ff.id " +
 			"WHERE " +
-			"    app.id = :applicationId " +
+			"    app.id = ?1 " +
 			"GROUP BY " +
 			"    app.id, jp.id";
 
 		// EntityManager를 사용하여 네이티브 쿼리를 실행하고, 결과를 Object 배열의 리스트로 받습니다.
 		@SuppressWarnings("unchecked") // 네이티브 쿼리 결과는 타입 캐스팅이 필요하므로 경고를 무시합니다.
 		List<Object[]> resultList = em.createNativeQuery(sql)
-			.setParameter("applicationId", applicationId)
+			.setParameter(1, applicationId)
 			.getResultList();
 
 		// 결과가 없으면 빈 Optional을 반환
