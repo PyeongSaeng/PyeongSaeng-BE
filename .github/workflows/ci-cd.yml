@@ -73,6 +73,14 @@ jobs:
           key: ${{ env.EC2_SSH_PRIVATE_KEY }}
           port: ${{ env.EC2_PORT }}
           script: |
+            # pyeongsaeng-network
+            if sudo docker network inspect pyeongsaeng-net >/dev/null 2>&1; then
+              echo "Network 'pyeongsaeng-net' already exists."
+            else
+              echo "Creating network 'pyeongsaeng_net'..."
+              sudo docker network create pyeongsaeng-net
+            fi
+            
             TIMESTAMP=$(date +"%Y%m%d%H%M%S")
             NEW_CONTAINER_NAME="${{ env.CONTAINER_NAME }}-$TIMESTAMP"
 
@@ -82,6 +90,7 @@ jobs:
             # Check for running container on port 8080
             CONTAINER_ID=$(sudo docker ps -q --filter "publish=8080")
 
+            
             # Stop the running container if it exists
             if [ ! -z "$CONTAINER_ID" ]; then
               echo "Stopping existing container: $CONTAINER_ID"
@@ -89,7 +98,9 @@ jobs:
             fi
 
             echo "Starting new container..."
-            sudo docker run --name $NEW_CONTAINER_NAME -d -p 8080:8080 \
+            sudo docker run --name $NEW_CONTAINER_NAME -d \
+              -p 8080:8080 \
+              --network pyeongsaeng-net \
               -e "SPRING_PROFILES_ACTIVE=prod" \
               -e "DB_URL=${{ env.DB_URL }}" \
               -e "DB_USERNAME=${{ env.DB_USERNAME }}" \
