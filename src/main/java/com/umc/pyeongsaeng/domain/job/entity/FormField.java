@@ -3,19 +3,11 @@ package com.umc.pyeongsaeng.domain.job.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.umc.pyeongsaeng.domain.application.entity.ApplicationAnswer;
 import com.umc.pyeongsaeng.domain.job.enums.FieldType;
 import com.umc.pyeongsaeng.global.common.entity.BaseEntity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,8 +26,8 @@ public class FormField extends BaseEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "job_post_field_id")
-	private JobPostField jobPostField;
+	@JoinColumn(name = "job_post_id")
+	private JobPost jobPost;
 
 	@Column(length = 50)
 	private String fieldName;

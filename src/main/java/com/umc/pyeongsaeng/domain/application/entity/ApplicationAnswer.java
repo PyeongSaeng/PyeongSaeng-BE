@@ -1,8 +1,12 @@
 package com.umc.pyeongsaeng.domain.application.entity;
 
+import com.umc.pyeongsaeng.domain.job.entity.FormField;
 import com.umc.pyeongsaeng.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -19,10 +23,16 @@ public class ApplicationAnswer extends BaseEntity {
 	@JoinColumn(name = "application_id")
 	private Application application;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "question_id")
-	private ApplicationQuestion question;
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "form_field_id")
+	private FormField formField;
+
+	@Builder.Default
+	@OneToMany(mappedBy = "applicationAnswer", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ApplicationFile> applicationFiles = new ArrayList<>();
 
 	@Column(columnDefinition = "TEXT", nullable = false)
 	private String answerText;
+
+
 }
