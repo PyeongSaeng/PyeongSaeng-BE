@@ -22,4 +22,14 @@ public class JobPostImageConverter {
 			.jobPost(jobPost)
 			.build();
 	}
+
+	public static JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO toJobPostImagePreViewWithUrlDTO(
+		JobPostImage jobPostImage, String imageUrl) {
+		return JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO.builder()
+			.keyName(jobPostImage.getKeyName())
+			.jobPostId(jobPostImage.getJobPost().getId())
+			.imageUrl(imageUrl)
+			.build();
+	}
+
 }

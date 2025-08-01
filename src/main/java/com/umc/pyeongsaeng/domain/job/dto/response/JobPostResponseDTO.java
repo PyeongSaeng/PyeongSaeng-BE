@@ -43,4 +43,29 @@ public class JobPostResponseDTO {
 		Boolean isFirst;
 		Boolean isLast;
 	}
+
+	@Builder
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class JobPostDetailDTO {
+		private String title;
+		private String address;
+		private String detailAddress;
+		private String roadAddress;
+		private String zipcode;
+		private Integer hourlyWage;
+		private Integer monthlySalary;
+		private Integer yearSalary;
+		private String description;
+		private String workingTime;
+		private LocalDate deadline;
+		private Integer recruitCount;
+		private String note;
+		private List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> images;
+		private String travelTime;
+	}
+
+
+
 }
