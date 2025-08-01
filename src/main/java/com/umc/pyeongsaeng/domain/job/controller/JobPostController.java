@@ -1,10 +1,11 @@
 package com.umc.pyeongsaeng.domain.job.controller;
 
-import com.umc.pyeongsaeng.domain.company.entity.Company;
-import com.umc.pyeongsaeng.domain.company.repository.CompanyRepository;
+import com.umc.pyeongsaeng.domain.job.converter.FormFieldConverter;
 import com.umc.pyeongsaeng.domain.job.converter.JobPostConverter;
 import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
+import com.umc.pyeongsaeng.domain.job.dto.response.JobPostFormFieldResponseDTO;
+import com.umc.pyeongsaeng.domain.job.entity.FormField;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import com.umc.pyeongsaeng.domain.job.service.JobPostCommandService;
 import com.umc.pyeongsaeng.domain.job.service.JobPostQueryService;
@@ -23,12 +24,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "채용 API", description = "채용공고 관련 API")
 @RequestMapping("/api/job")
@@ -38,7 +36,6 @@ public class JobPostController {
 
 	private final JobPostCommandService jobPostCommandService;
 	private final JobPostQueryService jobPostQueryService;
-	private final CompanyRepository companyRepository;
 
 	@Operation(summary = "채용공고 생성 API", description = "기업이 새로운 채용공고를 생성하는 API입니다.")
 	@ApiResponses(value = {
@@ -95,8 +92,8 @@ public class JobPostController {
 	@PostMapping("/posts")
 	public ApiResponse<JobPostResponseDTO.JobPostPreviewDTO> createJobPost(
 		@RequestBody JobPostRequestDTO.CreateDTO requestDTO,
-		@Parameter(hidden = true) @AuthenticationPrincipal Long companyId) {
-		JobPost newJobPost = jobPostCommandService.createJobPost(requestDTO, companyId);
+		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+		JobPost newJobPost = jobPostCommandService.createJobPost(requestDTO, userDetails.getCompany().getId());
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewDTO(newJobPost));
 	}
 
@@ -161,9 +158,15 @@ public class JobPostController {
 		@Parameter(name = "page", description = "페이지 번호 (1부터 시작)", example = "1") @PageNumber Integer page,
 		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-		// Company company = companyRepository.findById(companyId).orElse(null);
-		// Page<JobPost> jobPostList =  jobPostQueryService.getJobPostList(company, page);
 		Page<JobPost> jobPostList = jobPostQueryService.getJobPostList(userDetails.getCompany(), page);
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewListDTO(jobPostList));
+	}
+
+	@GetMapping("/{jobPostId}/questions")
+	public ApiResponse<JobPostFormFieldResponseDTO.FormFieldPreViewListDTO> getJobPostQuestions(@PathVariable(name = "jobPostId") Long jobPostId) {
+
+		List<FormField> formFieldList = jobPostQueryService.getFormFieldList(jobPostId);
+
+		return ApiResponse.onSuccess(FormFieldConverter.toFormFieldPreViewListDTO(formFieldList));
 	}
 }
