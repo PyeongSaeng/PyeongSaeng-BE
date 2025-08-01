@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.umc.pyeongsaeng.domain.application.dto.request.KeywordGenerationRequestDTO;
 import com.umc.pyeongsaeng.domain.application.dto.request.AnswerGenerationRequestDTO;
-import com.umc.pyeongsaeng.domain.application.dto.response.OpenAiResponseDTO;
 
 public interface OpenAiService {
 	List<String> generateKeywords(KeywordGenerationRequestDTO request);
