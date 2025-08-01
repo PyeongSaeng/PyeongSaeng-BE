@@ -57,12 +57,13 @@ public enum ErrorStatus implements BaseErrorCode {
 	SMS_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SMS402", "SMS 발송에 실패했습니다."),
 	SMS_RESEND_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "SMS403", "하루 인증 요청 가능 횟수를 초과했습니다. 제한 10회."),
 
-	// Recommendation
-	GOOGLE_DIRECTIONS_API_FAILED(HttpStatus.BAD_GATEWAY, "RECOMMEND401", "Google Directions API 호출에 실패했습니다."),
+	// Travel-time
+	GOOGLE_DIRECTIONS_API_FAILED(HttpStatus.BAD_GATEWAY, "TRAVEL401", "Google Directions API 호출에 실패했습니다."),
+	ROUTE_NOT_FOUND(HttpStatus.BAD_REQUEST, "TRAVEL402", "출발지/도착지 좌표가 잘못되었거나, 요청 위치에서는 대중교통 이동 경로를 지원하지 않습니다. 요청 유저의 좌표를 확인해주세요."),
 
-	// ADDRESS
-	GOOGLE_API_ERROR(HttpStatus.BAD_GATEWAY, "ADDRESS401", "구글 API 호출 중 오류 발생"),
-	ADDRESS_CONVERSION_FAILED(HttpStatus.BAD_REQUEST, "ADDRESS402", "주소 변환 실패"),
+	// Geo
+	GOOGLE_API_ERROR(HttpStatus.BAD_GATEWAY, "GEO401", "구글 API 호출 중 오류 발생"),
+	ADDRESS_CONVERSION_FAILED(HttpStatus.BAD_REQUEST, "GEO402", "주소 변환 실패"),
 
 	// Company
 	DUPLICATE_USERNAME(HttpStatus.CONFLICT, "COMPANY401", "이미 사용중인 아이디입니다."),
@@ -82,7 +83,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	PAGE_NUMBER_NOT_NUMBER(HttpStatus.BAD_REQUEST, "PAGE400", "페이지는 숫자만 가능합니다."),
 	PAGE_NUMBER_NEGATIVE(HttpStatus.BAD_REQUEST, "PAGE400", "페이지 숫자는 양수만 가능합니다."),
 
-	// SEARCH
+	// Search
 	INVALID_SORT_TYPE(HttpStatus.BAD_REQUEST, "SEARCH401", "지원하지 않는 정렬 타입입니다."),
 	ES_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"SEARCH402", "Elasticsearch 연결에 실패했습니다."),
 	ES_REQUEST_ERROR(HttpStatus.BAD_REQUEST,"SEARCH403", "Elasticsearch 요청 처리 중 오류가 발생했습니다. 인덱스나 쿼리를 확인해주세요."),
@@ -92,7 +93,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	INVALID_APPLICATION_ID(HttpStatus.BAD_REQUEST, "APPLICATION400", "유효하지 않은 ApplicationId 입니다."),
 	APPLICATION_PARSING_ERROR(HttpStatus.BAD_REQUEST, "APPLICATION500", "결과 파싱에러 입니다. 관리자에게 문의해주세요"),
 
-	// JOb
+	// Job
 	INVALID_JOB_POST_ID(HttpStatus.BAD_REQUEST, "JOB401", "유효하지 않은 채용공고 ID입니다."),
 
 	// Qusetion
