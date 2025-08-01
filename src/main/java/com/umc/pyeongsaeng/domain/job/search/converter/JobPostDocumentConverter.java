@@ -1,7 +1,7 @@
 package com.umc.pyeongsaeng.domain.job.search.converter;
 
 import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
-import com.umc.pyeongsaeng.domain.job.search.dto.JobSearchResponse;
+import com.umc.pyeongsaeng.domain.job.search.dto.response.JobSearchResponse;
 
 public class JobPostDocumentConverter {
 

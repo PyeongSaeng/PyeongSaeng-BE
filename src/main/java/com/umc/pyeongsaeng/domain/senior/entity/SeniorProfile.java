@@ -1,5 +1,8 @@
 package com.umc.pyeongsaeng.domain.senior.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.umc.pyeongsaeng.domain.senior.enums.ExperiencePeriod;
 import com.umc.pyeongsaeng.domain.senior.enums.Gender;
 import com.umc.pyeongsaeng.domain.senior.enums.JobType;
@@ -62,6 +65,9 @@ public class SeniorProfile extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 30)
 	private ExperiencePeriod experiencePeriod;
+
+	@OneToMany(mappedBy = "seniorProfile", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<SeniorQuestionAnswer> questionAnswers = new ArrayList<>();
 
 	//위도 경도 업데이트
 	public void updateLocation(Double latitude, Double longitude) {
