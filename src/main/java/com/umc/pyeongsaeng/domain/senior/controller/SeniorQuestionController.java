@@ -31,7 +31,7 @@ public class SeniorQuestionController {
 	private final SeniorQuestionQueryService seniorQuestionQueryService;
 	private final SeniorQuestionCommandService seniorQuestionCommandService;
 
-	@Operation(summary = "시니어 추가 질문 전체 조회", description = "해당 시니어 프로필의 모든 추가 질문과 선택 가능한 옵션, 그리고 이미 선택한 답변을 조회합니다.")
+	@Operation(summary = "시니어 추가 질문 전체 조회", description = "해당 시니어 프로필의 모든 추가 질문과 선택 가능한 옵션, 그리고 이미 선택한 답변을 조회합니다.(seniorProfileId = userId)")
 	@GetMapping("/{seniorProfileId}/questions")
 	public ApiResponse<List<SeniorQuestionResponseDTO.QuestionAnswerResponseDTO>> getQuestions(@PathVariable Long seniorProfileId) {
 		return ApiResponse.onSuccess(seniorQuestionQueryService.getAllSeniorQuestionsWithAnswers(seniorProfileId));
