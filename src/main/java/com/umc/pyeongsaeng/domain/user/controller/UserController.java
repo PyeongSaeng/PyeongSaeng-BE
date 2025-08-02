@@ -9,15 +9,18 @@ import org.springframework.web.bind.annotation.*;
 
 import com.umc.pyeongsaeng.domain.auth.dto.*;
 import com.umc.pyeongsaeng.domain.auth.service.*;
+import com.umc.pyeongsaeng.domain.sms.service.*;
 import com.umc.pyeongsaeng.domain.token.service.*;
 import com.umc.pyeongsaeng.domain.user.dto.*;
 import com.umc.pyeongsaeng.domain.user.service.*;
+import com.umc.pyeongsaeng.global.apiPayload.*;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
 import com.umc.pyeongsaeng.global.security.*;
 
 import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.security.*;
 import io.swagger.v3.oas.annotations.tags.*;
 import lombok.*;
 
@@ -31,6 +34,7 @@ public class UserController {
 	private final UserQueryServiceImpl userQueryServiceImpl;
 	private final AuthCommandService authCommandService;
 	private final TokenService tokenService;
+	private final SmsService smsService;
 
 	@DeleteMapping("/withdraw")
 	@Operation(summary = "회원 탈퇴",
@@ -172,5 +176,56 @@ public class UserController {
 		List<UserResponse.ConnectedSeniorDto> seniors = userQueryServiceImpl.getConnectedSeniors(protectorId);
 
 		return ApiResponse.of(SuccessStatus._OK, seniors);
+	}
+
+	@PostMapping("/find-username")
+	@SecurityRequirements
+	@Operation(summary = "아이디 찾기",
+		description = "이름, 전화번호, SMS 인증번호로 아이디를 조회합니다."
+	+"인증번호의 경우, 번호를 보내기 위해 /api/sms/send/account SMS 인증 api를 활용하셔야 합니다. 인증번호가 옳은지 확인하기 위해 /api/sms/verify를 따로 이용하실 필요는 없습니다.")
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER401", description = "존재하지 않는 회원입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SMS401", description = "SMS 인증에 실패했습니다.")
+	})
+	public ApiResponse<UserResponse.UsernameDto> findUsername(
+		@Validated @RequestBody UserRequest.FindUsernameDto request) {
+
+		UserResponse.UsernameDto response = userQueryServiceImpl.findUsername(request);
+		return ApiResponse.of(SuccessStatus._OK, response);
+	}
+
+	@PostMapping("/reset-password")
+	@SecurityRequirements
+	@Operation(summary = "비밀번호 찾기 (새 비밀번호 변경)",
+		description = "인증번호가 확인된 후 해당 api를 사용해서 비밀번호를 새롭게 재설정하면 됩니다."
+	+"인증 단계에서 return 되는 username을 그대로 가져다가 쓰시면 됩니다.")
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER401", description = "존재하지 않는 회원입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER407", description = "이미 탈퇴한 회원입니다."),
+	})
+	public ApiResponse<String> resetPassword(
+		@Validated @RequestBody UserRequest.PasswordChangeDto request) {
+
+		userCommandServiceImpl.resetPassword(request);
+		return ApiResponse.onSuccess(null);
+	}
+
+	@PostMapping("/reset-password/verify")
+	@SecurityRequirements
+	@Operation(summary = "비밀번호 찾기(새 비밀번호 변경) 전 인증단계 ",
+		description = "아이디, 전화번호, 인증번호를 확인합니다. 비밀번호를 바꿀 때 사용자 식별이 필요하니, 이때를 위한 username이 return됩니다."
+	+"인증번호의 경우, 번호를 보내기 위해 /api/sms/send/account SMS 인증 api를 활용하셔야 합니다. 인증번호가 옳은지 확인하기 위해 /api/sms/verify를 따로 이용하실 필요는 없습니다.")
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER401", description = "존재하지 않는 회원입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH403", description = "인증번호 불일치"),
+	})
+	public ApiResponse<UserResponse.UsernameDto> verifyResetPasswordCode(
+		@Validated @RequestBody UserRequest.PasswordVerificationDto request) {
+
+		UserResponse.UsernameDto response = userCommandServiceImpl.verifyResetPasswordCode(request);
+		return ApiResponse.of(SuccessStatus._OK, response);
 	}
 }

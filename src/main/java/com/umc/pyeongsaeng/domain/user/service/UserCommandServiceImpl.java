@@ -1,31 +1,29 @@
 package com.umc.pyeongsaeng.domain.user.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.*;
+import org.springframework.security.crypto.password.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
 
-import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepository;
-import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
-import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
-import com.umc.pyeongsaeng.domain.terms.repository.UserTermsRepository;
-import com.umc.pyeongsaeng.domain.token.repository.RefreshTokenRepository;
-import com.umc.pyeongsaeng.domain.token.service.TokenService;
-import com.umc.pyeongsaeng.domain.user.dto.UserRequest;
-import com.umc.pyeongsaeng.domain.user.dto.UserResponse;
-import com.umc.pyeongsaeng.domain.user.entity.User;
-import com.umc.pyeongsaeng.domain.user.enums.Role;
-import com.umc.pyeongsaeng.domain.user.enums.UserStatus;
-import com.umc.pyeongsaeng.domain.user.repository.SocialAccountRepository;
-import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
-import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
-import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
+import com.umc.pyeongsaeng.domain.application.repository.*;
+import com.umc.pyeongsaeng.domain.senior.entity.*;
+import com.umc.pyeongsaeng.domain.senior.repository.*;
+import com.umc.pyeongsaeng.domain.sms.service.*;
+import com.umc.pyeongsaeng.domain.terms.repository.*;
+import com.umc.pyeongsaeng.domain.token.repository.*;
+import com.umc.pyeongsaeng.domain.token.service.*;
+import com.umc.pyeongsaeng.domain.user.dto.*;
+import com.umc.pyeongsaeng.domain.user.entity.*;
+import com.umc.pyeongsaeng.domain.user.enums.*;
+import com.umc.pyeongsaeng.domain.user.repository.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +41,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final SeniorProfileRepository seniorProfileRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final SmsService smsService;
 
 	// confirmed로 의도 확인 후 UserStatus WITHDRAWN으로 변경
 	@Override
@@ -163,6 +162,30 @@ public class UserCommandServiceImpl implements UserCommandService {
 			profile.removeProtector();
 			seniorProfileRepository.save(profile);
 		}
+	}
+
+	// 비밀번호 찾기 (새 비밀번호 변경) 전 인증단계
+	@Override
+	public UserResponse.UsernameDto verifyResetPasswordCode(UserRequest.PasswordVerificationDto request) {
+		smsService.verifyCode(request.getPhone(), request.getVerificationCode());
+
+		User user = userRepository.findByUsernameAndPhone(request.getUsername(), request.getPhone())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		validateActiveUser(user);
+
+		return UserResponse.UsernameDto.from(user);
+	}
+
+	// 비밀번호 찾기 (새 비밀번호 변경)
+	@Override
+	public void resetPassword(UserRequest.PasswordChangeDto request) {
+		User user = userRepository.findByUsername(request.getUsername())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		validateActiveUser(user);
+
+		user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
 	}
 
 	private void validateWithdrawalIntent(boolean confirmed) {

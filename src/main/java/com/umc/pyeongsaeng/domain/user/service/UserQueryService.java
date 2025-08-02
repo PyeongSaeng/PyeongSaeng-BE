@@ -1,8 +1,8 @@
 package com.umc.pyeongsaeng.domain.user.service;
 
-import java.util.List;
+import java.util.*;
 
-import com.umc.pyeongsaeng.domain.user.dto.UserResponse;
+import com.umc.pyeongsaeng.domain.user.dto.*;
 
 public interface UserQueryService {
 	/**
@@ -25,4 +25,11 @@ public interface UserQueryService {
 	 * @return 연결된 시니어 목록
 	 */
 	List<UserResponse.ConnectedSeniorDto> getConnectedSeniors(Long protectorId);
+
+	/**
+	 * 인증 후 사용자 아이디를 조회
+	 * @param request 아이디 조회 요청
+	 * @return 사용자 아이디
+	 */
+	UserResponse.UsernameDto findUsername(UserRequest.FindUsernameDto request);
 }

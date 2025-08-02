@@ -1,14 +1,10 @@
 package com.umc.pyeongsaeng.domain.user.dto;
 
-import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
-import com.umc.pyeongsaeng.domain.senior.enums.ExperiencePeriod;
-import com.umc.pyeongsaeng.domain.senior.enums.JobType;
-import com.umc.pyeongsaeng.domain.user.entity.User;
+import com.umc.pyeongsaeng.domain.senior.entity.*;
+import com.umc.pyeongsaeng.domain.senior.enums.*;
+import com.umc.pyeongsaeng.domain.user.entity.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 public class UserResponse {
 	@Getter
@@ -77,6 +73,20 @@ public class UserResponse {
 				.seniorName(senior.getName())
 				.seniorPhone(seniorPhone)
 				.relation(relation)
+				.build();
+		}
+	}
+
+	@Getter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class UsernameDto {
+		private String username;
+
+		public static UsernameDto from(User user) {
+			return UsernameDto.builder()
+				.username(user.getUsername())
 				.build();
 		}
 	}

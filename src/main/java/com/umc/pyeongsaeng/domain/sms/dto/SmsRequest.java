@@ -1,12 +1,8 @@
 package com.umc.pyeongsaeng.domain.sms.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import io.swagger.v3.oas.annotations.media.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 public class SmsRequest {
 
@@ -37,5 +33,14 @@ public class SmsRequest {
 		@Pattern(regexp = "^\\d{6}$", message = "인증번호는 6자리 숫자여야 합니다.")
 		@Schema(description = "인증번호", example = "123456")
 		private String verificationCode;
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class AccountSmsRequestDto {
+		@NotBlank
+		@Pattern(regexp = "^010\\d{8}$", message = "올바른 전화번호 형식이 아닙니다.")
+		private String phone;
 	}
 }

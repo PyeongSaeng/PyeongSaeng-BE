@@ -10,6 +10,11 @@ spring:
       ddl-auto: create
     show-sql: false
 
+  data:
+    redis:
+      host: my-redis
+      port: 6379
+
 logging:
   level:
     org.hibernate.SQL: INFO

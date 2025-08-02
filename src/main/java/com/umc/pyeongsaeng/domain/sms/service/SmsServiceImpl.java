@@ -1,32 +1,40 @@
 package com.umc.pyeongsaeng.domain.sms.service;
 
-import java.time.Duration;
-import java.util.Random;
+import java.time.*;
+import java.util.*;
 
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.data.redis.core.*;
+import org.springframework.stereotype.*;
 
-import net.nurigo.sdk.NurigoApp;
-import net.nurigo.sdk.message.model.Message;
-import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
-import net.nurigo.sdk.message.service.DefaultMessageService;
+import net.nurigo.sdk.*;
+import net.nurigo.sdk.message.model.*;
+import net.nurigo.sdk.message.request.*;
+import net.nurigo.sdk.message.service.*;
 
-import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
-import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
+import com.umc.pyeongsaeng.domain.sms.dto.*;
+import com.umc.pyeongsaeng.domain.user.entity.*;
+import com.umc.pyeongsaeng.domain.user.repository.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
 
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
+import jakarta.annotation.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SmsServiceImpl implements SmsService {
 
 	private static final String SMS_PREFIX = "sms:";
 	private static final String SMS_COUNT_PREFIX = "sms:count:";
 	private static final int VERIFICATION_CODE_LENGTH = 6;
 	private static final int EXPIRY_MINUTES = 5;
-	private static final int MAX_SMS_PER_DAY = 10;
+	private static final int MAX_SMS_PER_DAY = 20;
+	private final UserRepository userRepository;
+	private final SocialAccountRepository socialAccountRepository;
 
 	private final RedisTemplate<String, Object> redisTemplate;
 
@@ -54,18 +62,21 @@ public class SmsServiceImpl implements SmsService {
 
 		if (count == null) {
 			redisTemplate.opsForValue().set(countKey, 1, Duration.ofHours(24));
-			return;
 		}
 
-		if (count >= MAX_SMS_PER_DAY) {
+		if (count != null && count >= MAX_SMS_PER_DAY) {
 			throw new GeneralException(ErrorStatus.SMS_RESEND_LIMIT_EXCEEDED);
 		}
 
-		redisTemplate.opsForValue().increment(countKey);
+		if (count != null && count < MAX_SMS_PER_DAY) {
+			redisTemplate.opsForValue().increment(countKey);
+		}
+
 		String code = generateVerificationCode();
 		String redisKey = SMS_PREFIX + phone;
 
 		redisTemplate.opsForValue().set(redisKey, code, Duration.ofMinutes(EXPIRY_MINUTES));
+		log.info("[SMS] 전화번호: {}, 인증번호: {}", phone, code);
 
 		sendSms(phone, code);
 	}
@@ -112,5 +123,24 @@ public class SmsServiceImpl implements SmsService {
 		} catch (Exception e) {
 			throw new GeneralException(ErrorStatus.SMS_SEND_FAILED);
 		}
+	}
+
+	@Override
+	public SmsResponse.SmsResultDto sendAccountVerificationCode(String phone) {
+		Optional<User> userOpt = userRepository.findByPhone(phone);
+
+		if (userOpt.isPresent()) {
+			User user = userOpt.get();
+			boolean isKakaoUser = user.getSocialAccounts().stream()
+				.anyMatch(sa -> "KAKAO".equals(sa.getProviderType()));
+
+			if (isKakaoUser) {
+				throw new GeneralException(ErrorStatus.KAKAO_USER_FIND_NOT_ALLOWED);
+			}
+		}
+
+		sendVerificationCode(phone);
+
+		return SmsResponse.SmsResultDto.success();
 	}
 }
