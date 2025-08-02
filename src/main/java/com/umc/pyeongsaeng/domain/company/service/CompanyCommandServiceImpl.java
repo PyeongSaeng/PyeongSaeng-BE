@@ -219,6 +219,36 @@ public class CompanyCommandServiceImpl implements CompanyCommandService {
 			.build();
 	}
 
+	// 기업 비밀번호 찾기 (새 비밀번호 변경) 전 인증단계
+	@Override
+	public CompanyResponse.UsernameDto verifyResetPasswordCode(CompanyRequest.PasswordVerificationDto request) {
+		smsService.verifyCode(request.getPhone(), request.getVerificationCode());
+
+		Company company = companyRepository.findByUsernameAndPhone(request.getUsername(), request.getPhone())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
+
+		validateActiveCompany(company);
+
+		return CompanyResponse.UsernameDto.from(company);
+	}
+
+	// 기업 비밀번호 찾기 (새 비밀번호 변경)
+	@Override
+	public void resetPassword(CompanyRequest.PasswordChangeDto request) {
+		Company company = companyRepository.findByUsername(request.getUsername())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
+
+		validateActiveCompany(company);
+
+		company.changePassword(passwordEncoder.encode(request.getNewPassword()));
+	}
+
+	private void validateActiveCompany(Company company) {
+		if (company.getStatus() != CompanyStatus.ACTIVE) {
+			throw new GeneralException(ErrorStatus.WITHDRAWN_COMPANY);
+		}
+	}
+
 	// 현재 비밀번호 검증
 	private void validateCurrentPassword(Company company, String currentPassword) {
 		if (!passwordEncoder.matches(currentPassword, company.getPassword())) {

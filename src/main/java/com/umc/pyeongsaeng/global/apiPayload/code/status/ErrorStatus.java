@@ -1,13 +1,10 @@
 package com.umc.pyeongsaeng.global.apiPayload.code.status;
 
-import co.elastic.clients.elasticsearch.nodes.Http;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 
-import com.umc.pyeongsaeng.global.apiPayload.code.BaseErrorCode;
-import com.umc.pyeongsaeng.global.apiPayload.code.ErrorReasonDTO;
+import com.umc.pyeongsaeng.global.apiPayload.code.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
 @AllArgsConstructor
@@ -32,6 +29,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	USER_WITHDRAWAL_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "USER410", "탈퇴 의도가 확인되지 않았습니다."),
 	SENIOR_PROFILE_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER411", "유효하지 않은 시니어 프로필입니다."),
 	INVALID_USER_ROLE(HttpStatus.BAD_REQUEST, "USER412", "유효하지 않은 Role입니다."),
+	KAKAO_USER_FIND_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "USER413", "카카오 회원은 아이디와 비밀번호를 찾을 수 없습니다."),
 
 	// Auth
 	LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH401", "아이디 또는 비밀번호가 올바르지 않습니다."),

@@ -1,29 +1,22 @@
 package com.umc.pyeongsaeng.domain.company.controller;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.security.core.annotation.*;
+import org.springframework.validation.annotation.*;
+import org.springframework.web.bind.annotation.*;
 
-import com.umc.pyeongsaeng.domain.company.dto.CompanyRequest;
-import com.umc.pyeongsaeng.domain.company.dto.CompanyResponse;
+import com.umc.pyeongsaeng.domain.company.dto.*;
 import com.umc.pyeongsaeng.domain.company.service.*;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
-import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
-import com.umc.pyeongsaeng.global.security.CustomUserDetails;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
+import com.umc.pyeongsaeng.global.security.*;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import jakarta.validation.*;
+import lombok.*;
 
 @RestController
 @RequestMapping("/api/companies")
@@ -188,5 +181,57 @@ public class CompanyController {
 	public ApiResponse<String> checkUsername(@RequestParam String username) {
 		companyQueryService.checkUsernameAvailability(username);
 		return ApiResponse.of(SuccessStatus._OK, "사용 가능한 아이디입니다.");
+	}
+
+	@PostMapping("/find-username")
+	@SecurityRequirements
+	@Operation(summary = "아이디 찾기",
+		description = "사업자명, 전화번호, SMS 인증번호로 아이디를 조회합니다."
+	+"인증번호의 경우, 번호를 보내기 위해 /api/sms/send SMS 인증 api를 활용하셔야 합니다. 인증번호가 옳은지 확인하기 위해 /api/sms/verify를 따로 이용하실 필요는 없습니다.")
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "존재하지 않는 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SMS401", description = "SMS 인증에 실패했습니다.")
+	})
+	public ApiResponse<CompanyResponse.UsernameDto> findUsername(
+		@Validated @RequestBody CompanyRequest.FindCompanyUsernameDto request) {
+
+		CompanyResponse.UsernameDto response = companyQueryService.findUsername(request);
+		return ApiResponse.of(SuccessStatus._OK, response);
+	}
+
+	@PostMapping("/reset-password/verify")
+	@SecurityRequirements
+	@Operation(summary = "비밀번호 찾기(새 비밀번호 변경) 전 인증단계",
+		description = "아이디, 전화번호, 인증번호를 확인합니다. 비밀번호를 바꿀 때 사용자 식별이 필요하니, 이때를 위한 username이 return됩니다. "
+	+"인증번호의 경우, 번호를 보내기 위해 /api/sms/send SMS 인증 api를 활용하셔야 합니다. 인증번호가 옳은지 확인하기 위해 /api/sms/verify를 따로 이용하실 필요는 없습니다.")
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "존재하지 않는 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY405", description = "탈퇴한 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SMS401", description = "SMS 인증에 실패했습니다.")
+	})
+	public ApiResponse<CompanyResponse.UsernameDto> verifyResetPasswordCode(
+		@Validated @RequestBody CompanyRequest.PasswordVerificationDto request) {
+
+		CompanyResponse.UsernameDto response = companyCommandService.verifyResetPasswordCode(request);
+		return ApiResponse.of(SuccessStatus._OK, response);
+	}
+
+	@PostMapping("/reset-password")
+	@SecurityRequirements
+	@Operation(summary = "비밀번호 찾기 (새 비밀번호 변경)",
+		description = "인증번호가 확인된 후 해당 api를 사용해서 비밀번호를 새롭게 재설정하면 됩니다. " +
+			"인증 단계에서 return 되는 username을 그대로 가져다가 쓰시면 됩니다.")
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "존재하지 않는 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY405", description = "탈퇴한 기업 계정입니다.")
+	})
+	public ApiResponse<String> resetPassword(
+		@Validated @RequestBody CompanyRequest.PasswordChangeDto request) {
+
+		companyCommandService.resetPassword(request);
+		return ApiResponse.onSuccess(null);
 	}
 }

@@ -17,4 +17,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 	boolean existsByBusinessNo(String businessNo);
 	boolean existsByPhone(String phone);
 	List<Company> findByStatusAndWithdrawnAtBefore(CompanyStatus status, LocalDateTime withdrawnAt);
+	Optional<Company> findByOwnerNameAndPhone(String ownerName, String phone);
+	Optional<Company> findByUsernameAndPhone(String username, String phone);
 }
