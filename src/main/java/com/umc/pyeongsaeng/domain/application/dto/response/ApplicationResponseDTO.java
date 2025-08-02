@@ -101,10 +101,10 @@ public class ApplicationResponseDTO {
 	})
 	public static abstract class AnswerResponseDTO {
 		// 공통 필드
-		private Long formFieldId;
-		private Long answerFieldId;
-		private String formFieldName;
-		private FieldType fieldType; // 직렬화 시 하위 타입을 결정하는 기준
+		private final Long formFieldId;
+		private final Long answerFieldId;
+		private final String formFieldName;
+		private final FieldType fieldType; // 직렬화 시 하위 타입을 결정하는 기준
 
 		protected AnswerResponseDTO(ApplicationAnswer answer) {
 			this.formFieldId = answer.getFormField().getId();
