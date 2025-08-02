@@ -72,8 +72,7 @@ public class UserQueryServiceImpl implements UserQueryService {
 		return seniorProfiles.stream()
 			.map(profile -> UserResponse.ConnectedSeniorDto.of(
 				profile.getSenior(),
-				profile.getPhoneNum(),
-				profile.getRelation()
+				profile.getPhoneNum()
 			))
 			.collect(Collectors.toList());
 	}
@@ -87,5 +86,28 @@ public class UserQueryServiceImpl implements UserQueryService {
 			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
 		return UserResponse.UsernameDto.from(user);
+	}
+
+	// 전화번호로 시니어 검색
+	@Override
+	public UserResponse.SeniorSearchResultDto searchSeniorByPhone(String phone, Long protectorId) {
+		User senior = userRepository.findByPhone(phone)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		if (senior.getRole() != Role.SENIOR) {
+			throw new GeneralException(ErrorStatus.NOT_SENIOR_ROLE);
+		}
+
+		if (senior.getStatus() != UserStatus.ACTIVE) {
+			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN);
+		}
+
+		boolean isAlreadyConnected = false;
+		if (protectorId != null) {
+			isAlreadyConnected = seniorProfileRepository
+				.existsBySeniorIdAndProtectorId(senior.getId(), protectorId);
+		}
+
+		return UserResponse.SeniorSearchResultDto.of(senior, isAlreadyConnected);
 	}
 }

@@ -94,4 +94,21 @@ public class UserRequest {
 		@Size(min = 6, max = 100)
 		private String newPassword;
 	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class SearchSeniorDto {
+		@NotBlank
+		@Pattern(regexp = "^010\\d{8}$", message = "올바른 전화번호 형식이 아닙니다.")
+		private String phone;
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class ConnectSeniorDto {
+		@NotNull
+		private Long seniorId;
+	}
 }

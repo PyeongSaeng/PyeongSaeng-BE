@@ -50,7 +50,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
 		if (user.getStatus() == UserStatus.WITHDRAWN) {
-			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN_USER);
+			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN);
 		}
 
 		validateWithdrawalIntent(confirmed);
@@ -66,7 +66,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
 		if (user.getStatus() != UserStatus.WITHDRAWN) {
-			throw new GeneralException(ErrorStatus.NOT_WITHDRAWN_USER);
+			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN);
 		}
 
 		if (user.getWithdrawnAt() != null &&
@@ -188,15 +188,57 @@ public class UserCommandServiceImpl implements UserCommandService {
 		user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
 	}
 
+	// 전화번호로 시니어 검색 후 보호자-시니어 연결
+	@Override
+	public void connectSeniorToProtector(Long protectorId, UserRequest.ConnectSeniorDto request) {
+		User protector = userRepository.findById(protectorId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		if (protector.getRole() != Role.PROTECTOR) {
+			throw new GeneralException(ErrorStatus.INVALID_PROTECTOR_ROLE);
+		}
+
+		User senior = userRepository.findById(request.getSeniorId())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		if (senior.getRole() != Role.SENIOR) {
+			throw new GeneralException(ErrorStatus.NOT_SENIOR_ROLE);
+		}
+
+		validateActiveUser(protector);
+		validateActiveUser(senior);
+
+		if (seniorProfileRepository.existsBySeniorIdAndProtectorId(senior.getId(), protectorId)) {
+			throw new GeneralException(ErrorStatus.ALREADY_CONNECTED_SENIOR);
+		}
+
+		long connectedSeniorCount = seniorProfileRepository.countByProtectorId(protectorId);
+		if (connectedSeniorCount >= 3) {
+			throw new GeneralException(ErrorStatus.PROTECTOR_SENIOR_LIMIT_EXCEEDED);
+		}
+
+		SeniorProfile seniorProfile = seniorProfileRepository.findBySeniorId(senior.getId())
+			.orElseGet(() -> {
+				SeniorProfile newProfile = SeniorProfile.builder()
+					.senior(senior)
+					.phoneNum(senior.getPhone())
+					.build();
+				return seniorProfileRepository.save(newProfile);
+			});
+
+		seniorProfile.updateProtector(protector);
+		seniorProfileRepository.save(seniorProfile);
+	}
+
 	private void validateWithdrawalIntent(boolean confirmed) {
 		if (!confirmed) {
-			throw new GeneralException(ErrorStatus.USER_WITHDRAWAL_NOT_CONFIRMED);
+			throw new GeneralException(ErrorStatus.WITHDRAWAL_NOT_CONFIRMED);
 		}
 	}
 
 	private void validateActiveUser(User user) {
 		if (user.getStatus() != UserStatus.ACTIVE) {
-			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN_USER);
+			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN);
 		}
 	}
 

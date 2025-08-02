@@ -32,4 +32,12 @@ public interface UserQueryService {
 	 * @return 사용자 아이디
 	 */
 	UserResponse.UsernameDto findUsername(UserRequest.FindUsernameDto request);
+
+	/**
+	 * 전화번호로 시니어 정보 조회
+	 * @param phone 검색할 시니어 전화번호
+	 * @param protectorId 보호자 사용자 아이디
+	 * @return 시니어 검색 결과
+	 */
+	UserResponse.SeniorSearchResultDto searchSeniorByPhone(String phone, Long protectorId);
 }

@@ -45,4 +45,11 @@ public interface UserCommandService {
 	 * @return 사용자 아이디
 	 */
 	UserResponse.UsernameDto verifyResetPasswordCode(UserRequest.PasswordVerificationDto request);
+
+	/**
+	 * 보호자와 시니어 연결 처리
+	 * @param protectorId 보호자 사용자 아이디
+	 * @param request 시니어 연결 요청
+	 */
+	void connectSeniorToProtector(Long protectorId, UserRequest.ConnectSeniorDto request);
 }

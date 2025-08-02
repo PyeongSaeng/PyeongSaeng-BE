@@ -65,14 +65,12 @@ public class UserResponse {
 		private Long seniorId;
 		private String seniorName;
 		private String seniorPhone;
-		private String relation;
 
-		public static ConnectedSeniorDto of(User senior, String seniorPhone, String relation) {
+		public static ConnectedSeniorDto of(User senior, String seniorPhone) {
 			return ConnectedSeniorDto.builder()
 				.seniorId(senior.getId())
 				.seniorName(senior.getName())
 				.seniorPhone(seniorPhone)
-				.relation(relation)
 				.build();
 		}
 	}
@@ -87,6 +85,26 @@ public class UserResponse {
 		public static UsernameDto from(User user) {
 			return UsernameDto.builder()
 				.username(user.getUsername())
+				.build();
+		}
+	}
+
+	@Getter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class SeniorSearchResultDto {
+		private Long id;
+		private String name;
+		private String phone;
+		private boolean isAlreadyConnected;
+
+		public static SeniorSearchResultDto of(User senior, boolean isConnected) {
+			return SeniorSearchResultDto.builder()
+				.id(senior.getId())
+				.name(senior.getName())
+				.phone(senior.getPhone())
+				.isAlreadyConnected(isConnected)
 				.build();
 		}
 	}
