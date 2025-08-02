@@ -29,6 +29,7 @@ public class JobPostImageConverter {
 			.keyName(jobPostImage.getKeyName())
 			.jobPostId(jobPostImage.getJobPost().getId())
 			.imageUrl(imageUrl)
+			.originalFileName(jobPostImage.getOriginalFileName())
 			.build();
 	}
 

@@ -26,5 +26,6 @@ public class JobPostImageResponseDTO {
 		private Long jobPostId;
 		private String keyName;
 		private String imageUrl;
+		private String originalFileName;
 	}
 }
