@@ -52,9 +52,15 @@ public class SmsController {
 	@PostMapping("/send/account")
 	@SecurityRequirements
 	@Operation(summary = "계정 찾기(아이디 찾기, 비밀번호 찾기)용 SMS 인증번호 발송",
-		description = "아이디 찾기 또는 비밀번호 재설정을 위한 인증번호를 발송합니다. 카카오 회원은 사용할 수 없습니다. "
-	+"카카오 회원이 사용할 경우, 이용자의 상황을 판단 후 '카카오 회원은 아이디와 비밀번호를 찾을 수 없습니다.'고 메시지가 뜹니다. "
-	+"일반 유저인지 카카오 유저인지 판단해서 메시지를 보내야 될 때 사용해주시면 됩니다.")
+		description = """
+	아이디 찾기 또는 비밀번호 재설정을 위한 인증번호를 발송합니다. 카카오 회원은 사용할 수 없습니다.
+
+	카카오 회원이 사용할 경우, 이용자의 상황을 판단 후 '카카오 회원은 아이디와 비밀번호를 찾을 수 없습니다.'고 메시지가 뜹니다.
+
+	일반 유저인지 카카오 유저인지 판단해서 메시지를 보내야 될 때 사용해주시면 됩니다.
+
+	기업 계정 찾기 기능은 그냥 /api/sms/send 쓰셔도 상관없습니다. 유저 계정 찾기 기능에는 반드시 해당 api를 사용해주세요.
+	""")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SMS201", description = "인증번호가 발송되었습니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER413", description = "카카오 회원은 아이디와 비밀번호를 찾을 수 없습니다."),

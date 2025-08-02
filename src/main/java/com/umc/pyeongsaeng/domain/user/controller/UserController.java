@@ -219,7 +219,7 @@ public class UserController {
 		description = "아이디, 전화번호, 인증번호를 확인합니다. 비밀번호를 바꿀 때 사용자 식별이 필요하니, 이때를 위한 username이 return됩니다."
 	+"인증번호의 경우, 번호를 보내기 위해 /api/sms/send/account SMS 인증 api를 활용하셔야 합니다. 인증번호가 옳은지 확인하기 위해 /api/sms/verify를 따로 이용하실 필요는 없습니다.")
 	@ApiResponses({
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER401", description = "존재하지 않는 회원입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SMS401", description = "SMS 인증에 실패했습니다."),
 	})
