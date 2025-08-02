@@ -166,4 +166,79 @@ public class JobPostController {
 		Page<JobPost> jobPostList = jobPostQueryService.getJobPostList(userDetails.getCompany(), page);
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewListDTO(jobPostList));
 	}
+
+	@Operation(summary = "채용공고 상세 조회 API", description = "특정 채용공고를 클릭했을 때, 해당 공고의 상세 정보를 조회하는 API입니다.")
+	@ApiResponses(value = {
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(
+			responseCode = "200",
+			description = "채용공고 상세 조회 성공",
+			content = @Content(
+				mediaType = "application/json",
+				schema = @Schema(implementation = ApiResponse.class),
+				examples = @ExampleObject(
+					name = "SuccessExample",
+					value = """
+                {
+                  "isSuccess": true,
+                  "code": "COMMON200",
+                  "message": "성공입니다.",
+                  "result": {
+                    "title": "아파트 단지 경비원 모집",
+                    "address": "서울시 서초구",
+                    "detailAddress": "서울시 서초구 반포동 123",
+                    "roadAddress": "서울특별시 서초구 반포대로 45",
+                    "zipcode": "06545",
+                    "hourlyWage": 11000,
+                    "monthlySalary": null,
+                    "yearSalary": null,
+                    "description": "아파트 단지에서 근무할 경비원을 모집합니다.",
+                    "workingTime": "06:00 ~ 18:00 (주간) / 18:00 ~ 06:00 (야간)",
+                    "deadline": "2025-08-31",
+                    "recruitCount": 2,
+                    "note": "근무복 지급, 휴게 공간 제공",
+                    "images": [
+                      {
+                        "jobPostId": 1,
+                        "keyName": "3e4fd-28df-4cfc-9846-231389d_바다.jpg",
+                        "imageUrl": "https://pyeongsaeng-bucket.s3.amazonaws.com/...."
+                      }
+                    ],
+                    "travelTime": "도보 + 지하철 35분"
+                  }
+                }
+                """
+				)
+			)
+		),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(
+			responseCode = "400",
+			description = "유저 또는 근무지의 위치 정보(위도/경도)가 잘못되었거나, 해당 지역에서는 대중교통 경로를 찾을 수 없습니다.",
+			content = @io.swagger.v3.oas.annotations.media.Content(
+				mediaType = "application/json",
+				schema = @io.swagger.v3.oas.annotations.media.Schema(
+					implementation = ApiResponse.class
+				),
+				examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+					name = "RouteNotFound",
+					value = """
+                {
+                  "isSuccess": false,
+                  "code": "ROUTE_NOT_FOUND",
+                  "message": "출발지/도착지 좌표가 잘못되었거나, 요청 위치에서는 대중교통 이동 경로를 지원하지 않습니다.",
+                  "result": null
+                }
+                """
+				)
+			)
+		)
+	})
+	@GetMapping("/posts/{jobPostId}")
+	public ApiResponse<JobPostResponseDTO.JobPostDetailDTO> getJobPostDetail(
+		@Parameter(name = "jobPostId", description = "조회할 채용공고 ID", example = "1")
+		@RequestParam Long jobPostId,
+		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails){
+		return ApiResponse.onSuccess(jobPostQueryService.getJobPostDetail(jobPostId, userDetails.getUser().getId()));
+	}
+
+
 }

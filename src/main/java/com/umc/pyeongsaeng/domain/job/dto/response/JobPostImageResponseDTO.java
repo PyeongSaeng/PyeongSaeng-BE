@@ -17,4 +17,15 @@ public class JobPostImageResponseDTO {
 
 		String keyName;
 	}
+
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class JobPostImagePreviewWithUrlDTO {
+		private Long jobPostId;
+		private String keyName;
+		private String imageUrl;
+		private String originalFileName;
+	}
 }

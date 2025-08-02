@@ -16,6 +16,6 @@ public class TravelTimeService {
 
 	public String getTravelTime(double originLat, double originLng, double destLat, double destLng) {
 		return travelTimeUtil.getTravelModeSummary(originLat, originLng, destLat, destLng)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.GOOGLE_DIRECTIONS_API_FAILED));
+			.orElseThrow(() -> new GeneralException(ErrorStatus.ROUTE_NOT_FOUND));
 	}
 }

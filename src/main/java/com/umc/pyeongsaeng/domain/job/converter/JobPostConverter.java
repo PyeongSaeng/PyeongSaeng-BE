@@ -11,7 +11,6 @@ import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
-//import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
 import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
 import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingResult;
 
@@ -19,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JobPostConverter {
+
 
 	public static JobPost toJobPost(JobPostRequestDTO.CreateDTO requestDTO, GoogleGeocodingResult convertedAddress) {
 
@@ -100,6 +100,27 @@ public class JobPostConverter {
 			.totalElements(jobPostList.getTotalElements())
 			.totalPage(jobPostList.getTotalPages())
 			.listSize(jobPostPreViewDTOList.size())
+			.build();
+	}
+
+	public static JobPostResponseDTO.JobPostDetailDTO toJobPostDetailDTO(JobPost jobPost, String travelTime,
+		List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> images) {
+		return JobPostResponseDTO.JobPostDetailDTO.builder()
+			.title(jobPost.getTitle())
+			.address(jobPost.getAddress())
+			.detailAddress(jobPost.getDetailAddress())
+			.roadAddress(jobPost.getRoadAddress())
+			.zipcode(jobPost.getZipcode())
+			.hourlyWage(jobPost.getHourlyWage())
+			.monthlySalary(jobPost.getMonthlySalary())
+			.yearSalary(jobPost.getYearSalary())
+			.description(jobPost.getDescription())
+			.workingTime(jobPost.getWorkingTime())
+			.deadline(jobPost.getDeadline())
+			.recruitCount(jobPost.getRecruitCount())
+			.note(jobPost.getNote())
+			.images(images)
+			.travelTime(travelTime)
 			.build();
 	}
 }
