@@ -124,6 +124,7 @@ public class SecurityConfig {
 				.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
 				.requestMatchers("/api/user/withdraw/cancel").permitAll()
 				.requestMatchers("/api/user/protector/**").hasRole("PROTECTOR")
+				.requestMatchers("/api/user/senior/search").hasRole("PROTECTOR")
 				.requestMatchers("/api/user/senior/**").hasRole("SENIOR")
 				.requestMatchers("/api/protector/**").hasRole("PROTECTOR")
 				.requestMatchers("/api/senior/**").hasRole("SENIOR")

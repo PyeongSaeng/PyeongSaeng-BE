@@ -135,7 +135,7 @@ public class CompanyCommandServiceImpl implements CompanyCommandService {
 			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
 
 		if (company.getStatus() == CompanyStatus.WITHDRAWN) {
-			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN_COMPANY);
+			throw new GeneralException(ErrorStatus.WITHDRAWN_COMPANY);
 		}
 
 		validateWithdrawalIntent(confirmed);
@@ -151,7 +151,7 @@ public class CompanyCommandServiceImpl implements CompanyCommandService {
 			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
 
 		if (company.getStatus() != CompanyStatus.WITHDRAWN) {
-			throw new GeneralException(ErrorStatus.NOT_WITHDRAWN_COMPANY);
+			throw new GeneralException(ErrorStatus.WITHDRAWN_COMPANY);
 		}
 
 		if (company.getWithdrawnAt() != null &&
@@ -259,7 +259,7 @@ public class CompanyCommandServiceImpl implements CompanyCommandService {
 	// 탈퇴 의도 확인
 	private void validateWithdrawalIntent(boolean confirmed) {
 		if (!confirmed) {
-			throw new GeneralException(ErrorStatus.COMPANY_WITHDRAWAL_NOT_CONFIRMED);
+			throw new GeneralException(ErrorStatus.WITHDRAWAL_NOT_CONFIRMED);
 		}
 	}
 

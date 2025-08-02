@@ -140,7 +140,6 @@ public class SmsServiceImpl implements SmsService {
 		}
 
 		sendVerificationCode(phone);
-
 		return SmsResponse.SmsResultDto.success();
 	}
 }

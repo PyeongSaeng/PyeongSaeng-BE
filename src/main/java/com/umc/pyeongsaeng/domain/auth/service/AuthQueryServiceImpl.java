@@ -20,7 +20,7 @@ public class AuthQueryServiceImpl implements AuthQueryService {
 	@Override
 	public void checkUsernameAvailability(String username) {
 		if (userRepository.existsByUsername(username)) {
-			throw new GeneralException(ErrorStatus.USERNAME_DUPLICATED);
+			throw new GeneralException(ErrorStatus.DUPLICATE_USERNAME);
 		}
 	}
 }
