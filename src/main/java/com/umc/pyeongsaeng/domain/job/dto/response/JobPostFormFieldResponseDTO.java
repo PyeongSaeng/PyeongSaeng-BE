@@ -15,6 +15,7 @@ public class JobPostFormFieldResponseDTO {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class FormFieldPreViewDTO {
+		Long formFieldId;
 		String formField;
 		FieldType fieldType;
 		// 질문별 선택지를 여기에 넣으면 좋을 것 같아요

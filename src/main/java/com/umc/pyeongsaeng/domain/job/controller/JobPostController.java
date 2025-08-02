@@ -162,8 +162,59 @@ public class JobPostController {
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewListDTO(jobPostList));
 	}
 
+
+	@Operation(summary = "채용공고 지원서 질문 목록 조회 API", description = "채용공고 지원서의 질문 목록을 조회하는 API입니다.")
+	@ApiResponses(value = {
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "질문 목록 조회 성공",
+			content = @Content(
+				mediaType = "application/json",
+				schema = @Schema(implementation = ApiResponse.class),
+				examples = @ExampleObject(
+					name = "SuccessExample",
+					value = """
+						{
+						  "isSuccess": true,
+						  "code": "200",
+						  "message": "요청에 성공하였습니다.",
+						  "result": {
+						    "formFieldList": [
+						      {
+						        "formField": "이름",
+						        "fieldType": "TEXT"
+						      },
+						      {
+						        "formField": "연락처",
+						        "fieldType": "TEXT"
+						      },
+						      {
+						        "formField": "자기소개",
+						        "fieldType": "TEXT"
+						      },
+						      {
+						        "formField": "자기소개",
+						        "fieldType": "IMAGE"
+						      }
+						    ]
+						  }
+						}
+						"""
+				)
+			)
+		),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "존재하지 않는 채용공고",
+			content = @Content(
+				mediaType = "application/json",
+				schema = @Schema(implementation = ApiResponse.class),
+				examples = @ExampleObject(
+					name = "NotFoundExample",
+					value = "{\"isSuccess\": false, \"code\": \"JOBPOST404\", \"message\": \"존재하지 않는 채용공고입니다.\", \"result\": null}"
+				)
+			)
+		)
+	})
 	@GetMapping("/{jobPostId}/questions")
-	public ApiResponse<JobPostFormFieldResponseDTO.FormFieldPreViewListDTO> getJobPostQuestions(@PathVariable(name = "jobPostId") Long jobPostId) {
+	public ApiResponse<JobPostFormFieldResponseDTO.FormFieldPreViewListDTO> getJobPostQuestions(
+		@Parameter(name = "jobPostId", description = "채용공고 ID", example = "1") @PathVariable(name = "jobPostId") Long jobPostId) {
 
 		List<FormField> formFieldList = jobPostQueryService.getFormFieldList(jobPostId);
 
