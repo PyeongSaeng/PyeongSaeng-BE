@@ -1,21 +1,24 @@
 package com.umc.pyeongsaeng.domain.application.converter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDTO;
+import com.umc.pyeongsaeng.domain.application.entity.Application;
+import com.umc.pyeongsaeng.domain.application.entity.ApplicationAnswer;
 import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepositoryCustom;
+import com.umc.pyeongsaeng.domain.job.enums.FieldType;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-
-import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDTO;
-import com.umc.pyeongsaeng.domain.application.entity.Application;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -93,6 +96,30 @@ public class ApplicationConverter {
 			.questionAndAnswerList(questionAndAnswerList)
 			.postState(JobPostState.valueOf(result.getPost_state()))
 			.applicationState(result.getApplication_status())
+			.build();
+	}
+
+	public static ApplicationResponseDTO.RegistrationResultDTO toRegistrationResultDTO(Application application, List<ApplicationAnswer> answers) {
+
+		List<ApplicationResponseDTO.AnswerResponseDTO> answerResultList = answers.stream()
+			.map(answer -> {
+				// 답변의 타입에 따라 적절한 ResponseDTO를 생성
+				if (answer.getFormField().getFieldType() == FieldType.TEXT) {
+					return new ApplicationResponseDTO.TextAnswerResponseDTO(answer);
+				} else if (answer.getFormField().getFieldType() == FieldType.IMAGE) {
+					return new ApplicationResponseDTO.ImageAnswerResponseDTO(answer);
+				}
+				return null;
+			})
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+
+		return ApplicationResponseDTO.RegistrationResultDTO.builder()
+			.applicationId(application.getId())
+			.jobPostId(application.getJobPost().getId())
+			.applicationStatus(application.getApplicationStatus().name())
+			.createdAt(application.getCreatedAt())
+			.answers(answerResultList)
 			.build();
 	}
 }

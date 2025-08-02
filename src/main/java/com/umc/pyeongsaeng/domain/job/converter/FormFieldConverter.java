@@ -11,6 +11,7 @@ public class FormFieldConverter {
 	public static JobPostFormFieldResponseDTO.FormFieldPreViewDTO toFormFieldPreViewDTO(FormField formField) {
 
 		return JobPostFormFieldResponseDTO.FormFieldPreViewDTO.builder()
+			.formFieldId(formField.getId())
 			.formField(formField.getFieldName())
 			.fieldType(formField.getFieldType())
 			.build();
