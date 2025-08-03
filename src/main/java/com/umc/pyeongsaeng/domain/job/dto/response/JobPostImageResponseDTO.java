@@ -15,6 +15,7 @@ public class JobPostImageResponseDTO {
 
 		Long jobPostId;
 		String keyName;
+		String originalFileName;
 	}
 
 	@Builder

@@ -1,6 +1,5 @@
 package com.umc.pyeongsaeng.domain.job.controller;
 
-import com.umc.pyeongsaeng.domain.company.repository.CompanyRepository;
 import com.umc.pyeongsaeng.domain.job.converter.JobPostConverter;
 import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
@@ -31,7 +30,6 @@ public class JobPostController {
 
 	private final JobPostCommandService jobPostCommandService;
 	private final JobPostQueryService jobPostQueryService;
-	private final CompanyRepository companyRepository;
 
 	@Operation(summary = "채용공고 생성 API", description = "기업이 새로운 채용공고를 생성하는 API입니다.")
 	@ApiResponses(value = {
@@ -88,12 +86,63 @@ public class JobPostController {
 	@PostMapping("/posts")
 	public ApiResponse<JobPostResponseDTO.JobPostPreviewDTO> createJobPost(
 		@RequestBody JobPostRequestDTO.CreateDTO requestDTO,
-		@Parameter(hidden = true) @AuthenticationPrincipal Long companyId) {
-		JobPost newJobPost = jobPostCommandService.createJobPost(requestDTO, companyId);
+		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+		JobPost newJobPost = jobPostCommandService.createJobPost(requestDTO, userDetails.getCompany().getId());
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewDTO(newJobPost));
 	}
 
-	@Operation(summary = "채용공고 목록 조회 API", description = "기업이 자신이 등록한 채용공고 목록을 페이징하여 조회하는 API입니다.")
+
+	@Operation(summary = "채용공고 수정 API", description = "기업이 자신이 등록한 채용공고를 수정하는 API입니다.")
+	@ApiResponses(value = {
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "채용공고 수정 성공",
+			content = @Content(
+				mediaType = "application/json",
+				schema = @Schema(implementation = ApiResponse.class),
+				examples = @ExampleObject(
+					name = "SuccessExample",
+					value = """
+						{
+						  "isSuccess": true,
+						  "code": "200",
+						  "message": "요청에 성공하였습니다.",
+						  "result": {
+							"id": 6,
+							"state": null,
+							"title": "주말 시니어 바리스타 채용22",
+							"address": "서울시 마포구",
+							"detailAddress": "월드컵북로 396, 101호",
+							"roadAddress": "서울특별시 마포구 월드컵북로 396",
+							"zipcode": "03925",
+							"hourlyWage": 13000,
+							"monthlySalary": null,
+							"yearSalary": null,
+							"description": "활기찬 주말을 함께할 시니어 바리스타를 찾습니다. 경력은 중요하지 않습니다.",
+							"workingTime": "매주 토, 일 10:00 ~ 16:00",
+							"deadline": "2025-08-15",
+							"recruitCount": 1,
+							"note": "앞치마 및 유니폼 제공",
+							"jobPostImageId": [
+							  {
+								"jobPostId": 6,
+								"keyName": "file123",
+								"originalFileName": "사진.jpg"
+							  }
+							]
+						  }
+						}
+						"""
+				)
+			)
+		),
+	})
+	@PutMapping("/posts/{jobPostId}")
+	public ApiResponse<JobPostResponseDTO.JobPostPreviewDTO> updateJobPost(
+		@PathVariable Long jobPostId,
+		@RequestBody JobPostRequestDTO.UpdateDTO requestDTO) {
+		JobPost updatedJobPost = jobPostCommandService.updateJobPost(jobPostId, requestDTO);
+		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewDTO(updatedJobPost));
+	}
+
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "채용공고 목록 조회 성공",
 			content = @Content(
