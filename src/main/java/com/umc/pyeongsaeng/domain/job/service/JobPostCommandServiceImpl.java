@@ -68,7 +68,6 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 		JobPost jobPost = jobPostRepository.findById(jobPostId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
 
-
 		GoogleGeocodingResult convertedAddress = null;
 		if (requestDTO.getRoadAddress() != null && !requestDTO.getRoadAddress().equals(jobPost.getRoadAddress())) {
 			convertedAddress = googleGeocodingClient.convert(requestDTO.getRoadAddress());

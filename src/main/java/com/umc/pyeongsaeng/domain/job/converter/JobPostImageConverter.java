@@ -13,7 +13,7 @@ public class JobPostImageConverter {
 		return JobPostImageResponseDTO.JobPostImagePreviewDTO.builder()
 			.originalFileName(jobPostImage.getOriginalFileName())
 			.keyName(jobPostImage.getKeyName())
-			.jobPostId(jobPostImage.getJobPost().getId())
+			.imageId(jobPostImage.getId())
 			.build();
 	}
 

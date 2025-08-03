@@ -13,7 +13,7 @@ public class JobPostImageResponseDTO {
 	@NoArgsConstructor
 	public static class JobPostImagePreviewDTO {
 
-		Long jobPostId;
+		Long imageId;
 		String keyName;
 		String originalFileName;
 	}

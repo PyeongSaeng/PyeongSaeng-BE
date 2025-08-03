@@ -77,11 +77,11 @@ public class JobPostController {
 					    },
 					    {
 					      "fieldName": "자기소개",
-					      "fieldType": "TEXTAREA"
+					      "fieldType": "TEXT"
 					    },
 					    {
 					      "fieldName": "경력 유무",
-					      "fieldType": "RADIO"
+					      "fieldType": "IMAGE"
 					    }
 					  ]
 					}
@@ -90,49 +90,6 @@ public class JobPostController {
 		)
 	))
 	@ApiResponses(value = {
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "채용공고 생성 성공",
-			content = @Content(
-				mediaType = "application/json",
-				schema = @Schema(implementation = ApiResponse.class),
-				examples = {
-					@ExampleObject(
-						name = "채용공고 생성 예시",
-						summary = "폼 필드를 포함한 채용공고 생성 예시입니다.",
-						value = """
-							{
-							  "isSuccess": true,
-							  "code": "200",
-							  "message": "요청에 성공하였습니다.",
-							  "result": {
-							    "id": 1,
-							    "state": "RECRUITING",
-							    "title": "시니어 돌보미 채용",
-							    "address": "서울특별시 강남구",
-							    "detailAddress": "테헤란로 212",
-							    "roadAddress": "서울특별시 강남구 테헤란로 212",
-							    "zipcode": "06222",
-							    "hourlyWage": 15000,
-							    "monthlySalary": null,
-							    "yearSalary": null,
-							    "description": "어르신과 함께 즐거운 시간을 보내실 분을 찾습니다. 주 3회, 오후 시간에 근무하며, 식사 준비 및 말벗이 주된 업무입니다.",
-							    "workingTime": "월, 수, 금 14:00 ~ 18:00",
-							    "deadline": "2025-08-31",
-							    "recruitCount": 1,
-							    "note": "경력자 우대",
-							    "jobPostImages": [
-							      {
-							        "jobPostId": 1,
-							        "keyName": "image_key_1.jpg",
-							        "originalFileName": "job_post_image_1.jpg"
-							      }
-							    ]
-							  }
-							}
-							"""
-					)
-				}
-			)
-		),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패",
 			content = @Content(
 				mediaType = "application/json",
@@ -154,7 +111,64 @@ public class JobPostController {
 
 
 
-	@Operation(summary = "채용공고 수정 API", description = "기업이 자신이 등록한 채용공고를 수정하는 API입니다.")
+	@Operation(summary = "채용공고 수정 API", description = "기업이 자신이 등록한 채용공고를 수정하는 API입니다.",
+		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+			description = "채용공고 수정 요청 DTO",
+			required = true,
+			content = @Content(
+				mediaType = "application/json",
+				schema = @Schema(implementation = JobPostRequestDTO.UpdateDTO.class),
+				examples = @ExampleObject(
+					name = "채용공고 수정 예시",
+					summary = "폼 필드를 포함한 채용공고 수정 예시입니다.",
+					value = """
+						{
+						  "title": "시니어 돌보미 채용",
+						  "address": "서울특별시 강남구",
+						  "detailAddress": "테헤란로 212",
+						  "roadAddress": "서울특별시 강남구 테헤란로 212",
+						  "zipcode": "06222",
+						  "hourlyWage": 15000,
+						  "monthlySalary": null,
+						  "yearSalary": null,
+						  "description": "어르신과 함께 즐거운 시간을 보내실 분을 찾습니다. 주 3회, 오후 시간에 근무하며, 식사 준비 및 말벗이 주된 업무입니다.",
+						  "workingTime": "월, 수, 금 14:00 ~ 18:00",
+						  "deadline": "2025-08-31",
+						  "recruitCount": 1,
+						  "note": "경력자 우대",
+						  "images": [
+						    {
+						      "keyName": "image_key_1.jpg43",
+						      "originalFileName": "job_post_image_1.jpg"
+						    },
+						    {
+						      "keyName": "image_key_2.png43",
+						      "originalFileName": "job_post_image_2.png"
+						    }
+						  ],
+						  "formFieldList": [
+						    {
+						      "fieldName": "성함",
+						      "fieldType": "TEXT"
+						    },
+						    {
+						      "fieldName": "연락처",
+						      "fieldType": "TEXT"
+						    },
+						    {
+						      "fieldName": "자기소개",
+						      "fieldType": "TEXT"
+						    },
+						    {
+						      "fieldName": "경력 유무",
+						      "fieldType": "IMAGE"
+						    }
+						  ]
+						}
+						"""
+				)
+			)
+		))
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "채용공고 수정 성공",
 			content = @Content(
