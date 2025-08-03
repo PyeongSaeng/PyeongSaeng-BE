@@ -86,6 +86,16 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 			jobPost.getImages().addAll(newImages);
 		}
 
+		if (requestDTO.getFormFieldList() != null) {
+			formFieldRepository.deleteAll(jobPost.getFormField());
+			List<FormField> newFormField = requestDTO.getFormFieldList().stream()
+				.map(formField -> FormFieldConverter.toFormField(formField, jobPost))
+				.toList();
+			formFieldRepository.saveAll(newFormField);
+			jobPost.getFormField().clear();
+			jobPost.getFormField().addAll(newFormField);
+		}
+
 		saveToElasticsearch(jobPost, convertedAddress);
 
 		return jobPost;
