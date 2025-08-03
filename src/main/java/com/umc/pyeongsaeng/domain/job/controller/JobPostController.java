@@ -1,17 +1,16 @@
 package com.umc.pyeongsaeng.domain.job.controller;
 
-import com.umc.pyeongsaeng.domain.company.entity.Company;
 import com.umc.pyeongsaeng.domain.company.repository.CompanyRepository;
 import com.umc.pyeongsaeng.domain.job.converter.JobPostConverter;
 import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
+import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import com.umc.pyeongsaeng.domain.job.service.JobPostCommandService;
 import com.umc.pyeongsaeng.domain.job.service.JobPostQueryService;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.resolvation.annotation.PageNumber;
 import com.umc.pyeongsaeng.global.security.CustomUserDetails;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,15 +19,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "채용 API", description = "채용공고 관련 API")
 @RequestMapping("/api/job")
@@ -116,27 +109,27 @@ public class JobPostController {
 						  "result": {
 						    "jobPostList": [
 						      {
-						        "jobPostId": 1,
-						        "title": "시니어 백엔드 개발자 모집",
-						        "imageUrl": "https://pyeongsaeng-s3.s3.ap-northeast-2.amazonaws.com/company/pyeongsaeng_logo.png",
-						        "companyName": "평생전자",
-						        "address": "서울시 강남구",
-						        "deadline": "2025-08-31",
-						        "createdAt": "2025-07-25T10:00:00"
-						      },
-						      {
-						        "jobPostId": 2,
-						        "title": "경력 무관! 마케팅 전문가 모집",
-						        "imageUrl": "https://pyeongsaeng-s3.s3.ap-northeast-2.amazonaws.com/company/eussya_logo.png",
-						        "companyName": "으쌰으쌰컴퍼니",
-						        "address": "서울시 서초구",
-						        "deadline": "2025-09-15",
-						        "createdAt": "2025-07-25T11:00:00"
+                                "id": 3,
+                                "state": "RECRUITING",
+                                "title": "",
+                                "address": null,
+                                "detailAddress": "1",
+                                "roadAddress": "110",
+                                "zipcode": "04538",
+                                "hourlyWage": 11000,
+                                "monthlySalary": 2300000,
+                                "yearSalary": null,
+                                "description": ".",
+                                "workingTime": "10:00 - 17:00",
+                                "deadline": "2025-09-30",
+                                "recruitCount": 1,
+                                "note": "",
+                                "jobPostImageId": []
 						      }
 						    ],
-						    "listSize": 2,
+						    "listSize": 1,
 						    "totalPage": 1,
-						    "totalElements": 2,
+						    "totalElements": 1,
 						    "isFirst": true,
 						    "isLast": true
 						  }
@@ -156,14 +149,13 @@ public class JobPostController {
 			)
 		)
 	})
-	@GetMapping("/posts")
+	@GetMapping("/companies/me/posts")
 	public ApiResponse<JobPostResponseDTO.JobPostPreviewListDTO> getJobPost(
 		@Parameter(name = "page", description = "페이지 번호 (1부터 시작)", example = "1") @PageNumber Integer page,
-		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+		@RequestParam(name = "state", required = false, defaultValue = "RECRUITING") JobPostState jobPostState) {
 
-		// Company company = companyRepository.findById(companyId).orElse(null);
-		// Page<JobPost> jobPostList =  jobPostQueryService.getJobPostList(company, page);
-		Page<JobPost> jobPostList = jobPostQueryService.getJobPostList(userDetails.getCompany(), page);
+		Page<JobPost> jobPostList = jobPostQueryService.getJobPostList(userDetails.getCompany(), page, jobPostState);
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewListDTO(jobPostList));
 	}
 

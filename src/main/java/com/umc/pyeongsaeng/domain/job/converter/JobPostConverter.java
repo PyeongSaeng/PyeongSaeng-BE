@@ -1,20 +1,18 @@
 package com.umc.pyeongsaeng.domain.job.converter;
 
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Page;
-
 import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
 import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingResult;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class JobPostConverter {
@@ -48,6 +46,8 @@ public class JobPostConverter {
 			.map(JobPostImageConverter::toJobPostImagePreViewDTO).collect(Collectors.toList());
 
 		return JobPostResponseDTO.JobPostPreviewDTO.builder()
+			.id(jobPost.getId())
+			.state(jobPost.getState())
 			.title(jobPost.getTitle())
 			.address(jobPost.getAddress())
 			.detailAddress(jobPost.getDetailAddress())

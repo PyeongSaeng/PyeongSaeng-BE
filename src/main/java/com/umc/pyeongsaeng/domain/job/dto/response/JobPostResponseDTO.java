@@ -1,12 +1,13 @@
 package com.umc.pyeongsaeng.domain.job.dto.response;
 
-import java.time.LocalDate;
-import java.util.List;
-
+import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public class JobPostResponseDTO {
 
@@ -15,6 +16,8 @@ public class JobPostResponseDTO {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class JobPostPreviewDTO {
+		Long id;
+		JobPostState state;
 		String title;
 		String address;
 		String detailAddress;
