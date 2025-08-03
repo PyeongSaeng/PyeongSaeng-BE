@@ -70,8 +70,3 @@ openai:
   api:
     key: ${OPENAI_API_KEY}
     url: https://api.openai.com/v1/chat/completions
-
-odcloud:
-  api:
-    base-url: https://dummy-url.com
-    service-key: dummy-key-1234
