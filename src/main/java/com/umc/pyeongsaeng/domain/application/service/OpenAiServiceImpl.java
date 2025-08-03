@@ -3,7 +3,6 @@ package com.umc.pyeongsaeng.domain.application.service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.umc.pyeongsaeng.domain.application.dto.request.AnswerGenerationRequestDTO;
 import com.umc.pyeongsaeng.domain.application.dto.request.KeywordGenerationRequestDTO;
@@ -13,8 +12,9 @@ import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -38,27 +38,21 @@ public class OpenAiServiceImpl implements OpenAiService {
 
 	@Override
 	public List<String> generateKeywords(KeywordGenerationRequestDTO request) {
-		String prompt = OpenAiPromptBuilder.buildKeywordPrompt(request.getAnswers(), request.getQuestion());
-		String rawAnswer = callOpenAi(prompt);
-
-		// ✅ 예: "경제적 자립, 사회 기여, 사람들과 어울림" → ["경제적 자립", "사회 기여", "사람들과 어울림"]
-		return Arrays.stream(rawAnswer.split("[,\\n]"))
-			.map(String::trim)
-			.filter(s -> !s.isBlank())
-			.collect(Collectors.toList());
+		String prompt = OpenAiPromptBuilder.buildKeywordPrompt(request);
+		return extractListFromResponse(callOpenAi(prompt));
 	}
 
 	@Override
-	public String generateSentence(AnswerGenerationRequestDTO request) {
-		String prompt = OpenAiPromptBuilder.buildAnswerPrompt(request.getAnswers(), request.getQuestion(), request.getSelectedKeyword());
-		return callOpenAi(prompt);
+	public String generateAnswer(AnswerGenerationRequestDTO request) {
+		String prompt = OpenAiPromptBuilder.buildAnswerPrompt(request);
+		return extractStringFromResponse(callOpenAi(prompt));
 	}
 
 	private String callOpenAi(String prompt) {
 		Map<String, Object> requestBody = Map.of(
 			"model", model,
 			"messages", new Object[]{
-				Map.of("role", "system", "content", "너는 노인을 위한 지원서 작성 도우미야. 친절하고 따뜻하게 대답해줘."),
+				Map.of("role", "system", "content", "너는 노인을 위한 지원서 작성 도우미야. 친절하고 따뜻하게 한국인 노인의 입장에서 대답해줘."),
 				Map.of("role", "user", "content", prompt)
 			}
 		);
@@ -72,8 +66,7 @@ public class OpenAiServiceImpl implements OpenAiService {
 			ResponseEntity<Map> response = restTemplate.postForEntity(openAiUrl, entity, Map.class);
 
 			if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-				String answer = ((Map)((Map)((List<?>) response.getBody().get("choices")).get(0)).get("message")).get("content").toString();
-				return answer.trim();
+				return ((Map)((Map)((List<?>)response.getBody().get("choices")).get(0)).get("message")).get("content").toString().trim();
 			} else {
 				log.error("[OpenAI] 응답 실패: {}", response);
 				throw new GeneralException(ErrorStatus.AI_RESPONSE_ERROR);
@@ -82,5 +75,16 @@ public class OpenAiServiceImpl implements OpenAiService {
 			log.error("[OpenAI] 요청 중 오류 발생", e);
 			throw new GeneralException(ErrorStatus.AI_REQUEST_ERROR);
 		}
+	}
+
+	private List<String> extractListFromResponse(String rawContent) {
+		return Arrays.stream(rawContent.split("[,\n]"))
+			.map(String::trim)
+			.filter(s -> !s.isBlank())
+			.toList();
+	}
+
+	private String extractStringFromResponse(String rawContent) {
+		return rawContent;
 	}
 }

@@ -1,7 +1,18 @@
 package com.umc.pyeongsaeng.domain.application.dto.request;
 
-public class KeywordGenerationRequestDTO {
+import java.util.List;
 
-	//private List<SeniorQuestionAnswerDTO> datas;
+import com.umc.pyeongsaeng.domain.senior.dto.response.SeniorQuestionResponseDTO;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class KeywordGenerationRequestDTO {
+	private List<SeniorQuestionResponseDTO.QuestionAnswerResponseDTO> answers;
 	private String question;
 }

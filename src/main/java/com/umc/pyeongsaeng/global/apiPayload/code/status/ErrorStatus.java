@@ -1,6 +1,5 @@
 package com.umc.pyeongsaeng.global.apiPayload.code.status;
 
-import co.elastic.clients.elasticsearch.nodes.Http;
 import org.springframework.http.HttpStatus;
 
 import com.umc.pyeongsaeng.global.apiPayload.code.BaseErrorCode;
@@ -30,8 +29,6 @@ public enum ErrorStatus implements BaseErrorCode {
 	NOT_WITHDRAWN_USER(HttpStatus.BAD_REQUEST, "USER408", "탈퇴하지 않은 회원입니다."),
 	WITHDRAWAL_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, "USER409", "탈퇴 후 7일이 경과하여 복구할 수 없습니다."),
 	USER_WITHDRAWAL_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "USER410", "탈퇴 의도가 확인되지 않았습니다."),
-	SENIOR_PROFILE_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER411", "유효하지 않은 시니어 프로필입니다."),
-	INVALID_USER_ROLE(HttpStatus.BAD_REQUEST, "USER412", "유효하지 않은 Role입니다."),
 
 	// Auth
 	LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH401", "아이디 또는 비밀번호가 올바르지 않습니다."),
@@ -88,16 +85,8 @@ public enum ErrorStatus implements BaseErrorCode {
 	ES_REQUEST_ERROR(HttpStatus.BAD_REQUEST,"SEARCH403", "Elasticsearch 요청 처리 중 오류가 발생했습니다. 인덱스나 쿼리를 확인해주세요."),
 	ES_PARTIAL_SHARD_FAILURE(HttpStatus.BAD_GATEWAY,"SEARCH403", "Elasticsearch 일부 샤드에서 오류가 발생했습니다. 검색 결과가 누락되었을 수 있습니다."),
 
-	// Application
-	INVALID_APPLICATION_ID(HttpStatus.BAD_REQUEST, "APPLICATION400", "유효하지 않은 ApplicationId 입니다."),
-	APPLICATION_PARSING_ERROR(HttpStatus.BAD_REQUEST, "APPLICATION500", "결과 파싱에러 입니다. 관리자에게 문의해주세요"),
-
-	// JOb
-	INVALID_JOB_POST_ID(HttpStatus.BAD_REQUEST, "JOB401", "유효하지 않은 채용공고 ID입니다."),
-
-	// Qusetion
-	SENIOR_QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND,"QUESTION401","해당 시니어 질문을 찾을 수 없습니다."),
-	SENIOR_QUESTION_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND,"QUESTION402","해당 시니어 질문의 옵션을 찾을 수 없습니다.");
+	// JOB
+	INVALID_JOB_POST_ID(HttpStatus.BAD_REQUEST, "JOB401", "유효하지 않은 채용공고 ID입니다.");
 
 
 	private final HttpStatus httpStatus;

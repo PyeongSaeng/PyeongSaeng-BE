@@ -122,6 +122,7 @@ public class SecurityConfig {
 				.requestMatchers("/api/protector/**").hasRole("PROTECTOR")
 				.requestMatchers("/api/senior/**").hasRole("SENIOR")
 				.requestMatchers("/api/companies/**").hasRole("COMPANY")
+				.requestMatchers("/api/ai/**").permitAll()
 				.anyRequest().authenticated()
 			)
 
