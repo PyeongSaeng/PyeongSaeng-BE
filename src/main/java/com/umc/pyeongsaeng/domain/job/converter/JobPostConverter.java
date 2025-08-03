@@ -1,6 +1,7 @@
 package com.umc.pyeongsaeng.domain.job.converter;
 
 import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
+import com.umc.pyeongsaeng.domain.job.dto.response.FormFieldResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
@@ -34,6 +35,7 @@ public class JobPostConverter {
 			.deadline(requestDTO.getDeadline())
 			.recruitCount(requestDTO.getRecruitCount())
 			.images(new ArrayList<>())
+			.formField(new ArrayList<>())
 			.note(requestDTO.getNote())
 			.latitude(convertedAddress.lat())
 			.longitude(convertedAddress.lon())
@@ -44,6 +46,10 @@ public class JobPostConverter {
 
 		List<JobPostImageResponseDTO.JobPostImagePreviewDTO> jobPostImagePreviewDTOList = jobPost.getImages().stream()
 			.map(JobPostImageConverter::toJobPostImagePreViewDTO).collect(Collectors.toList());
+
+
+		List<FormFieldResponseDTO.FormFieldPreViewDTO> jobPostFormFieldPreviewDTOList = jobPost.getFormField().stream()
+			.map(FormFieldConverter::toFormFieldPreViewDTO).collect(Collectors.toList());
 
 		return JobPostResponseDTO.JobPostPreviewDTO.builder()
 			.id(jobPost.getId())
@@ -60,7 +66,8 @@ public class JobPostConverter {
 			.workingTime(jobPost.getWorkingTime())
 			.deadline(jobPost.getDeadline())
 			.recruitCount(jobPost.getRecruitCount())
-			.jobPostImageId(jobPostImagePreviewDTOList)
+			.jobPostImages(jobPostImagePreviewDTOList)
+			.formFields(jobPostFormFieldPreviewDTOList)
 			.note(jobPost.getNote())
 			.build();
 	}

@@ -1,10 +1,13 @@
 package com.umc.pyeongsaeng.domain.job.service;
 
+import com.umc.pyeongsaeng.domain.job.converter.FormFieldConverter;
 import com.umc.pyeongsaeng.domain.job.converter.JobPostConverter;
 import com.umc.pyeongsaeng.domain.job.converter.JobPostImageConverter;
 import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
+import com.umc.pyeongsaeng.domain.job.entity.FormField;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import com.umc.pyeongsaeng.domain.job.entity.JobPostImage;
+import com.umc.pyeongsaeng.domain.job.repository.FormFieldRepository;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostImageRepository;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
 import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
@@ -31,6 +34,7 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 	private final JobPostImageRepository jobPostImageRepository;
 	private final GoogleGeocodingClient googleGeocodingClient;
 	private final ElasticOperationServiceImpl elasticOperationServiceImpl;
+	private final FormFieldRepository formFieldRepository;
 
 	@Override
 	public JobPost createJobPost(JobPostRequestDTO.CreateDTO requestDTO, Long companyId) {
@@ -46,11 +50,16 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 			.collect(Collectors.toList());
 
 		jobPostImageRepository.saveAll(savedImages);
-
 		newJobPost.getImages().addAll(savedImages);
 
+		List<FormField> savedFormFields = requestDTO.getFormfieldList().stream()
+			.map(formFields -> FormFieldConverter.toFormField(formFields, newJobPost))
+			.toList();
+
+		formFieldRepository.saveAll(savedFormFields);
+		newJobPost.getFormField().addAll(savedFormFields);
+
 		saveToElasticsearch(newJobPost, convertedAddress);
-		// 이미지 정보까지 완전히 채워진 JobPost 객체를 반환
 		return newJobPost;
 	}
 

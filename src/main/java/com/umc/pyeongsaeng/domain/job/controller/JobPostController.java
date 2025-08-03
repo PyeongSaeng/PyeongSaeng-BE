@@ -31,7 +31,64 @@ public class JobPostController {
 	private final JobPostCommandService jobPostCommandService;
 	private final JobPostQueryService jobPostQueryService;
 
-	@Operation(summary = "채용공고 생성 API", description = "기업이 새로운 채용공고를 생성하는 API입니다.")
+	@Operation(summary = "채용공고 생성 API", description = "기업이 새로운 채용공고를 생성하는 API입니다.",
+		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+		description = "채용공고 생성 요청 DTO",
+		required = true,
+		content = @Content(
+			mediaType = "application/json",
+			schema = @Schema(implementation = JobPostRequestDTO.CreateDTO.class),
+			examples = @ExampleObject(
+				name = "채용공고 생성 예시",
+				summary = "폼 필드를 포함한 채용공고 생성 예시입니다.",
+				value = """
+					{
+					  "title": "시니어 돌보미 채용",
+					  "address": "서울특별시 강남구",
+					  "detailAddress": "테헤란로 212",
+					  "roadAddress": "서울특별시 강남구 테헤란로 212",
+					  "zipcode": "06222",
+					  "hourlyWage": 15000,
+					  "monthlySalary": null,
+					  "yearSalary": null,
+					  "description": "어르신과 함께 즐거운 시간을 보내실 분을 찾습니다. 주 3회, 오후 시간에 근무하며, 식사 준비 및 말벗이 주된 업무입니다.",
+					  "workingTime": "월, 수, 금 14:00 ~ 18:00",
+					  "deadline": "2025-08-31",
+					  "recruitCount": 1,
+					  "note": "경력자 우대",
+					  "images": [
+					    {
+					      "keyName": "image_key_1.jpg",
+					      "originalFileName": "job_post_image_1.jpg"
+					    },
+					    {
+					      "keyName": "image_key_2.png",
+					      "originalFileName": "job_post_image_2.png"
+					    }
+					  ],
+					  "formfieldList": [
+					    {
+					      "fieldName": "성함",
+					      "fieldType": "TEXT"
+					    },
+					    {
+					      "fieldName": "연락처",
+					      "fieldType": "TEXT"
+					    },
+					    {
+					      "fieldName": "자기소개",
+					      "fieldType": "TEXTAREA"
+					    },
+					    {
+					      "fieldName": "경력 유무",
+					      "fieldType": "RADIO"
+					    }
+					  ]
+					}
+					"""
+			)
+		)
+	))
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "채용공고 생성 성공",
 			content = @Content(
@@ -39,36 +96,40 @@ public class JobPostController {
 				schema = @Schema(implementation = ApiResponse.class),
 				examples = {
 					@ExampleObject(
-						name = "시급제 공고 예시",
-						summary = "카페 바리스타와 같은 시급제 채용공고 생성 예시입니다.",
+						name = "채용공고 생성 예시",
+						summary = "폼 필드를 포함한 채용공고 생성 예시입니다.",
 						value = """
 							{
 							  "isSuccess": true,
 							  "code": "200",
 							  "message": "요청에 성공하였습니다.",
 							  "result": {
-							    "title": "주말 시니어 바리스타 채용",
-							    "address": "서울시 마포구",
-							    "detailAddress": "월드컵북로 396, 101호",
-							    "roadAddress": "서울특별시 마포구 월드컵북로 396",
-							    "zipcode": "03925",
-							    "hourlyWage": 13000,
+							    "id": 1,
+							    "state": "RECRUITING",
+							    "title": "시니어 돌보미 채용",
+							    "address": "서울특별시 강남구",
+							    "detailAddress": "테헤란로 212",
+							    "roadAddress": "서울특별시 강남구 테헤란로 212",
+							    "zipcode": "06222",
+							    "hourlyWage": 15000,
 							    "monthlySalary": null,
 							    "yearSalary": null,
-							    "description": "활기찬 주말을 함께할 시니어 바리스타를 찾습니다. 경력은 중요하지 않습니다.",
-							    "workingTime": "매주 토, 일 10:00 ~ 16:00",
-							    "deadline": "2025-08-15",
+							    "description": "어르신과 함께 즐거운 시간을 보내실 분을 찾습니다. 주 3회, 오후 시간에 근무하며, 식사 준비 및 말벗이 주된 업무입니다.",
+							    "workingTime": "월, 수, 금 14:00 ~ 18:00",
+							    "deadline": "2025-08-31",
 							    "recruitCount": 1,
-							    "note": "앞치마 및 유니폼 제공",
-							    "jobPostImageId": [
+							    "note": "경력자 우대",
+							    "jobPostImages": [
 							      {
-							        "keyName": "cafe_weekend_barista.png"
+							        "jobPostId": 1,
+							        "keyName": "image_key_1.jpg",
+							        "originalFileName": "job_post_image_1.jpg"
 							      }
 							    ]
 							  }
 							}
 							"""
-					),
+					)
 				}
 			)
 		),
@@ -92,6 +153,7 @@ public class JobPostController {
 	}
 
 
+
 	@Operation(summary = "채용공고 수정 API", description = "기업이 자신이 등록한 채용공고를 수정하는 API입니다.")
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "채용공고 수정 성공",
@@ -107,24 +169,24 @@ public class JobPostController {
 						  "message": "요청에 성공하였습니다.",
 						  "result": {
 							"id": 6,
-							"state": null,
-							"title": "주말 시니어 바리스타 채용22",
+							"state": "RECRUITING",
+							"title": "주말 시니어 바리스타 채용 (수정)",
 							"address": "서울시 마포구",
 							"detailAddress": "월드컵북로 396, 101호",
 							"roadAddress": "서울특별시 마포구 월드컵북로 396",
 							"zipcode": "03925",
-							"hourlyWage": 13000,
+							"hourlyWage": 14000,
 							"monthlySalary": null,
 							"yearSalary": null,
-							"description": "활기찬 주말을 함께할 시니어 바리스타를 찾습니다. 경력은 중요하지 않습니다.",
-							"workingTime": "매주 토, 일 10:00 ~ 16:00",
-							"deadline": "2025-08-15",
+							"description": "활기찬 주말을 함께할 시니어 바리스타를 찾습니다. 경력은 중요하지 않습니다. (수정)",
+							"workingTime": "매주 토, 일 10:00 ~ 17:00",
+							"deadline": "2025-08-20",
 							"recruitCount": 1,
-							"note": "앞치마 및 유니폼 제공",
-							"jobPostImageId": [
+							"note": "앞치마 및 유니폼 제공, 중식 제공",
+							"jobPostImages": [
 							  {
 								"jobPostId": 6,
-								"keyName": "file123",
+								"keyName": "file123.jpg",
 								"originalFileName": "사진.jpg"
 							  }
 							]
