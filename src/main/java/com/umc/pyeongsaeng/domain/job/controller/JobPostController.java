@@ -125,8 +125,7 @@ public class JobPostController {
                                 "recruitCount": 1,
                                 "note": "라떼 아트 가능자 특별 우대",
                                 "jobPostImageId": [{
-                                    "jobPostId": 3,
-                                    "keyName": "example_image.png"
+                                    "keyName": "example_image12"
                                 }]
 						      }
 						    ],
