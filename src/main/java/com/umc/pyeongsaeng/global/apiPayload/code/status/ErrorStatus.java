@@ -1,5 +1,6 @@
 package com.umc.pyeongsaeng.global.apiPayload.code.status;
 
+import co.elastic.clients.elasticsearch.nodes.Http;
 import org.springframework.http.HttpStatus;
 
 import com.umc.pyeongsaeng.global.apiPayload.code.BaseErrorCode;
@@ -29,6 +30,8 @@ public enum ErrorStatus implements BaseErrorCode {
 	NOT_WITHDRAWN_USER(HttpStatus.BAD_REQUEST, "USER408", "탈퇴하지 않은 회원입니다."),
 	WITHDRAWAL_PERIOD_EXPIRED(HttpStatus.BAD_REQUEST, "USER409", "탈퇴 후 7일이 경과하여 복구할 수 없습니다."),
 	USER_WITHDRAWAL_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "USER410", "탈퇴 의도가 확인되지 않았습니다."),
+	SENIOR_PROFILE_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER411", "유효하지 않은 시니어 프로필입니다."),
+	INVALID_USER_ROLE(HttpStatus.BAD_REQUEST, "USER412", "유효하지 않은 Role입니다."),
 
 	// Auth
 	LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH401", "아이디 또는 비밀번호가 올바르지 않습니다."),
@@ -54,12 +57,13 @@ public enum ErrorStatus implements BaseErrorCode {
 	SMS_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SMS402", "SMS 발송에 실패했습니다."),
 	SMS_RESEND_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "SMS403", "하루 인증 요청 가능 횟수를 초과했습니다. 제한 10회."),
 
-	// Recommendation
-	GOOGLE_DIRECTIONS_API_FAILED(HttpStatus.BAD_GATEWAY, "RECOMMEND401", "Google Directions API 호출에 실패했습니다."),
+	// Travel-time
+	GOOGLE_DIRECTIONS_API_FAILED(HttpStatus.BAD_GATEWAY, "TRAVEL401", "Google Directions API 호출에 실패했습니다."),
+	ROUTE_NOT_FOUND(HttpStatus.BAD_REQUEST, "TRAVEL402", "출발지/도착지 좌표가 잘못되었거나, 요청 위치에서는 대중교통 이동 경로를 지원하지 않습니다. 요청 유저의 좌표를 확인해주세요."),
 
-	// ADDRESS
-	GOOGLE_API_ERROR(HttpStatus.BAD_GATEWAY, "ADDRESS401", "구글 API 호출 중 오류 발생"),
-	ADDRESS_CONVERSION_FAILED(HttpStatus.BAD_REQUEST, "ADDRESS402", "주소 변환 실패"),
+	// Geo
+	GOOGLE_API_ERROR(HttpStatus.BAD_GATEWAY, "GEO401", "구글 API 호출 중 오류 발생"),
+	ADDRESS_CONVERSION_FAILED(HttpStatus.BAD_REQUEST, "GEO402", "주소 변환 실패"),
 
 	// Company
 	DUPLICATE_USERNAME(HttpStatus.CONFLICT, "COMPANY401", "이미 사용중인 아이디입니다."),
@@ -79,19 +83,26 @@ public enum ErrorStatus implements BaseErrorCode {
 	PAGE_NUMBER_NOT_NUMBER(HttpStatus.BAD_REQUEST, "PAGE400", "페이지는 숫자만 가능합니다."),
 	PAGE_NUMBER_NEGATIVE(HttpStatus.BAD_REQUEST, "PAGE400", "페이지 숫자는 양수만 가능합니다."),
 
-	// SEARCH
+	// Search
 	INVALID_SORT_TYPE(HttpStatus.BAD_REQUEST, "SEARCH401", "지원하지 않는 정렬 타입입니다."),
 	ES_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"SEARCH402", "Elasticsearch 연결에 실패했습니다."),
 	ES_REQUEST_ERROR(HttpStatus.BAD_REQUEST,"SEARCH403", "Elasticsearch 요청 처리 중 오류가 발생했습니다. 인덱스나 쿼리를 확인해주세요."),
 	ES_PARTIAL_SHARD_FAILURE(HttpStatus.BAD_GATEWAY,"SEARCH403", "Elasticsearch 일부 샤드에서 오류가 발생했습니다. 검색 결과가 누락되었을 수 있습니다."),
 
-	// JOB
+	// Application
+	INVALID_APPLICATION_ID(HttpStatus.BAD_REQUEST, "APPLICATION400", "유효하지 않은 ApplicationId 입니다."),
+	APPLICATION_PARSING_ERROR(HttpStatus.BAD_REQUEST, "APPLICATION500", "결과 파싱에러 입니다. 관리자에게 문의해주세요"),
+
+	// Job
 	INVALID_JOB_POST_ID(HttpStatus.BAD_REQUEST, "JOB401", "유효하지 않은 채용공고 ID입니다."),
 
-	// AI
-	AI_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI5001", "AI 응답 파싱에 실패했습니다."),
-	AI_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI5002", "AI 요청 중 오류가 발생했습니다.");
+	// Qusetion
+	SENIOR_QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND,"QUESTION401","해당 시니어 질문을 찾을 수 없습니다."),
+	SENIOR_QUESTION_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND,"QUESTION402","해당 시니어 질문의 옵션을 찾을 수 없습니다."),
 
+	// AI
+	AI_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI501", "AI 응답 파싱에 실패했습니다."),
+	AI_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI502", "AI 요청 중 오류가 발생했습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

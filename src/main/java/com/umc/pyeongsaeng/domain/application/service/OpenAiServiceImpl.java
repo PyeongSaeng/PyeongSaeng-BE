@@ -52,7 +52,7 @@ public class OpenAiServiceImpl implements OpenAiService {
 		Map<String, Object> requestBody = Map.of(
 			"model", model,
 			"messages", new Object[]{
-				Map.of("role", "system", "content", "너는 노인을 위한 지원서 작성 도우미야. 친절하고 따뜻하게 한국인 노인의 입장에서 대답해줘."),
+				Map.of("role", "system", "content", "너는 노인을 위한 지원서 작성 도우미야. 시니어가 직접 말하는 것처럼 편안하고 자연스럽게, 간단명료하고 진심 어린 표현으로 작성해줘. 너무 미사여구를 쓰지 마."),
 				Map.of("role", "user", "content", prompt)
 			}
 		);
