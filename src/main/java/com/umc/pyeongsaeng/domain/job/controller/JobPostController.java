@@ -111,20 +111,23 @@ public class JobPostController {
 						      {
                                 "id": 3,
                                 "state": "RECRUITING",
-                                "title": "",
-                                "address": null,
-                                "detailAddress": "1",
+                                "title": "바리스타 구인",
+                                "address": "평생요양원",
+                                "detailAddress": "서울특별시 중구세종대로 110",
                                 "roadAddress": "110",
                                 "zipcode": "04538",
                                 "hourlyWage": 11000,
                                 "monthlySalary": 2300000,
                                 "yearSalary": null,
-                                "description": ".",
+                                "description": "커피를 사랑하는 동료모집",
                                 "workingTime": "10:00 - 17:00",
                                 "deadline": "2025-09-30",
                                 "recruitCount": 1,
-                                "note": "",
-                                "jobPostImageId": []
+                                "note": "라떼 아트 가능자 특별 우대",
+                                "jobPostImageId": [{
+                                    "jobPostId": 3,
+                                    "keyName": "example_image.png"
+                                }]
 						      }
 						    ],
 						    "listSize": 1,

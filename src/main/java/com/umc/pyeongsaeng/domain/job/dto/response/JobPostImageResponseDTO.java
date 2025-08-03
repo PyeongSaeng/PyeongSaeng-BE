@@ -14,7 +14,6 @@ public class JobPostImageResponseDTO {
 	public static class JobPostImagePreviewDTO {
 
 		Long jobPostId;
-
 		String keyName;
 	}
 
