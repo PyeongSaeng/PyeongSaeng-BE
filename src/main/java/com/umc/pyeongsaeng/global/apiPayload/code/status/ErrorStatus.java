@@ -86,7 +86,11 @@ public enum ErrorStatus implements BaseErrorCode {
 	ES_PARTIAL_SHARD_FAILURE(HttpStatus.BAD_GATEWAY,"SEARCH403", "Elasticsearch 일부 샤드에서 오류가 발생했습니다. 검색 결과가 누락되었을 수 있습니다."),
 
 	// JOB
-	INVALID_JOB_POST_ID(HttpStatus.BAD_REQUEST, "JOB401", "유효하지 않은 채용공고 ID입니다.");
+	INVALID_JOB_POST_ID(HttpStatus.BAD_REQUEST, "JOB401", "유효하지 않은 채용공고 ID입니다."),
+
+	// AI
+	AI_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI5001", "AI 응답 파싱에 실패했습니다."),
+	AI_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI5002", "AI 요청 중 오류가 발생했습니다.");
 
 
 	private final HttpStatus httpStatus;
