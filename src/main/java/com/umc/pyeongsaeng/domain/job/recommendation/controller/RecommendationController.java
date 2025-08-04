@@ -28,6 +28,13 @@ public class RecommendationController {
 	private final TravelTimeService travelTimeService;
 	private final RecommendationService recommendationService;
 
+	@GetMapping("/recommendations")
+	public ApiResponse<List<RecommendationResponseDTO>> recommendJobsByDistance() {
+		Long userId = 2L; // 🧪 테스트용 하드코딩
+		List<RecommendationResponseDTO> recommendations = recommendationService.recommendJobsByDistance(userId);
+		return ApiResponse.of(SuccessStatus._OK, recommendations);
+	}
+	/**
 	// 직선 거리 기반 추천
 	@GetMapping("/recommendations")
 	public ApiResponse<List<RecommendationResponseDTO>> recommendJobsByDistance(
@@ -37,6 +44,7 @@ public class RecommendationController {
 		List<RecommendationResponseDTO> recommendations = recommendationService.recommendJobsByDistance(userId);
 		return ApiResponse.of(SuccessStatus._OK, recommendations);
 	}
+	 **/
 
 	@PostMapping("/travel-time")
 	public ResponseEntity<ApiResponse<TravelTimeResponseDTO>> getTravelTime(

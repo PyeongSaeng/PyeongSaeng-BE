@@ -13,12 +13,15 @@ import com.umc.pyeongsaeng.global.s3.dto.S3DTO;
 import com.umc.pyeongsaeng.global.s3.service.S3Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RecommendationServiceImpl implements RecommendationService {
@@ -39,16 +42,25 @@ public class RecommendationServiceImpl implements RecommendationService {
 		return jobPostRepository.findAll().stream()
 			.filter(job -> job.getLatitude() != null && job.getLongitude() != null)
 			.map(job -> {
+				log.info("추천 대상 jobPostId: {}", job.getId());
+
 				double distance = DistanceUtil.calculateDistance(userLat, userLng, job.getLatitude(), job.getLongitude());
 
-				// 대표 이미지 가져오기
-				String imageUrl = jobPostImageRepository.findFirstByJobPostIdOrderByIdAsc(job.getId())
-					.map(img -> s3Service.getPresignedToDownload(
-						S3DTO.PresignedUrlToDownloadRequest.builder()
-							.keyName(img.getKeyName())
-							.build()
-					).getUrl())
-					.orElse(null);
+				String imageUrl = null;
+				try {
+					imageUrl = jobPostImageRepository.findFirstByJobPostIdOrderByIdAsc(job.getId())
+						.map(img -> {
+							log.info("대표 이미지 keyName = {}", img.getKeyName());
+							return s3Service.getPresignedToDownload(
+								S3DTO.PresignedUrlToDownloadRequest.builder()
+									.keyName(img.getKeyName())
+									.build()
+							).getUrl();
+						})
+						.orElse(null);
+				} catch (Exception e) {
+					log.error("이미지 presigned URL 생성 실패: {}", e.getMessage());
+				}
 
 				return RecommendationConverter.toRecommendationResponseDTO(job, distance, imageUrl);
 			})
