@@ -39,8 +39,20 @@ public class JobPostResponseDTO {
 	@Getter
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class JobPostPreviewListDTO {
-		List<JobPostPreviewDTO> jobPostList;
+	public static class JobPostPreviewByCompanyDTO {
+		Long id;
+		JobPostState state;
+		String title;
+		List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> images;
+	}
+
+
+	@Builder
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class JobPostPreviewByCompanyListDTO {
+		List<JobPostPreviewByCompanyDTO> jobPostList;
 		Integer listSize;
 		Integer totalPage;
 		Long totalElements;

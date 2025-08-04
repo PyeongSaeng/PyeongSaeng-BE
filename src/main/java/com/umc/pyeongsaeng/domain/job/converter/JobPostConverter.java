@@ -51,7 +51,6 @@ public class JobPostConverter {
 		List<JobPostImageResponseDTO.JobPostImagePreviewDTO> jobPostImagePreviewDTOList = jobPost.getImages().stream()
 			.map(JobPostImageConverter::toJobPostImagePreViewDTO).collect(Collectors.toList());
 
-
 		List<FormFieldResponseDTO.FormFieldPreViewDTO> jobPostFormFieldPreviewDTOList = jobPost.getFormField().stream()
 			.map(FormFieldConverter::toFormFieldPreViewDTO).collect(Collectors.toList());
 
@@ -100,17 +99,26 @@ public class JobPostConverter {
 			.build();
 	}
 
-	public static JobPostResponseDTO.JobPostPreviewListDTO toJobPostPreviewListDTO(Page<JobPost> jobPostList) {
-		List<JobPostResponseDTO.JobPostPreviewDTO> jobPostPreViewDTOList = jobPostList.stream()
-			.map(JobPostConverter::toJobPostPreviewDTO).collect(Collectors.toList());
+	public static JobPostResponseDTO.JobPostPreviewByCompanyDTO toJobPostPreviewByCompanyDTO(JobPost jobPost,
+																							 List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> images) {
+		return JobPostResponseDTO.JobPostPreviewByCompanyDTO.builder()
+			.id(jobPost.getId())
+			.state(jobPost.getState())
+			.title(jobPost.getTitle())
+			.images(images)
+			.build();
+	}
 
-		return JobPostResponseDTO.JobPostPreviewListDTO.builder()
-			.jobPostList(jobPostPreViewDTOList)
+
+	public static JobPostResponseDTO.JobPostPreviewByCompanyListDTO toJobPostPreviewByCompanyListDTO(Page<JobPostResponseDTO.JobPostPreviewByCompanyDTO> jobPostList) {
+
+		return JobPostResponseDTO.JobPostPreviewByCompanyListDTO.builder()
+			.jobPostList(jobPostList.getContent())
 			.isFirst(jobPostList.isFirst())
 			.isLast(jobPostList.isLast())
 			.totalElements(jobPostList.getTotalElements())
 			.totalPage(jobPostList.getTotalPages())
-			.listSize(jobPostPreViewDTOList.size())
+			.listSize(jobPostList.getContent().size())
 			.build();
 	}
 

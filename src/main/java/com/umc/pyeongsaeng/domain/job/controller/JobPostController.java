@@ -31,9 +31,9 @@ public class JobPostController {
 	private final JobPostCommandService jobPostCommandService;
 	private final JobPostQueryService jobPostQueryService;
 
-	@Operation(summary = "채용공고 생성 API", description = "기업이 새로운 채용공고를 생성하는 API입니다.",
+	@Operation(summary = "회사가 채용공고 생성 API", description = "기업이 새로운 채용공고를 생성하는 API입니다.",
 		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-		description = "채용공고 생성 요청 DTO",
+		description = "회사가 채용공고 생성 요청 DTO",
 		required = true,
 		content = @Content(
 			mediaType = "application/json",
@@ -176,11 +176,9 @@ public class JobPostController {
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewDTO(newJobPost));
 	}
 
-
-
-	@Operation(summary = "채용공고 수정 API", description = "기업이 자신이 등록한 채용공고를 수정하는 API입니다. PUT API로 데이터를 전부 넣어줘야 합니다.",
+	@Operation(summary = "회사가 채용공고 수정 API", description = "기업이 자신이 등록한 채용공고를 수정하는 API입니다. PUT API로 데이터를 전부 넣어줘야 합니다.",
 		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-			description = "채용공고 수정 요청 DTO",
+			description = "회사가 채용공고 수정 요청 DTO",
 			required = true,
 			content = @Content(
 				mediaType = "application/json",
@@ -313,6 +311,7 @@ public class JobPostController {
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewDTO(updatedJobPost));
 	}
 
+	@Operation(summary = "회사의 채용공고 목록 조회 API", description = "회사가 쓴 채용 공고 목록을 조회하는 API입니다.")
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "채용공고 목록 조회 성공",
 			content = @Content(
@@ -323,34 +322,52 @@ public class JobPostController {
 					value = """
 						{
 						  "isSuccess": true,
-						  "code": "200",
-						  "message": "요청에 성공하였습니다.",
+						  "code": "COMMON200",
+						  "message": "성공입니다.",
 						  "result": {
 						    "jobPostList": [
 						      {
-                                "id": 3,
-                                "state": "RECRUITING",
-                                "title": "바리스타 구인",
-                                "address": "평생요양원",
-                                "detailAddress": "서울특별시 중구세종대로 110",
-                                "roadAddress": "110",
-                                "zipcode": "04538",
-                                "hourlyWage": 11000,
-                                "monthlySalary": 2300000,
-                                "yearSalary": null,
-                                "description": "커피를 사랑하는 동료모집",
-                                "workingTime": "10:00 - 17:00",
-                                "deadline": "2025-09-30",
-                                "recruitCount": 1,
-                                "note": "라떼 아트 가능자 특별 우대",
-                                "jobPostImageId": [{
-                                    "keyName": "example_image12"
-                                }]
-						      }
+						        "id": 2,
+						        "state": "RECRUITING",
+						        "title": "시니어 돌보미 채용",
+						        "images": [
+						          {
+						            "jobPostId": 1,
+						            "keyName": "image_key_124",
+						            "imageUrl": "https://pyeongsaeng-bucket.s3.amazonaws.com/image_key_124?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250804T075202Z&X-Amz-SignedHeaders=host&X-Amz-Expires=179&X-Amz-Credential=AKIASVLKCJ3ELQ3ZP7VV%2F20250804%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=11f53a4935399662205da6f3d7d27bcf49e17f6f9baa8479012ea671dae93e22",
+						            "originalFileName": "job_post_image_1.jpg"
+						          },
+						          {
+						            "jobPostId": 1,
+						            "keyName": "image_key_2.png",
+						            "imageUrl": "https://pyeongsaeng-bucket.s3.amazonaws.com/image_key_2.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250804T075202Z&X-Amz-SignedHeaders=host&X-Amz-Expires=180&X-Amz-Credential=AKIASVLKCJ3ELQ3ZP7VV%2F20250804%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=34debf6fc44485a38158266c1a3884f0d70a8a77ccbbfc6fdd547d0f039b3eaa",
+						            "originalFileName": "job_post_image_2.png"
+						          }
+						        ]
+						      },
+						      {
+						        "id": 4,
+						        "state": "RECRUITING",
+						        "title": "시니어 돌보미 채용",
+						        "images": [
+						          {
+						            "jobPostId": 2,
+						            "keyName": "image_key_124",
+						            "imageUrl": "https://pyeongsaeng-bucket.s3.amazonaws.com/image_key_124?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250804T075202Z&X-Amz-SignedHeaders=host&X-Amz-Expires=180&X-Amz-Credential=AKIASVLKCJ3ELQ3ZP7VV%2F20250804%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=b3f41a335efc2199511c30741f7bec1fde49f596f90b02d3ebed8fe4de7f607e",
+						            "originalFileName": "job_post_image_1.jpg"
+						          },
+						          {
+						            "jobPostId": 2,
+						            "keyName": "image_key_2.png",
+						            "imageUrl": "https://pyeongsaeng-bucket.s3.amazonaws.com/image_key_2.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250804T075202Z&X-Amz-SignedHeaders=host&X-Amz-Expires=180&X-Amz-Credential=AKIASVLKCJ3ELQ3ZP7VV%2F20250804%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=34debf6fc44485a38158266c1a3884f0d70a8a77ccbbfc6fdd547d0f039b3eaa",
+						            "originalFileName": "job_post_image_2.png"
+						          }
+						        ]
+						      },
 						    ],
-						    "listSize": 1,
+						    "listSize": 2,
 						    "totalPage": 1,
-						    "totalElements": 1,
+						    "totalElements": 2,
 						    "isFirst": true,
 						    "isLast": true
 						  }
@@ -359,25 +376,15 @@ public class JobPostController {
 				)
 			)
 		),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "인증 실패",
-			content = @Content(
-				mediaType = "application/json",
-				schema = @Schema(implementation = ApiResponse.class),
-				examples = @ExampleObject(
-					name = "UnauthorizedExample",
-					value = "{\"isSuccess\": false, \"code\": \"AUTH401\", \"message\": \"인증되지 않은 사용자입니다.\", \"result\": null}"
-				)
-			)
-		)
 	})
 	@GetMapping("/companies/me/posts")
-	public ApiResponse<JobPostResponseDTO.JobPostPreviewListDTO> getJobPost(
+	public ApiResponse<JobPostResponseDTO.JobPostPreviewByCompanyListDTO> getJobPost(
 		@Parameter(name = "page", description = "페이지 번호 (1부터 시작)", example = "1") @PageNumber Integer page,
 		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
 		@RequestParam(name = "state", required = false, defaultValue = "RECRUITING") JobPostState jobPostState) {
 
-		Page<JobPost> jobPostList = jobPostQueryService.getJobPostList(userDetails.getCompany(), page, jobPostState);
-		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewListDTO(jobPostList));
+		Page<JobPostResponseDTO.JobPostPreviewByCompanyDTO> jobPostList = jobPostQueryService.getJobPostPreViewPageByCompany(userDetails.getCompany(), page, jobPostState);
+		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewByCompanyListDTO(jobPostList));
 	}
 
 	@Operation(summary = "채용공고 상세 조회 API", description = "특정 채용공고를 클릭했을 때, 해당 공고의 상세 정보를 조회하는 API입니다.")
