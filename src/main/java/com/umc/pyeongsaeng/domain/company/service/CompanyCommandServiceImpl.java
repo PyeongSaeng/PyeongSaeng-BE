@@ -40,13 +40,13 @@ public class CompanyCommandServiceImpl implements CompanyCommandService {
 	// 회원가입
 	@Override
 	public CompanyResponse.CompanySignUpResponseDto signUp(CompanyRequest.CompanySignUpRequestDto request) {
-//		smsService.verifyCode(request.getPhone(), request.getVerificationCode());
+		smsService.verifyCode(request.getPhone(), request.getVerificationCode());
 
-//		validateDuplicateUsername(request.getUsername());
-//		validateDuplicateBusinessNo(request.getBusinessNo());
-//		validateDuplicatePhone(request.getPhone());
-//
-//		validateBusinessNumber(request.getBusinessNo());
+		validateDuplicateUsername(request.getUsername());
+		validateDuplicateBusinessNo(request.getBusinessNo());
+		validateDuplicatePhone(request.getPhone());
+
+		validateBusinessNumber(request.getBusinessNo());
 
 		Company company = createCompany(request);
 		Company savedCompany = companyRepository.save(company);
