@@ -13,9 +13,6 @@ spring:
       hibernate:
         format_sql: true
 
-  elasticsearch:
-    uris: http://localhost:9200
-
 logging:
   level:
     org.hibernate.SQL: INFO
