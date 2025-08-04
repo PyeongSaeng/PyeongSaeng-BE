@@ -10,6 +10,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -29,7 +30,7 @@ public class ApplicationAnswer extends BaseEntity {
 
 	@Builder.Default
 	@OneToMany(mappedBy = "applicationAnswer", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ApplicationFile> applicationFiles = new ArrayList<>();
+	private List<ApplicationAnswerFile> applicationFiles = new ArrayList<>();
 
 	@Column(columnDefinition = "TEXT", nullable = false)
 	private String answerText;

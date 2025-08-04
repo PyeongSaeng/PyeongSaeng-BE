@@ -88,6 +88,8 @@ public enum ErrorStatus implements BaseErrorCode {
 	INVALID_APPLICATION_ID(HttpStatus.BAD_REQUEST, "APPLICATION400", "유효하지 않은 ApplicationId 입니다."),
 	APPLICATION_PARSING_ERROR(HttpStatus.BAD_REQUEST, "APPLICATION500", "결과 파싱에러 입니다. 관리자에게 문의해주세요"),
 
+	// FormField
+	FORM_FIELD_NOT_FOUND(HttpStatus.BAD_REQUEST, "FORMFIELD400", "유효하지 않은 formFieldId 입니다"),
 	// Job
 	INVALID_JOB_POST_ID(HttpStatus.BAD_REQUEST, "JOB401", "유효하지 않은 채용공고 ID입니다."),
 
