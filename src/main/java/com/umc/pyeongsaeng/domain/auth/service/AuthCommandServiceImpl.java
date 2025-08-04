@@ -21,6 +21,8 @@ import com.umc.pyeongsaeng.domain.user.repository.SocialAccountRepository;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
+import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingClient;
+import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingResult;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 	private final TokenService tokenService;
 	private final SeniorProfileRepository seniorProfileRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final GoogleGeocodingClient googleGeocodingClient;
 
 	// 로그인
 	@Override
@@ -155,14 +158,14 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 			throw new GeneralException(ErrorStatus.INVALID_PASSWORD);
 		}
 		if (userRepository.existsByUsername(username)) {
-			throw new GeneralException(ErrorStatus.USERNAME_DUPLICATED);
+			throw new GeneralException(ErrorStatus.DUPLICATE_USERNAME);
 		}
 	}
 
 	// 전화번호 중복 검증
 	private void validateDuplicatePhone(String phone) {
 		if (userRepository.existsByPhone(phone)) {
-			throw new GeneralException(ErrorStatus.PHONE_DUPLICATED);
+			throw new GeneralException(ErrorStatus.DUPLICATE_PHONE);
 		}
 	}
 
@@ -227,16 +230,19 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
 	// 시니어 프로필 생성 및 저장
 	private void createSeniorProfile(User senior, User protector, AuthRequest.SeniorSignupRequestDto request) {
+		GoogleGeocodingResult geoResult = googleGeocodingClient.convert(request.getRoadAddress());
+
 		SeniorProfile seniorProfile = SeniorProfile.builder()
 			.senior(senior)
 			.protector(protector)
-			.relation(request.getRelation())
 			.age(request.getAge())
 			.gender(request.getGender() != null ? Gender.valueOf(request.getGender()) : null)
 			.phoneNum(request.getPhoneNum())
 			.zipcode(request.getZipcode())
 			.roadAddress(request.getRoadAddress())
 			.detailAddress(request.getDetailAddress())
+			.latitude(geoResult.lat())
+			.longitude(geoResult.lon())
 			.job(request.getJob() != null ? JobType.valueOf(request.getJob()) : null)
 			.experiencePeriod(request.getExperiencePeriod() != null ?
 				ExperiencePeriod.valueOf(request.getExperiencePeriod()) : null)

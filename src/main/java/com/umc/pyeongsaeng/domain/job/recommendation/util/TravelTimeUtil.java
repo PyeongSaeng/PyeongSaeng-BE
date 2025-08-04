@@ -43,52 +43,61 @@ public class TravelTimeUtil {
 			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
 			JSONObject json = new JSONObject(response.body());
-			JSONArray routes = json.optJSONArray("routes");
+			String status = json.optString("status");
 
-			if (routes != null && routes.length() > 0) {
-				JSONObject leg = routes.getJSONObject(0).getJSONArray("legs").getJSONObject(0);
-				String durationText = leg.getJSONObject("duration").getString("text");
+			if ("NOT_FOUND".equals(status) || "ZERO_RESULTS".equals(status)) {
+				return Optional.empty();
+			}
 
-				// 분 단위 한글로 변경
-				durationText = durationText
-					.replaceAll("mins", "분")
-					.replaceAll("min", "분")
-					.replaceAll("hours", "시간")
-					.replaceAll("hour", "시간");
+			if ("OK".equals(status)) {
+				JSONArray routes = json.optJSONArray("routes");
+				if (routes != null && routes.length() > 0) {
+					JSONObject leg = routes.getJSONObject(0).getJSONArray("legs").getJSONObject(0);
+					String durationText = leg.getJSONObject("duration").getString("text");
 
-				JSONArray steps = leg.getJSONArray("steps");
-				Set<String> modes = new LinkedHashSet<>();
+					// 분 단위 한글로 변경
+					durationText = durationText
+						.replaceAll("mins", "분")
+						.replaceAll("min", "분")
+						.replaceAll("hours", "시간")
+						.replaceAll("hour", "시간");
 
-				for (int i = 0; i < steps.length(); i++) {
-					JSONObject step = steps.getJSONObject(i);
-					String travelMode = step.optString("travel_mode");
+					JSONArray steps = leg.getJSONArray("steps");
+					Set<String> modes = new LinkedHashSet<>();
 
-					if ("WALKING".equals(travelMode)) {
-						modes.add("도보");
-					} else if ("TRANSIT".equals(travelMode)) {
-						String type = step.getJSONObject("transit_details")
-							.getJSONObject("line")
-							.getJSONObject("vehicle")
-							.getString("type");
+					for (int i = 0; i < steps.length(); i++) {
+						JSONObject step = steps.getJSONObject(i);
+						String travelMode = step.optString("travel_mode");
 
-						if ("SUBWAY".equals(type)) {
-							modes.add("지하철");
-						} else if ("BUS".equals(type)) {
-							modes.add("버스");
-						} else {
-							modes.add("대중교통");
+						if ("WALKING".equals(travelMode)) {
+							modes.add("도보");
+						} else if ("TRANSIT".equals(travelMode)) {
+							String type = step.getJSONObject("transit_details")
+								.getJSONObject("line")
+								.getJSONObject("vehicle")
+								.getString("type");
+
+							if ("SUBWAY".equals(type)) {
+								modes.add("지하철");
+							} else if ("BUS".equals(type)) {
+								modes.add("버스");
+							} else {
+								modes.add("대중교통");
+							}
 						}
 					}
-				}
 
-				String summary = String.join(" + ", modes) + " " + durationText;
-				return Optional.of(summary);
+					String summary = String.join(" + ", modes) + " " + durationText;
+					return Optional.of(summary);
+				}
 			}
+
+			throw new GeneralException(ErrorStatus.GOOGLE_DIRECTIONS_API_FAILED);
 
 		} catch (Exception e) {
 			log.error("[TravelTimeUtil] API 호출 실패: {}", e.getMessage());
+			throw new GeneralException(ErrorStatus.GOOGLE_DIRECTIONS_API_FAILED);
 		}
-
-		return Optional.empty();
 	}
 }
+

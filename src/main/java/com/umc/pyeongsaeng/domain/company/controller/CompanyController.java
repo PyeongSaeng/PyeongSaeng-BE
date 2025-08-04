@@ -1,29 +1,22 @@
 package com.umc.pyeongsaeng.domain.company.controller;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.security.core.annotation.*;
+import org.springframework.validation.annotation.*;
+import org.springframework.web.bind.annotation.*;
 
-import com.umc.pyeongsaeng.domain.company.dto.CompanyRequest;
-import com.umc.pyeongsaeng.domain.company.dto.CompanyResponse;
+import com.umc.pyeongsaeng.domain.company.dto.*;
 import com.umc.pyeongsaeng.domain.company.service.*;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
-import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
-import com.umc.pyeongsaeng.global.security.CustomUserDetails;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
+import com.umc.pyeongsaeng.global.security.*;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.responses.*;
+import io.swagger.v3.oas.annotations.security.*;
+import io.swagger.v3.oas.annotations.tags.*;
+import jakarta.validation.*;
+import lombok.*;
 
 @RestController
 @RequestMapping("/api/companies")
@@ -50,9 +43,11 @@ public class CompanyController {
     """)
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON201", description = "회원가입이 성공적으로 완료되었습니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "이미 사용중인 아이디입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY402", description = "이미 가입한 사업자등록번호입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER412", description = "이미 사용중인 아이디입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "이미 가입한 사업자등록번호입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY403", description = "유효하지 않거나 활성화되지 않은 사업자등록번호입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER413", description = "이미 사용중인 전화번호입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SMS401", description = "SMS 인증에 실패했습니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON500", description = "서버 내부 오류가 발생했습니다.")
 	})
@@ -68,9 +63,9 @@ public class CompanyController {
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "로그인이 성공적으로 완료되었습니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "존재하지 않는 기업 계정입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY405", description = "비밀번호가 일치하지 않습니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY406", description = "탈퇴한 기업 계정입니다.")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "존재하지 않는 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH402", description = "비밀번호가 유효하지 않습니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY402", description = "탈퇴한 기업 계정입니다.")
 	})
 	public ResponseEntity<ApiResponse<CompanyResponse.LoginResponseDto>> login(
 		@Valid @RequestBody CompanyRequest.LoginRequestDto request) {
@@ -107,9 +102,9 @@ public class CompanyController {
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "정보 수정이 성공적으로 완료되었습니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH401", description = "인증되지 않은 사용자입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "존재하지 않는 기업 계정입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH403", description = "비밀번호가 유효하지 않습니다.")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON401", description = "인증되지 않은 사용자입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "존재하지 않는 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH402", description = "비밀번호가 유효하지 않습니다.")
 	})
 	public ApiResponse<CompanyResponse.CompanyInfoDto> updateProfile(
 		@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -125,10 +120,10 @@ public class CompanyController {
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "탈퇴가 성공적으로 완료되었습니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH401", description = "인증되지 않은 사용자입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "존재하지 않는 기업 계정입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY407", description = "이미 탈퇴한 기업 계정입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY408", description = "탈퇴 의도가 확인되지 않았습니다.")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON401", description = "인증되지 않은 사용자입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "존재하지 않는 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY402", description = "탈퇴한 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER416", description = "탈퇴 의도가 확인되지 않았습니다.")
 	})
 	public ApiResponse<Void> withdraw(
 		@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -143,9 +138,9 @@ public class CompanyController {
 	@Operation(summary = "기업 탈퇴 취소", description = "탈퇴한 기업 계정을 복구합니다. 탈퇴 7일 후 모든 데이터가 삭제됩니다. 문구 입력에 성공하면 탈퇴 의도인 것으로 판단합니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "탈퇴 취소가 성공적으로 완료되었습니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "존재하지 않는 기업 계정입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY409", description = "탈퇴하지 않은 기업 계정입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER408", description = "탈퇴 후 7일이 경과하여 복구할 수 없습니다.")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "존재하지 않는 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY402", description = "탈퇴하지 않은 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER410", description = "탈퇴 후 7일이 경과하여 복구할 수 없습니다.")
 	})
 	public ResponseEntity<ApiResponse<CompanyResponse.LoginResponseDto>> cancelWithdrawal(
 		@Valid @RequestBody CompanyRequest.LoginRequestDto request) {
@@ -166,8 +161,8 @@ public class CompanyController {
 	@Operation(summary = "기업 정보 조회", description = "현재 로그인한 기업의 정보를 조회합니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "조회가 성공적으로 완료되었습니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH401", description = "인증되지 않은 사용자입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY404", description = "존재하지 않는 기업 계정입니다.")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON401", description = "인증되지 않은 사용자입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "존재하지 않는 기업 계정입니다.")
 	})
 	public ApiResponse<CompanyResponse.CompanyDetailDto> getProfile(
 		@AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -183,10 +178,62 @@ public class CompanyController {
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "사용 가능한 아이디입니다."),
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON400", description = "잘못된 요청입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "이미 사용중인 아이디입니다.")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER412", description = "이미 사용중인 아이디입니다.")
 	})
 	public ApiResponse<String> checkUsername(@RequestParam String username) {
 		companyQueryService.checkUsernameAvailability(username);
 		return ApiResponse.of(SuccessStatus._OK, "사용 가능한 아이디입니다.");
+	}
+
+	@PostMapping("/find-username")
+	@SecurityRequirements
+	@Operation(summary = "아이디 찾기",
+		description = "사업자명, 전화번호, SMS 인증번호로 아이디를 조회합니다."
+	+"인증번호의 경우, 번호를 보내기 위해 /api/sms/send SMS 인증 api를 활용하셔야 합니다. 인증번호가 옳은지 확인하기 위해 /api/sms/verify를 따로 이용하실 필요는 없습니다.")
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "존재하지 않는 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SMS401", description = "SMS 인증에 실패했습니다.")
+	})
+	public ApiResponse<CompanyResponse.UsernameDto> findUsername(
+		@Validated @RequestBody CompanyRequest.FindCompanyUsernameDto request) {
+
+		CompanyResponse.UsernameDto response = companyQueryService.findUsername(request);
+		return ApiResponse.of(SuccessStatus._OK, response);
+	}
+
+	@PostMapping("/reset-password/verify")
+	@SecurityRequirements
+	@Operation(summary = "비밀번호 찾기(새 비밀번호 변경) 전 인증단계",
+		description = "아이디, 전화번호, 인증번호를 확인합니다. 비밀번호를 바꿀 때 사용자 식별이 필요하니, 이때를 위한 username이 return됩니다. "
+	+"인증번호의 경우, 번호를 보내기 위해 /api/sms/send SMS 인증 api를 활용하셔야 합니다. 인증번호가 옳은지 확인하기 위해 /api/sms/verify를 따로 이용하실 필요는 없습니다.")
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "존재하지 않는 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY402", description = "탈퇴한 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "SMS401", description = "SMS 인증에 실패했습니다.")
+	})
+	public ApiResponse<CompanyResponse.UsernameDto> verifyResetPasswordCode(
+		@Validated @RequestBody CompanyRequest.PasswordVerificationDto request) {
+
+		CompanyResponse.UsernameDto response = companyCommandService.verifyResetPasswordCode(request);
+		return ApiResponse.of(SuccessStatus._OK, response);
+	}
+
+	@PostMapping("/reset-password")
+	@SecurityRequirements
+	@Operation(summary = "비밀번호 찾기 (새 비밀번호 변경)",
+		description = "인증번호가 확인된 후 해당 api를 사용해서 비밀번호를 새롭게 재설정하면 됩니다. " +
+			"인증 단계에서 return 되는 username을 그대로 가져다가 쓰시면 됩니다.")
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY401", description = "존재하지 않는 기업 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMPANY402", description = "탈퇴한 기업 계정입니다.")
+	})
+	public ApiResponse<String> resetPassword(
+		@Validated @RequestBody CompanyRequest.PasswordChangeDto request) {
+
+		companyCommandService.resetPassword(request);
+		return ApiResponse.onSuccess(null);
 	}
 }

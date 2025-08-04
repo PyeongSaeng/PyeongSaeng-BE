@@ -162,8 +162,7 @@ public class JobPostController {
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewListDTO(jobPostList));
 	}
 
-
-	@Operation(summary = "채용공고 지원서 질문 목록 조회 API", description = "채용공고 지원서의 질문 목록을 조회하는 API입니다.")
+@Operation(summary = "채용공고 지원서 질문 목록 조회 API", description = "채용공고 지원서의 질문 목록을 조회하는 API입니다.")
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "질문 목록 조회 성공",
 			content = @Content(

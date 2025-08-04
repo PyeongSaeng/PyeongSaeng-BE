@@ -39,6 +39,7 @@ public class S3DTO {
 	}
 
 	@Getter
+	@Builder
 	public static class PresignedUrlToDownloadRequest {
 
 		@NotBlank
