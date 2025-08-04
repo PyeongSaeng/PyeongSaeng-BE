@@ -58,11 +58,11 @@ public class JobPostController {
 					  "note": "경력자 우대",
 					  "images": [
 					    {
-					      "keyName": "image_key_1.jpg",
+					      "keyName": "file5123",
 					      "originalFileName": "job_post_image_1.jpg"
 					    },
 					    {
-					      "keyName": "image_key_2.png",
+					      "keyName": "file5126",
 					      "originalFileName": "job_post_image_2.png"
 					    }
 					  ],
