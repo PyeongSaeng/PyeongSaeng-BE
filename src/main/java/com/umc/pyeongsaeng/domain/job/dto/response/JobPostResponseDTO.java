@@ -31,8 +31,8 @@ public class JobPostResponseDTO {
 		LocalDate deadline;
 		Integer recruitCount;
 		String note;
-		List<JobPostImageResponseDTO.JobPostImagePreviewDTO> jobPostImages;
-		List<FormFieldResponseDTO.FormFieldPreViewDTO> formFields;
+		List<JobPostImageResponseDTO.JobPostImagePreviewDTO> jobPostImageList;
+		List<FormFieldResponseDTO.FormFieldPreViewDTO> formFieldList;
 	}
 
 	@Builder

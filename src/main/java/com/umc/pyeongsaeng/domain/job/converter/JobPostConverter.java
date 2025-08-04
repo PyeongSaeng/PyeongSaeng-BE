@@ -70,8 +70,8 @@ public class JobPostConverter {
 			.workingTime(jobPost.getWorkingTime())
 			.deadline(jobPost.getDeadline())
 			.recruitCount(jobPost.getRecruitCount())
-			.jobPostImages(jobPostImagePreviewDTOList)
-			.formFields(jobPostFormFieldPreviewDTOList)
+			.jobPostImageList(jobPostImagePreviewDTOList)
+			.formFieldList(jobPostFormFieldPreviewDTOList)
 			.note(jobPost.getNote())
 			.build();
 	}

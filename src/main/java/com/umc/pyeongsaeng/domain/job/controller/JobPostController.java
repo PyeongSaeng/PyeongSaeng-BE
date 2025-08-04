@@ -56,7 +56,7 @@ public class JobPostController {
 					  "deadline": "2025-08-31",
 					  "recruitCount": 1,
 					  "note": "경력자 우대",
-					  "jobPostImages": [
+					  "jobPostImageList": [
 					    {
 					      "keyName": "file5123",
 					      "originalFileName": "job_post_image_1.jpg"
@@ -117,7 +117,7 @@ public class JobPostController {
 						    "deadline": "2025-08-31",
 						    "recruitCount": 1,
 						    "note": "경력자 우대",
-						    "jobPostImages": [
+						    "jobPostImageList": [
 						      {
 						        "imageId": 3,
 						        "keyName": "image_key_124",
@@ -178,7 +178,7 @@ public class JobPostController {
 
 
 
-	@Operation(summary = "채용공고 수정 API", description = "기업이 자신이 등록한 채용공고를 수정하는 API입니다.",
+	@Operation(summary = "채용공고 수정 API", description = "기업이 자신이 등록한 채용공고를 수정하는 API입니다. PUT API로 데이터를 전부 넣어줘야 합니다.",
 		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
 			description = "채용공고 수정 요청 DTO",
 			required = true,
@@ -203,7 +203,7 @@ public class JobPostController {
 						  "deadline": "2025-08-31",
 						  "recruitCount": 1,
 						  "note": "경력자 우대",
-						  "images": [
+						  "jobPostImageList": [
 						    {
 						      "keyName": "image_key_1.jpg43",
 						      "originalFileName": "job_post_image_1.jpg"
@@ -245,34 +245,61 @@ public class JobPostController {
 					name = "SuccessExample",
 					value = """
 						{
-						  "isSuccess": true,
-						  "code": "200",
-						  "message": "요청에 성공하였습니다.",
-						  "result": {
-							"id": 6,
-							"state": "RECRUITING",
-							"title": "주말 시니어 바리스타 채용 (수정)",
-							"address": "서울시 마포구",
-							"detailAddress": "월드컵북로 396, 101호",
-							"roadAddress": "서울특별시 마포구 월드컵북로 396",
-							"zipcode": "03925",
-							"hourlyWage": 14000,
-							"monthlySalary": null,
-							"yearSalary": null,
-							"description": "활기찬 주말을 함께할 시니어 바리스타를 찾습니다. 경력은 중요하지 않습니다. (수정)",
-							"workingTime": "매주 토, 일 10:00 ~ 17:00",
-							"deadline": "2025-08-20",
-							"recruitCount": 1,
-							"note": "앞치마 및 유니폼 제공, 중식 제공",
-							"jobPostImages": [
-							  {
-								"jobPostId": 6,
-								"keyName": "file123.jpg",
-								"originalFileName": "사진.jpg"
-							  }
-							]
-						  }
-						}
+						   "isSuccess": true,
+						   "code": "COMMON200",
+						   "message": "성공입니다.",
+						   "result": {
+						     "id": 5,
+						     "state": "RECRUITING",
+						     "title": "시니어 돌보미 채용",
+						     "address": "서울특별시 강남구",
+						     "detailAddress": "테헤란로 212",
+						     "roadAddress": "서울특별시 강남구 테헤란로 212",
+						     "zipcode": "06222",
+						     "hourlyWage": 15000,
+						     "monthlySalary": null,
+						     "yearSalary": null,
+						     "description": "어르신과 함께 즐거운 시간을 보내실 분을 찾습니다. 주 3회, 오후 시간에 근무하며, 식사 준비 및 말벗이 주된 업무입니다.",
+						     "workingTime": "월, 수, 금 14:00 ~ 18:00",
+						     "deadline": "2025-08-31",
+						     "recruitCount": 1,
+						     "note": "경력자 우대",
+						     "jobPostImageList": [
+						       {
+						         "imageId": 17,
+						         "keyName": "image_key_1.jpg43",
+						         "originalFileName": "job_post_image_1.jpg"
+						       },
+						       {
+						         "imageId": 18,
+						         "keyName": "image_key_2.png43",
+						         "originalFileName": "job_post_image_2.png"
+						       }
+						     ],
+						     "formFieldList": [
+						       {
+						         "id": 33,
+						         "fieldName": "성함",
+						         "fieldType": "TEXT"
+						       },
+						       {
+						         "id": 34,
+						         "fieldName": "연락처",
+						         "fieldType": "TEXT"
+						       },
+						       {
+						         "id": 35,
+						         "fieldName": "자기소개",
+						         "fieldType": "TEXT"
+						       },
+						       {
+						         "id": 36,
+						         "fieldName": "경력 유무",
+						         "fieldType": "IMAGE"
+						       }
+						     ]
+						   }
+						 }
 						"""
 				)
 			)

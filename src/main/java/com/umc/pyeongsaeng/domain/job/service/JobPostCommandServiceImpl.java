@@ -47,7 +47,7 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 		JobPost newJobPost = jobPostRepository.save(requestedJobPost);
 
 		// requestDTO에 잇는 jobPostImage 저장을 위한 분리 stream
-		List<JobPostImage> savedImages = requestDTO.getJobPostImages().stream()
+		List<JobPostImage> savedImages = requestDTO.getJobPostImageList().stream()
 			.map(images -> JobPostImageConverter.toJobPostImage(images, newJobPost))
 			.collect(Collectors.toList());
 
@@ -77,9 +77,9 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 
 		jobPost.update(requestDTO, convertedAddress);
 
-		if (requestDTO.getImages() != null) {
+		if (requestDTO.getJobPostImageList() != null) {
 			jobPostImageRepository.deleteAll(jobPost.getImages());
-			List<JobPostImage> newImages = requestDTO.getImages().stream()
+			List<JobPostImage> newImages = requestDTO.getJobPostImageList().stream()
 				.map(images -> JobPostImageConverter.toJobPostImage(images, jobPost))
 				.collect(Collectors.toList());
 			jobPostImageRepository.saveAll(newImages);

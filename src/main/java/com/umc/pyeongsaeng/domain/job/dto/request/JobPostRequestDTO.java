@@ -67,7 +67,7 @@ public class JobPostRequestDTO {
 
 		String note;
 
-		List<ImageRequestDTO> jobPostImages;
+		List<ImageRequestDTO> jobPostImageList;
 
 		List<FormFieldRequestDTO.CreateDTO> formFieldList;
 	}
@@ -118,7 +118,7 @@ public class JobPostRequestDTO {
 
 		String note;
 
-		List<ImageRequestDTO> images;
+		List<ImageRequestDTO> jobPostImageList;
 
 		List<FormFieldRequestDTO.CreateDTO> formFieldList;
 	}
