@@ -10,12 +10,9 @@ public record RecommendationResponse(
 	Integer hourlyWage,
 	String workingTime,
 	Integer monthlySalary,
-	Double distanceKm,
-	String imageUrl
+	Double distanceKm
 ) {
 	public static RecommendationResponse from(JobPost jobPost, double distanceKm) {
-		String imageUrl = jobPost.getImages().isEmpty() ? null : jobPost.getImages().get(0).getKeyName();
-
 		return new RecommendationResponse(
 			jobPost.getId(),
 			jobPost.getTitle(),
@@ -24,8 +21,7 @@ public record RecommendationResponse(
 			jobPost.getHourlyWage(),
 			jobPost.getWorkingTime(),
 			jobPost.getMonthlySalary(),
-			distanceKm,
-			imageUrl
+			distanceKm
 		);
 	}
 }
