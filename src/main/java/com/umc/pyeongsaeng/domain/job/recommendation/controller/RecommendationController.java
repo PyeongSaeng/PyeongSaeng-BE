@@ -28,7 +28,7 @@ public class RecommendationController {
 	private final TravelTimeService travelTimeService;
 	private final RecommendationService recommendationService;
 
-	//직선 거리 기반 추천
+	// 직선 거리 기반 추천
 	@GetMapping("/recommendations")
 	public ApiResponse<List<RecommendationResponse>> recommendJobsByDistance(
 		@AuthenticationPrincipal User user
