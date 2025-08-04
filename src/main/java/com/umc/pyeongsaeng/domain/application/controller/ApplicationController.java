@@ -34,7 +34,7 @@ public class ApplicationController {
 	private final ApplicationCommandService applicationCommandService;
 
 	@GetMapping
-	@Operation(summary = "특정 공고의 지원서 목록 조회 API", description = "특정 채용 공고에 제출된 지원서 목록을 페이지별로 조회하는 API입니다.")
+	@Operation(summary = "기업의 특정 공고의 지원서 목록 조회 API", description = "특정 채용 공고에 제출된 지원서 목록을 페이지별로 조회하는 API입니다.")
 	@Parameters({
 		@Parameter(name = "jobPostId", description = "조회할 채용 공고의 ID", required = true, in = ParameterIn.QUERY),
 		@Parameter(name = "page", description = "페이지 번호 (1부터 시작)", required = true, in = ParameterIn.QUERY)
@@ -76,7 +76,7 @@ public class ApplicationController {
 	}
 
 	@GetMapping("/{applicationId}/details")
-	@Operation(summary = "지원서 상세 조회 API", description = "특정 지원서의 상세 정보를 조회하는 API입니다. 질문과 답변 목록을 포함합니다.")
+	@Operation(summary = "기업이 지원자의 지원서 상세 조회 API", description = "특정 지원서의 상세 정보를 조회하는 API입니다. 질문과 답변 목록을 포함합니다.")
 	@Parameters({
 		@Parameter(name = "applicationId", description = "조회할 지원서의 ID", required = true, in = ParameterIn.PATH)
 	})

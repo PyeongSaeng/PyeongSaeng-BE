@@ -66,6 +66,13 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 	}
 
 	@Override
+	public JobPost getJobPostDetail(Long jobPostId) {
+		JobPost jobPost = jobPostRepository.findById(jobPostId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
+		return jobPost;
+	}
+
+	@Override
 	public JobPost updateJobPost(Long jobPostId, JobPostRequestDTO.UpdateDTO requestDTO) {
 		JobPost jobPost = jobPostRepository.findById(jobPostId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));

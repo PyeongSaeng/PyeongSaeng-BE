@@ -93,7 +93,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	// Job
 	INVALID_JOB_POST_ID(HttpStatus.BAD_REQUEST, "JOB401", "유효하지 않은 채용공고 ID입니다."),
 	INVALID_JOB_POST_STATE(HttpStatus.BAD_REQUEST, "JOB402", "지원되지 않는 JobPostState 입니다"),
-
+	JOB_POST_NOT_MATCH_COMPANY(HttpStatus.BAD_REQUEST, "JOB403", "기업이 작성한 게시글이 아닙니다."),
 	// Qusetion
 	SENIOR_QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND,"QUESTION401","해당 시니어 질문을 찾을 수 없습니다."),
 	SENIOR_QUESTION_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND,"QUESTION402","해당 시니어 질문의 옵션을 찾을 수 없습니다.");

@@ -311,6 +311,83 @@ public class JobPostController {
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewDTO(updatedJobPost));
 	}
 
+	@Operation(summary = "회사가 채용공고 상세보기 API", description = "기업이 자신이 등록한 채용공고를 상세볼 수 있는 API 입니다.")
+	@ApiResponses(value = {
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "채용공고 수정 성공",
+			content = @Content(
+				mediaType = "application/json",
+				schema = @Schema(implementation = ApiResponse.class),
+				examples = @ExampleObject(
+					name = "SuccessExample",
+					value = """
+						{
+						   "isSuccess": true,
+						   "code": "COMMON200",
+						   "message": "성공입니다.",
+						   "result": {
+						     "id": 5,
+						     "state": "RECRUITING",
+						     "title": "시니어 돌보미 채용",
+						     "address": "서울특별시 강남구",
+						     "detailAddress": "테헤란로 212",
+						     "roadAddress": "서울특별시 강남구 테헤란로 212",
+						     "zipcode": "06222",
+						     "hourlyWage": 15000,
+						     "monthlySalary": null,
+						     "yearSalary": null,
+						     "description": "어르신과 함께 즐거운 시간을 보내실 분을 찾습니다. 주 3회, 오후 시간에 근무하며, 식사 준비 및 말벗이 주된 업무입니다.",
+						     "workingTime": "월, 수, 금 14:00 ~ 18:00",
+						     "deadline": "2025-08-31",
+						     "recruitCount": 1,
+						     "note": "경력자 우대",
+						     "jobPostImageList": [
+						       {
+						         "imageId": 17,
+						         "keyName": "image_key_1.jpg43",
+						         "originalFileName": "job_post_image_1.jpg"
+						       },
+						       {
+						         "imageId": 18,
+						         "keyName": "image_key_2.png43",
+						         "originalFileName": "job_post_image_2.png"
+						       }
+						     ],
+						     "formFieldList": [
+						       {
+						         "id": 33,
+						         "fieldName": "성함",
+						         "fieldType": "TEXT"
+						       },
+						       {
+						         "id": 34,
+						         "fieldName": "연락처",
+						         "fieldType": "TEXT"
+						       },
+						       {
+						         "id": 35,
+						         "fieldName": "자기소개",
+						         "fieldType": "TEXT"
+						       },
+						       {
+						         "id": 36,
+						         "fieldName": "경력 유무",
+						         "fieldType": "IMAGE"
+						       }
+						     ]
+						   }
+						 }
+						"""
+				)
+			)
+		),
+	})
+	@GetMapping("/posts/{jobPostId}/detail")
+	public ApiResponse<JobPostResponseDTO.JobPostPreviewDTO> updateJobPost(
+		@PathVariable Long jobPostId) {
+		JobPost searchedJobPost = jobPostCommandService.getJobPostDetail(jobPostId);
+		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewDTO(searchedJobPost));
+	}
+
 	@Operation(summary = "회사의 채용공고 목록 조회 API", description = "회사가 쓴 채용 공고 목록을 조회하는 API입니다.")
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "채용공고 목록 조회 성공",
@@ -387,7 +464,7 @@ public class JobPostController {
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewByCompanyListDTO(jobPostList));
 	}
 
-	@Operation(summary = "채용공고 상세 조회 API", description = "특정 채용공고를 클릭했을 때, 해당 공고의 상세 정보를 조회하는 API입니다.")
+	@Operation(summary = "지원자가 채용공고 상세 조회 API", description = "지원자가 특정 채용공고를 클릭했을 때, 해당 공고의 상세 정보를 조회하는 API입니다.")
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(
 			responseCode = "200",

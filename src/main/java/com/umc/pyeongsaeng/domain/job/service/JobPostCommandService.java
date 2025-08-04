@@ -10,4 +10,7 @@ public interface JobPostCommandService {
 
 	// 회사에서 채용공고 업데이트
 	JobPost updateJobPost(Long jobPostId, JobPostRequestDTO.UpdateDTO updateDTO);
+
+	// 회사에서 채용공고 상세조회
+	JobPost getJobPostDetail(Long jobPostId);
 }
