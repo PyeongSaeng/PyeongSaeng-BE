@@ -50,10 +50,12 @@ public class ApplicationController {
 				"            {\n" +
 				"                \"applicationId\": 1,\n" +
 				"                \"applicantName\": \"김시니어\"\n" +
+				"                \"applicantStatus\": \"DRAFT\"\n" +
 				"            },\n" +
 				"            {\n" +
 				"                \"applicationId\": 2,\n" +
 				"                \"applicantName\": \"박시니어\"\n" +
+				"                \"applicantStatus\": \"SUBMITTED\"\n" +
 				"            }\n" +
 				"        ],\n" +
 				"        \"listSize\": 2,\n" +

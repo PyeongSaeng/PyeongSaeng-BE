@@ -1,26 +1,27 @@
 package com.umc.pyeongsaeng.domain.job.converter;
 
+import com.umc.pyeongsaeng.domain.company.entity.Company;
+import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
+import com.umc.pyeongsaeng.domain.job.dto.response.FormFieldResponseDTO;
+import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
+import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
+import com.umc.pyeongsaeng.domain.job.entity.JobPost;
+import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
+import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
+import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingResult;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Page;
-
-import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
-import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
-import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
-import com.umc.pyeongsaeng.domain.job.entity.JobPost;
-import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
-import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingResult;
-
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 public class JobPostConverter {
 
 
-	public static JobPost toJobPost(JobPostRequestDTO.CreateDTO requestDTO, GoogleGeocodingResult convertedAddress) {
+	public static JobPost toJobPost(JobPostRequestDTO.CreateDTO requestDTO, Company requestCompany, GoogleGeocodingResult convertedAddress) {
 
 		return JobPost.builder()
 			.title(requestDTO.getTitle())
@@ -35,7 +36,10 @@ public class JobPostConverter {
 			.workingTime(requestDTO.getWorkingTime())
 			.deadline(requestDTO.getDeadline())
 			.recruitCount(requestDTO.getRecruitCount())
+			.state(JobPostState.RECRUITING)
+			.company(requestCompany)
 			.images(new ArrayList<>())
+			.formField(new ArrayList<>())
 			.note(requestDTO.getNote())
 			.latitude(convertedAddress.lat())
 			.longitude(convertedAddress.lon())
@@ -47,7 +51,12 @@ public class JobPostConverter {
 		List<JobPostImageResponseDTO.JobPostImagePreviewDTO> jobPostImagePreviewDTOList = jobPost.getImages().stream()
 			.map(JobPostImageConverter::toJobPostImagePreViewDTO).collect(Collectors.toList());
 
+		List<FormFieldResponseDTO.FormFieldPreViewDTO> jobPostFormFieldPreviewDTOList = jobPost.getFormField().stream()
+			.map(FormFieldConverter::toFormFieldPreViewDTO).collect(Collectors.toList());
+
 		return JobPostResponseDTO.JobPostPreviewDTO.builder()
+			.id(jobPost.getId())
+			.state(jobPost.getState())
 			.title(jobPost.getTitle())
 			.address(jobPost.getAddress())
 			.detailAddress(jobPost.getDetailAddress())
@@ -60,7 +69,8 @@ public class JobPostConverter {
 			.workingTime(jobPost.getWorkingTime())
 			.deadline(jobPost.getDeadline())
 			.recruitCount(jobPost.getRecruitCount())
-			.jobPostImageId(jobPostImagePreviewDTOList)
+			.jobPostImageList(jobPostImagePreviewDTOList)
+			.formFieldList(jobPostFormFieldPreviewDTOList)
 			.note(jobPost.getNote())
 			.build();
 	}
@@ -89,17 +99,26 @@ public class JobPostConverter {
 			.build();
 	}
 
-	public static JobPostResponseDTO.JobPostPreviewListDTO toJobPostPreviewListDTO(Page<JobPost> jobPostList) {
-		List<JobPostResponseDTO.JobPostPreviewDTO> jobPostPreViewDTOList = jobPostList.stream()
-			.map(JobPostConverter::toJobPostPreviewDTO).collect(Collectors.toList());
+	public static JobPostResponseDTO.JobPostPreviewByCompanyDTO toJobPostPreviewByCompanyDTO(JobPost jobPost,
+																							 List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> images) {
+		return JobPostResponseDTO.JobPostPreviewByCompanyDTO.builder()
+			.id(jobPost.getId())
+			.state(jobPost.getState())
+			.title(jobPost.getTitle())
+			.images(images)
+			.build();
+	}
 
-		return JobPostResponseDTO.JobPostPreviewListDTO.builder()
-			.jobPostList(jobPostPreViewDTOList)
+
+	public static JobPostResponseDTO.JobPostPreviewByCompanyListDTO toJobPostPreviewByCompanyListDTO(Page<JobPostResponseDTO.JobPostPreviewByCompanyDTO> jobPostList) {
+
+		return JobPostResponseDTO.JobPostPreviewByCompanyListDTO.builder()
+			.jobPostList(jobPostList.getContent())
 			.isFirst(jobPostList.isFirst())
 			.isLast(jobPostList.isLast())
 			.totalElements(jobPostList.getTotalElements())
 			.totalPage(jobPostList.getTotalPages())
-			.listSize(jobPostPreViewDTOList.size())
+			.listSize(jobPostList.getContent().size())
 			.build();
 	}
 

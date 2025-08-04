@@ -2,7 +2,9 @@ package com.umc.pyeongsaeng.domain.job.entity;
 
 import com.umc.pyeongsaeng.domain.application.entity.Application;
 import com.umc.pyeongsaeng.domain.company.entity.Company;
+import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
+import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingResult;
 import com.umc.pyeongsaeng.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -77,4 +79,50 @@ public class JobPost extends BaseEntity {
 	// 경도
 	private Double longitude;
 
+	public void update(JobPostRequestDTO.UpdateDTO requestDTO, GoogleGeocodingResult convertedAddress) {
+		this.state = JobPostState.RECRUITING;
+		if (requestDTO.getTitle() != null) {
+			this.title = requestDTO.getTitle();
+		}
+		if (requestDTO.getAddress() != null) {
+			this.address = requestDTO.getAddress();
+		}
+		if (requestDTO.getDetailAddress() != null) {
+			this.detailAddress = requestDTO.getDetailAddress();
+		}
+		if (requestDTO.getRoadAddress() != null) {
+			this.roadAddress = requestDTO.getRoadAddress();
+		}
+		if (requestDTO.getZipcode() != null) {
+			this.zipcode = requestDTO.getZipcode();
+		}
+		if (requestDTO.getHourlyWage() != null) {
+			this.hourlyWage = requestDTO.getHourlyWage();
+		}
+		if (requestDTO.getMonthlySalary() != null) {
+			this.monthlySalary = requestDTO.getMonthlySalary();
+		}
+		if (requestDTO.getYearSalary() != null) {
+			this.yearSalary = requestDTO.getYearSalary();
+		}
+		if (requestDTO.getDescription() != null) {
+			this.description = requestDTO.getDescription();
+		}
+		if (requestDTO.getWorkingTime() != null) {
+			this.workingTime = requestDTO.getWorkingTime();
+		}
+		if (requestDTO.getDeadline() != null) {
+			this.deadline = requestDTO.getDeadline();
+		}
+		if (requestDTO.getRecruitCount() != null) {
+			this.recruitCount = requestDTO.getRecruitCount();
+		}
+		if (requestDTO.getNote() != null) {
+			this.note = requestDTO.getNote();
+		}
+		if (convertedAddress != null) {
+			this.latitude = convertedAddress.lat();
+			this.longitude = convertedAddress.lon();
+		}
+	}
 }

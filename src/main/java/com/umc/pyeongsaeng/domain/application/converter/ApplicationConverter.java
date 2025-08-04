@@ -30,6 +30,7 @@ public class ApplicationConverter {
 		return ApplicationResponseDTO.ApplicationPreViewDTO.builder()
 			.applicationId(application.getId())
 			.applicantName(application.getApplicant().getName())
+			.applicationStatus(application.getApplicationStatus())
 			.build();
 	}
 

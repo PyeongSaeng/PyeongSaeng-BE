@@ -1,12 +1,13 @@
 package com.umc.pyeongsaeng.domain.job.dto.response;
 
-import java.time.LocalDate;
-import java.util.List;
-
+import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public class JobPostResponseDTO {
 
@@ -15,6 +16,8 @@ public class JobPostResponseDTO {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class JobPostPreviewDTO {
+		Long id;
+		JobPostState state;
 		String title;
 		String address;
 		String detailAddress;
@@ -28,15 +31,28 @@ public class JobPostResponseDTO {
 		LocalDate deadline;
 		Integer recruitCount;
 		String note;
-		List<JobPostImageResponseDTO.JobPostImagePreviewDTO> jobPostImageId;
+		List<JobPostImageResponseDTO.JobPostImagePreviewDTO> jobPostImageList;
+		List<FormFieldResponseDTO.FormFieldPreViewDTO> formFieldList;
 	}
 
 	@Builder
 	@Getter
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class JobPostPreviewListDTO {
-		List<JobPostPreviewDTO> jobPostList;
+	public static class JobPostPreviewByCompanyDTO {
+		Long id;
+		JobPostState state;
+		String title;
+		List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> images;
+	}
+
+
+	@Builder
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class JobPostPreviewByCompanyListDTO {
+		List<JobPostPreviewByCompanyDTO> jobPostList;
 		Integer listSize;
 		Integer totalPage;
 		Long totalElements;

@@ -8,6 +8,7 @@ import com.umc.pyeongsaeng.domain.job.enums.FieldType;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import lombok.*;
 
+import java.util.List;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class ApplicationResponseDTO {
 	public static class ApplicationPreViewDTO {
 		Long applicationId;
 		String applicantName;
+		ApplicationStatus applicationStatus;
 	}
 
 	@Builder

@@ -24,7 +24,7 @@ public class ApplicationAnswer extends BaseEntity {
 	@JoinColumn(name = "application_id")
 	private Application application;
 
-	@OneToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "form_field_id")
 	private FormField formField;
 

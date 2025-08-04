@@ -25,6 +25,9 @@ public class FormField extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@OneToMany(mappedBy = "formField", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ApplicationAnswer> applicationAnswers = new ArrayList<>();
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "job_post_id")
 	private JobPost jobPost;

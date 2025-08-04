@@ -1,18 +1,25 @@
 package com.umc.pyeongsaeng.domain.job.converter;
 
-import com.umc.pyeongsaeng.domain.job.dto.response.JobPostFormFieldResponseDTO;
+import com.umc.pyeongsaeng.domain.job.dto.request.FormFieldRequestDTO;
+import com.umc.pyeongsaeng.domain.job.dto.response.FormFieldResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.FormField;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 
 public class FormFieldConverter {
 
-	public static JobPostFormFieldResponseDTO.FormFieldPreViewDTO toFormFieldPreViewDTO(FormField formField) {
+	public static FormField toFormField(FormFieldRequestDTO.CreateDTO formField, JobPost newJobPost) {
+		return FormField.builder()
+			.fieldName(formField.getFieldName())
+			.fieldType(formField.getFieldType())
+			.jobPost(newJobPost)
+			.build();
+	}
 
-		return JobPostFormFieldResponseDTO.FormFieldPreViewDTO.builder()
-			.formFieldId(formField.getId())
-			.formField(formField.getFieldName())
+	public static FormFieldResponseDTO.FormFieldPreViewDTO toFormFieldPreViewDTO(FormField formField) {
+
+		return FormFieldResponseDTO.FormFieldPreViewDTO.builder()
+			.id(formField.getId())
+			.fieldName(formField.getFieldName())
 			.fieldType(formField.getFieldType())
 			.build();
 	}

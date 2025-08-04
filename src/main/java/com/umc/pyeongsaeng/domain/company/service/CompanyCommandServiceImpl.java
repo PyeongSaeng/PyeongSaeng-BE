@@ -1,13 +1,5 @@
 package com.umc.pyeongsaeng.domain.company.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.umc.pyeongsaeng.domain.company.dto.CompanyRequest;
 import com.umc.pyeongsaeng.domain.company.dto.CompanyResponse;
 import com.umc.pyeongsaeng.domain.company.entity.Company;
@@ -21,8 +13,14 @@ import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import com.umc.pyeongsaeng.global.client.nts.NtsApiClient;
 import com.umc.pyeongsaeng.global.util.JwtUtil;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
