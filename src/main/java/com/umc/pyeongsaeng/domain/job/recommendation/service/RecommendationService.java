@@ -1,9 +1,9 @@
 package com.umc.pyeongsaeng.domain.job.recommendation.service;
 
-import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.RecommendationResponse;
+import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.RecommendationResponseDTO;
 
 import java.util.List;
 
 public interface RecommendationService {
-	List<RecommendationResponse> recommendJobsByDistance(Long userId);
+	List<RecommendationResponseDTO> recommendJobsByDistance(Long userId);
 }

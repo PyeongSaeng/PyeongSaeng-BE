@@ -2,7 +2,7 @@ package com.umc.pyeongsaeng.domain.job.recommendation.dto.response;
 
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 
-public record RecommendationResponse(
+public record RecommendationResponseDTO(
 	Long jobPostId,
 	String title,
 	String companyName,
@@ -12,8 +12,8 @@ public record RecommendationResponse(
 	Integer monthlySalary,
 	Double distanceKm
 ) {
-	public static RecommendationResponse from(JobPost jobPost, double distanceKm) {
-		return new RecommendationResponse(
+	public static RecommendationResponseDTO from(JobPost jobPost, double distanceKm) {
+		return new RecommendationResponseDTO(
 			jobPost.getId(),
 			jobPost.getTitle(),
 			jobPost.getCompany().getOwnerName(),

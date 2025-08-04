@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.umc.pyeongsaeng.domain.job.recommendation.dto.request.TravelTimeRequest;
-import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.RecommendationResponse;
-import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.TravelTimeResponse;
+import com.umc.pyeongsaeng.domain.job.recommendation.dto.request.TravelTimeRequestDTO;
+import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.RecommendationResponseDTO;
+import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.TravelTimeResponseDTO;
 import com.umc.pyeongsaeng.domain.job.recommendation.service.RecommendationService;
 import com.umc.pyeongsaeng.domain.job.recommendation.service.TravelTimeService;
 import com.umc.pyeongsaeng.domain.user.entity.User;
@@ -30,17 +30,17 @@ public class RecommendationController {
 
 	// 직선 거리 기반 추천
 	@GetMapping("/recommendations")
-	public ApiResponse<List<RecommendationResponse>> recommendJobsByDistance(
+	public ApiResponse<List<RecommendationResponseDTO>> recommendJobsByDistance(
 		@AuthenticationPrincipal User user
 	) {
 		Long userId = user.getId();
-		List<RecommendationResponse> recommendations = recommendationService.recommendJobsByDistance(userId);
+		List<RecommendationResponseDTO> recommendations = recommendationService.recommendJobsByDistance(userId);
 		return ApiResponse.of(SuccessStatus._OK, recommendations);
 	}
 
 	@PostMapping("/travel-time")
-	public ResponseEntity<ApiResponse<TravelTimeResponse>> getTravelTime(
-		@RequestBody TravelTimeRequest request
+	public ResponseEntity<ApiResponse<TravelTimeResponseDTO>> getTravelTime(
+		@RequestBody TravelTimeRequestDTO request
 	) {
 		String travelSummary = travelTimeService.getTravelTime(
 			request.originLat(),
@@ -49,7 +49,7 @@ public class RecommendationController {
 			request.destLng()
 		);
 
-		TravelTimeResponse response = new TravelTimeResponse(travelSummary);
+		TravelTimeResponseDTO response = new TravelTimeResponseDTO(travelSummary);
 		return ResponseEntity.ok(ApiResponse.of(SuccessStatus._OK, response));
 	}
 }
