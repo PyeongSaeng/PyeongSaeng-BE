@@ -1,10 +1,10 @@
 package com.umc.pyeongsaeng.domain.application.dto.response;
 
-import java.util.List;
-
 import com.umc.pyeongsaeng.domain.application.enums.ApplicationStatus;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import lombok.*;
+
+import java.util.List;
 
 public class ApplicationResponseDTO {
 
@@ -15,6 +15,7 @@ public class ApplicationResponseDTO {
 	public static class ApplicationPreViewDTO {
 		Long applicationId;
 		String applicantName;
+		ApplicationStatus applicationStatus;
 	}
 
 	@Builder

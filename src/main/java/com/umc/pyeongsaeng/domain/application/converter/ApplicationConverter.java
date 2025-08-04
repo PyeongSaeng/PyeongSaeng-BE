@@ -1,21 +1,21 @@
 package com.umc.pyeongsaeng.domain.application.converter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDTO;
+import com.umc.pyeongsaeng.domain.application.entity.Application;
 import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepositoryCustom;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-
-import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDTO;
-import com.umc.pyeongsaeng.domain.application.entity.Application;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -27,6 +27,7 @@ public class ApplicationConverter {
 		return ApplicationResponseDTO.ApplicationPreViewDTO.builder()
 			.applicationId(application.getId())
 			.applicantName(application.getApplicant().getName())
+			.applicationStatus(application.getApplicationStatus())
 			.build();
 	}
 
