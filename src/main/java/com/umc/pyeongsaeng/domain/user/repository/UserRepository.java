@@ -18,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findByPhone(String phone);
 	boolean existsByPhone(String phone);
 	List<User> findByStatusAndWithdrawnAtBefore(UserStatus status, LocalDateTime dateTime);
+	Optional<User> findByNameAndPhone(String name, String phone);
+	Optional<User> findByUsernameAndPhone(String username, String phone);
 }

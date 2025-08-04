@@ -99,11 +99,11 @@ public class AuthController {
     """)
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON201", description = "성공적으로 생성되었습니다"),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH402", description = "이미 사용중인 아이디입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH403", description = "비밀번호는 필수 입력값입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH404", description = "유효하지 않은 카카오 ID입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH405", description = "이미 등록된 카카오 계정입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER402", description = "이미 사용중인 전화번호입니다.")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER412", description = "이미 사용중인 아이디입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH402", description = "비밀번호가 유효하지 않습니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH403", description = "유효하지 않은 카카오 ID입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH404", description = "이미 등록된 카카오 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER413", description = "이미 사용중인 전화번호입니다.")
 	})
 	@io.swagger.v3.oas.annotations.parameters.RequestBody(
 		description = "보호자 회원가입 요청 데이터",
@@ -182,18 +182,18 @@ public class AuthController {
 
     > 보호자 연결:
     - 독립 가입: protectorId = null
-    - 보호자 연결 가입: protectorId 필수, relation 입력 필요
+    - 보호자 연결 가입: protectorId 필수
     """)
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON201", description = "성공적으로 생성되었습니다"),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH402", description = "이미 사용중인 아이디입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH403", description = "비밀번호는 필수 입력값입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH404", description = "유효하지 않은 카카오 ID입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH405", description = "이미 등록된 카카오 계정입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER402", description = "이미 사용중인 전화번호입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER403", description = "존재하지 않는 보호자입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER404", description = "보호자 권한이 없는 사용자입니다."),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER405", description = "보호자는 최대 3명의 시니어만 등록할 수 있습니다.")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER412", description = "이미 사용중인 아이디입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH402", description = "비밀번호가 유효하지 않습니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH403", description = "유효하지 않은 카카오 ID입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH404", description = "이미 등록된 카카오 계정입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER413", description = "이미 사용중인 전화번호입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER402", description = "존재하지 않는 보호자입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER405", description = "보호자 권한이 없는 사용자입니다."),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER408", description = "보호자는 최대 3명의 시니어만 등록할 수 있습니다.")
 	})
 	@io.swagger.v3.oas.annotations.parameters.RequestBody(
 		description = "시니어 회원가입 요청 데이터",
@@ -218,7 +218,6 @@ public class AuthController {
                             "job": "EMPLOYEE",
                             "experiencePeriod": "OVER_TEN_YEARS",
                             "protectorId": 1,
-                            "relation": "모녀",
                             "providerType": null,
                             "providerUserId": null
                         }
@@ -241,7 +240,6 @@ public class AuthController {
                           "job": "EMPLOYEE",
                           "experiencePeriod": "OVER_TEN_YEARS",
                           "protectorId": 1,
-                          "relation": "부녀",
                           "providerType": "KAKAO",
                           "providerUserId": "1234567899"
                         }
@@ -268,7 +266,7 @@ public class AuthController {
 	@Operation(summary = "아이디 중복 확인", description = "아이디 중복 여부를 확인합니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "성공입니다"),
-		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH402", description = "이미 사용중인 아이디입니다.")
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "USER412", description = "이미 사용중인 아이디입니다.")
 	})
 	public ApiResponse<String> checkUsername(@RequestParam String username) {
 		authQueryService.checkUsernameAvailability(username);
@@ -277,7 +275,7 @@ public class AuthController {
 
 	@PostMapping("/logout")
 	@Operation(summary = "로그아웃", description = "사용자의 리프레시 토큰을 삭제하여 로그아웃 처리합니다.")
-	@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH201", description = "로그아웃되었습니다.")
+	@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "로그아웃되었습니다.")
 	public ResponseEntity<ApiResponse<String>> logout(
 		@AuthenticationPrincipal CustomUserDetails currentUser) {
 

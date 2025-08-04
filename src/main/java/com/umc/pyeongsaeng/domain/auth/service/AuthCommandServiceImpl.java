@@ -158,14 +158,14 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 			throw new GeneralException(ErrorStatus.INVALID_PASSWORD);
 		}
 		if (userRepository.existsByUsername(username)) {
-			throw new GeneralException(ErrorStatus.USERNAME_DUPLICATED);
+			throw new GeneralException(ErrorStatus.DUPLICATE_USERNAME);
 		}
 	}
 
 	// 전화번호 중복 검증
 	private void validateDuplicatePhone(String phone) {
 		if (userRepository.existsByPhone(phone)) {
-			throw new GeneralException(ErrorStatus.PHONE_DUPLICATED);
+			throw new GeneralException(ErrorStatus.DUPLICATE_PHONE);
 		}
 	}
 
@@ -235,7 +235,6 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 		SeniorProfile seniorProfile = SeniorProfile.builder()
 			.senior(senior)
 			.protector(protector)
-			.relation(request.getRelation())
 			.age(request.getAge())
 			.gender(request.getGender() != null ? Gender.valueOf(request.getGender()) : null)
 			.phoneNum(request.getPhoneNum())

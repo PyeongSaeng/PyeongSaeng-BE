@@ -1,21 +1,23 @@
 package com.umc.pyeongsaeng.domain.company.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
 
-import com.umc.pyeongsaeng.domain.company.dto.CompanyResponse;
-import com.umc.pyeongsaeng.domain.company.entity.Company;
-import com.umc.pyeongsaeng.domain.company.repository.CompanyRepository;
-import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
-import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
+import com.umc.pyeongsaeng.domain.company.dto.*;
+import com.umc.pyeongsaeng.domain.company.entity.*;
+import com.umc.pyeongsaeng.domain.company.repository.*;
+import com.umc.pyeongsaeng.domain.sms.service.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
 
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CompanyQueryServiceImpl implements CompanyQueryService {
 	private final CompanyRepository companyRepository;
+	private final SmsService smsService;
 
 	// 기업 상세 정보 조회
 	@Override
@@ -41,5 +43,16 @@ public class CompanyQueryServiceImpl implements CompanyQueryService {
 		if (companyRepository.existsByUsername(username)) {
 			throw new GeneralException(ErrorStatus.DUPLICATE_USERNAME);
 		}
+	}
+
+	// 아이디 찾기
+	@Override
+	public CompanyResponse.UsernameDto findUsername(CompanyRequest.FindCompanyUsernameDto request) {
+		smsService.verifyCode(request.getPhone(), request.getVerificationCode());
+
+		Company company = companyRepository.findByOwnerNameAndPhone(request.getOwnerName(), request.getPhone())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.COMPANY_NOT_FOUND));
+
+		return CompanyResponse.UsernameDto.from(company);
 	}
 }

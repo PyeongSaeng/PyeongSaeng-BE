@@ -32,4 +32,24 @@ public interface UserCommandService {
 	 * @return 업데이트된 시니어 정보
 	 */
 	UserResponse.SeniorInfoDto updateSeniorInfo(Long userId, UserRequest.UpdateSeniorDto request);
+
+	/**
+	 * 비밀번호 재설정
+	 * @param request 비밀번호 변경 요청
+	 */
+	void resetPassword(UserRequest.PasswordChangeDto request);
+
+	/**
+	 * 인증번호를 검증
+	 * @param request 인증 요청
+	 * @return 사용자 아이디
+	 */
+	UserResponse.UsernameDto verifyResetPasswordCode(UserRequest.PasswordVerificationDto request);
+
+	/**
+	 * 보호자와 시니어 연결 처리
+	 * @param protectorId 보호자 사용자 아이디
+	 * @param request 시니어 연결 요청
+	 */
+	void connectSeniorToProtector(Long protectorId, UserRequest.ConnectSeniorDto request);
 }

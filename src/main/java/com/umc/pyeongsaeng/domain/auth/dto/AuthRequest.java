@@ -116,10 +116,6 @@ public class AuthRequest {
 		@Schema(description = "보호자 ID (보호자와 연결할 경우에 사용)", required = false)
 		private Long protectorId;
 
-		@Schema(description = "보호자와의 관계", required = false)
-		@Size(max = 20)
-		private String relation;
-
 		@Schema(description = "소셜 로그인 타입", example = "KAKAO", required = false)
 		private String providerType;
 
