@@ -69,7 +69,7 @@ public class JobPostRequestDTO {
 
 		List<ImageRequestDTO> images;
 
-		List<FormFieldRequestDTO.CreateDTO> formfieldList;
+		List<FormFieldRequestDTO.CreateDTO> formFieldList;
 	}
 
 	@Builder
@@ -77,26 +77,49 @@ public class JobPostRequestDTO {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class UpdateDTO {
+
+		@NotBlank(message = "제목을 입력해주세요.")
 		@Size(max = 255, message = "제목은 255자 이하로 입력해주세요.")
 		String title;
+
+		@NotBlank(message = "주소를 입력해주세요.")
 		@Size(max = 255, message = "주소는 255자 이하로 입력해주세요.")
 		String address;
+
+		@NotBlank(message = "상세주소를 입력해주세요.")
 		@Size(max = 255, message = "상세주소는 255자 이하로 입력해주세요.")
 		String detailAddress;
+
+		@NotBlank(message = "도로명주소를 입력해주세요.")
 		@Size(max = 255, message = "도로명주소는 255자 이하로 입력해주세요.")
 		String roadAddress;
+
+		@NotBlank(message = "우편번호를 입력해주세요.")
 		@Size(max = 10, message = "우편번호는 10자 이하로 입력해주세요.")
 		String zipcode;
+
 		Integer hourlyWage;
+
 		Integer monthlySalary;
+
 		Integer yearSalary;
+
+		@NotBlank(message = "상세설명을 입력해주세요.")
 		String description;
+
+		@NotBlank(message = "근무시간을 입력해주세요.")
 		String workingTime;
+
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 		LocalDate deadline;
+
+		@NotNull(message = "모집인원을 입력해주세요.")
 		Integer recruitCount;
+
 		String note;
+
 		List<ImageRequestDTO> images;
+
 		List<FormFieldRequestDTO.CreateDTO> formFieldList;
 	}
 }

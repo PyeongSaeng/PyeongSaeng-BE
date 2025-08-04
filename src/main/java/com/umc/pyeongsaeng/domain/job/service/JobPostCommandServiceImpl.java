@@ -1,5 +1,6 @@
 package com.umc.pyeongsaeng.domain.job.service;
 
+import com.umc.pyeongsaeng.domain.company.entity.Company;
 import com.umc.pyeongsaeng.domain.job.converter.FormFieldConverter;
 import com.umc.pyeongsaeng.domain.job.converter.JobPostConverter;
 import com.umc.pyeongsaeng.domain.job.converter.JobPostImageConverter;
@@ -37,10 +38,11 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 	private final FormFieldRepository formFieldRepository;
 
 	@Override
-	public JobPost createJobPost(JobPostRequestDTO.CreateDTO requestDTO, Long companyId) {
+	public JobPost createJobPost(JobPostRequestDTO.CreateDTO requestDTO, Company requestCompany) {
 
 		GoogleGeocodingResult convertedAddress = googleGeocodingClient.convert(requestDTO.getRoadAddress());
-		JobPost requestedJobPost = JobPostConverter.toJobPost(requestDTO, convertedAddress);
+
+		JobPost requestedJobPost = JobPostConverter.toJobPost(requestDTO, requestCompany, convertedAddress);
 
 		JobPost newJobPost = jobPostRepository.save(requestedJobPost);
 
@@ -52,7 +54,7 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 		jobPostImageRepository.saveAll(savedImages);
 		newJobPost.getImages().addAll(savedImages);
 
-		List<FormField> savedFormFields = requestDTO.getFormfieldList().stream()
+		List<FormField> savedFormFields = requestDTO.getFormFieldList().stream()
 			.map(formFields -> FormFieldConverter.toFormField(formFields, newJobPost))
 			.toList();
 

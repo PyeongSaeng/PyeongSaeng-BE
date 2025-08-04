@@ -1,10 +1,12 @@
 package com.umc.pyeongsaeng.domain.job.converter;
 
+import com.umc.pyeongsaeng.domain.company.entity.Company;
 import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.FormFieldResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
+import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
 import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingResult;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 public class JobPostConverter {
 
 
-	public static JobPost toJobPost(JobPostRequestDTO.CreateDTO requestDTO, GoogleGeocodingResult convertedAddress) {
+	public static JobPost toJobPost(JobPostRequestDTO.CreateDTO requestDTO, Company requestCompany, GoogleGeocodingResult convertedAddress) {
 
 		return JobPost.builder()
 			.title(requestDTO.getTitle())
@@ -34,6 +36,8 @@ public class JobPostConverter {
 			.workingTime(requestDTO.getWorkingTime())
 			.deadline(requestDTO.getDeadline())
 			.recruitCount(requestDTO.getRecruitCount())
+			.state(JobPostState.RECRUITING)
+			.company(requestCompany)
 			.images(new ArrayList<>())
 			.formField(new ArrayList<>())
 			.note(requestDTO.getNote())

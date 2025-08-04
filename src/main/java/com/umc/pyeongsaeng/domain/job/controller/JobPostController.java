@@ -105,7 +105,7 @@ public class JobPostController {
 	public ApiResponse<JobPostResponseDTO.JobPostPreviewDTO> createJobPost(
 		@RequestBody JobPostRequestDTO.CreateDTO requestDTO,
 		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
-		JobPost newJobPost = jobPostCommandService.createJobPost(requestDTO, userDetails.getCompany().getId());
+		JobPost newJobPost = jobPostCommandService.createJobPost(requestDTO, userDetails.getCompany());
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewDTO(newJobPost));
 	}
 

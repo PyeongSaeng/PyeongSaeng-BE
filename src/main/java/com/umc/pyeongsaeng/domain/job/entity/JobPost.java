@@ -80,6 +80,7 @@ public class JobPost extends BaseEntity {
 	private Double longitude;
 
 	public void update(JobPostRequestDTO.UpdateDTO requestDTO, GoogleGeocodingResult convertedAddress) {
+		this.state = JobPostState.RECRUITING;
 		if (requestDTO.getTitle() != null) {
 			this.title = requestDTO.getTitle();
 		}
