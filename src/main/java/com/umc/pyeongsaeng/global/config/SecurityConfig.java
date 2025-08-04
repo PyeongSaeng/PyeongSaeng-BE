@@ -36,8 +36,14 @@ public class SecurityConfig {
 		"/api/auth/signup/**",
 		"/api/auth/kakao/login",
 		"/api/auth/check-username",
-		"/api/sms/**",
 		"/api/token/**",
+		"/api/sms/**",
+		"/api/companies/find-username",
+		"/api/companies/reset-password",
+		"/api/companies/reset-password/verify",
+		"/api/user/find-username",
+		"/api/user/reset-password",
+		"/api/user/reset-password/verify",
 		"/api/companies/sign-up",
 		"/api/companies/login",
 		"/api/companies/check-username",
@@ -118,6 +124,7 @@ public class SecurityConfig {
 				.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
 				.requestMatchers("/api/user/withdraw/cancel").permitAll()
 				.requestMatchers("/api/user/protector/**").hasRole("PROTECTOR")
+				.requestMatchers("/api/user/senior/search").hasRole("PROTECTOR")
 				.requestMatchers("/api/user/senior/**").hasRole("SENIOR")
 				.requestMatchers("/api/protector/**").hasRole("PROTECTOR")
 				.requestMatchers("/api/senior/**").hasRole("SENIOR")

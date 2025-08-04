@@ -23,4 +23,15 @@ public class FormFieldConverter {
 			.fieldType(formField.getFieldType())
 			.build();
 	}
+
+	public static JobPostFormFieldResponseDTO.FormFieldPreViewListDTO toFormFieldPreViewListDTO (List<FormField> formFieldList) {
+
+		List<JobPostFormFieldResponseDTO.FormFieldPreViewDTO> formFieldPreViewList = formFieldList.stream()
+			.map(FormFieldConverter::toFormFieldPreViewDTO)
+			.collect(Collectors.toList());
+
+		return JobPostFormFieldResponseDTO.FormFieldPreViewListDTO.builder()
+			.formFieldList(formFieldPreViewList)
+			.build();
+	}
 }

@@ -1,21 +1,22 @@
 package com.umc.pyeongsaeng.domain.user.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
+import java.util.stream.*;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
 
-import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
-import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
-import com.umc.pyeongsaeng.domain.user.dto.UserResponse;
-import com.umc.pyeongsaeng.domain.user.entity.User;
-import com.umc.pyeongsaeng.domain.user.enums.Role;
-import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
-import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
-import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
+import com.umc.pyeongsaeng.domain.senior.entity.*;
+import com.umc.pyeongsaeng.domain.senior.repository.*;
+import com.umc.pyeongsaeng.domain.sms.service.*;
+import com.umc.pyeongsaeng.domain.user.dto.*;
+import com.umc.pyeongsaeng.domain.user.entity.*;
+import com.umc.pyeongsaeng.domain.user.enums.*;
+import com.umc.pyeongsaeng.domain.user.repository.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
 
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,8 @@ public class UserQueryServiceImpl implements UserQueryService {
 
 	private final UserRepository userRepository;
 	private final SeniorProfileRepository seniorProfileRepository;
+	private final SocialAccountRepository socialAccountRepository;
+	private final SmsService smsService;
 
 	// 보호자 정보 조회
 	@Override
@@ -69,9 +72,42 @@ public class UserQueryServiceImpl implements UserQueryService {
 		return seniorProfiles.stream()
 			.map(profile -> UserResponse.ConnectedSeniorDto.of(
 				profile.getSenior(),
-				profile.getPhoneNum(),
-				profile.getRelation()
+				profile.getPhoneNum()
 			))
 			.collect(Collectors.toList());
+	}
+
+	// 아이디 찾기
+	@Override
+	public UserResponse.UsernameDto findUsername(UserRequest.FindUsernameDto request) {
+		smsService.verifyCode(request.getPhone(), request.getVerificationCode());
+
+		User user = userRepository.findByNameAndPhone(request.getName(), request.getPhone())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		return UserResponse.UsernameDto.from(user);
+	}
+
+	// 전화번호로 시니어 검색
+	@Override
+	public UserResponse.SeniorSearchResultDto searchSeniorByPhone(String phone, Long protectorId) {
+		User senior = userRepository.findByPhone(phone)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		if (senior.getRole() != Role.SENIOR) {
+			throw new GeneralException(ErrorStatus.NOT_SENIOR_ROLE);
+		}
+
+		if (senior.getStatus() != UserStatus.ACTIVE) {
+			throw new GeneralException(ErrorStatus.ALREADY_WITHDRAWN);
+		}
+
+		boolean isAlreadyConnected = false;
+		if (protectorId != null) {
+			isAlreadyConnected = seniorProfileRepository
+				.existsBySeniorIdAndProtectorId(senior.getId(), protectorId);
+		}
+
+		return UserResponse.SeniorSearchResultDto.of(senior, isAlreadyConnected);
 	}
 }

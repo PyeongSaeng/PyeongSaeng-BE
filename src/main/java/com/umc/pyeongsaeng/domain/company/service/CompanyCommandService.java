@@ -50,4 +50,17 @@ public interface CompanyCommandService {
 	 * @return 쿠키 제거 명령 문자열
 	 */
 	String getLogoutCookie();
+
+	/**
+	 * 비밀번호 재설정 전 인증
+	 * @param request 인증 요청
+	 * @return 사용자 아이디
+	 */
+	CompanyResponse.UsernameDto verifyResetPasswordCode(CompanyRequest.PasswordVerificationDto request);
+
+	/**
+	 * 비밀번호 재설정
+	 * @param request 비밀번호 변경 요청
+	 */
+	void resetPassword(CompanyRequest.PasswordChangeDto request);
 }

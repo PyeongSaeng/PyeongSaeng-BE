@@ -46,7 +46,7 @@ public class ApplicationRepositoryImpl implements ApplicationRepositoryCustom {
 			"                                 'keyName', af.key_name, " +
 			"                                 'originalFileName', af.original_file_name " +
 			"                             ) " +
-		"                             ) AS CHAR) " +
+			"                             ) AS CHAR) " +
 			"                     FROM application_file af " +
 			"                     WHERE af.application_answer_id = ans.id) " +
 			"                ELSE " +

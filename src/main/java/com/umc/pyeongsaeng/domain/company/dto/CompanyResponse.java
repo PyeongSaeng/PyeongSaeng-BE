@@ -1,10 +1,9 @@
 package com.umc.pyeongsaeng.domain.company.dto;
 
-import com.umc.pyeongsaeng.domain.company.enums.CompanyStatus;
+import com.umc.pyeongsaeng.domain.company.entity.*;
+import com.umc.pyeongsaeng.domain.company.enums.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 public class CompanyResponse {
 
@@ -55,5 +54,19 @@ public class CompanyResponse {
 		private String email;
 		private String phone;
 		private CompanyStatus status;
+	}
+
+	@Getter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class UsernameDto {
+		private String username;
+
+		public static UsernameDto from(Company company) {
+			return UsernameDto.builder()
+				.username(company.getUsername())
+				.build();
+		}
 	}
 }

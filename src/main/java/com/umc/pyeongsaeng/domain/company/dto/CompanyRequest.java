@@ -1,11 +1,7 @@
 package com.umc.pyeongsaeng.domain.company.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 public class CompanyRequest {
 
@@ -77,5 +73,47 @@ public class CompanyRequest {
 	public static class WithdrawRequestDto {
 		@NotNull
 		private boolean confirmed;
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class FindCompanyUsernameDto {
+		@NotBlank
+		@Pattern(regexp = "^010\\d{8}$", message = "올바른 전화번호 형식이 아닙니다.")
+		private String phone;
+
+		@NotBlank
+		private String ownerName;
+
+		@NotBlank
+		private String verificationCode;
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class PasswordVerificationDto {
+		@NotBlank
+		private String username;
+
+		@NotBlank
+		@Pattern(regexp = "^010\\d{8}$", message = "올바른 전화번호 형식이 아닙니다.")
+		private String phone;
+
+		@NotBlank
+		private String verificationCode;
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class PasswordChangeDto {
+		@NotBlank
+		private String username;
+
+		@NotBlank
+		@Size(min = 6, max = 100)
+		private String newPassword;
 	}
 }

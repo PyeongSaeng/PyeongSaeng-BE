@@ -1,6 +1,6 @@
 package com.umc.pyeongsaeng.domain.company.service;
 
-import com.umc.pyeongsaeng.domain.company.dto.CompanyResponse;
+import com.umc.pyeongsaeng.domain.company.dto.*;
 
 public interface CompanyQueryService {
 	/**
@@ -15,4 +15,11 @@ public interface CompanyQueryService {
 	 * @param username 확인할 아이디
 	 */
 	void checkUsernameAvailability(String username);
+
+	/**
+	 * 아이디 찾기
+	 * @param request 아이디 찾기 요청
+	 * @return 사용자 아이디
+	 */
+	CompanyResponse.UsernameDto findUsername(CompanyRequest.FindCompanyUsernameDto request);
 }
