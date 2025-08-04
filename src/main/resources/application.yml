@@ -65,6 +65,12 @@ elasticsearch:
   username: elastic
   password: ${ES_PASSWORD}
 
+odcloud:
+  api:
+    base-url: https://api.odcloud.kr/api/nts-businessman/v1/status
+    service-key: ${ODCLOUD_SERVICE_KEY}
+    return-type: JSON
+
 openai:
   model: gpt-4o
   api:

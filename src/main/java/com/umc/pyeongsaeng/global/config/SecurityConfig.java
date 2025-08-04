@@ -121,7 +121,7 @@ public class SecurityConfig {
 				.requestMatchers("/api/user/senior/**").hasRole("SENIOR")
 				.requestMatchers("/api/protector/**").hasRole("PROTECTOR")
 				.requestMatchers("/api/senior/**").hasRole("SENIOR")
-				.requestMatchers("/api/companies/**").hasRole("COMPANY").requestMatchers("/api/ai/**").permitAll()
+				.requestMatchers("/api/companies/**").hasRole("COMPANY")
 				.anyRequest().authenticated()
 			)
 
