@@ -32,18 +32,12 @@ public class RecommendationController {
 	private final ElasticOperationService elasticOperationService;
 
 
-	@GetMapping("/recommendations")
-	public ApiResponse<List<RecommendationResponseDTO>> recommendJobsByDistance() {
-		Long userId = 2L; // 🧪 테스트용 하드코딩
-		List<RecommendationResponseDTO> recommendations = recommendationService.recommendJobsByDistance(userId);
-		return ApiResponse.of(SuccessStatus._OK, recommendations);
+	@GetMapping("/recommend/test")
+	public ResponseEntity<?> testRecommendation(@RequestParam Long userId) {
+		List<RecommendationResponseDTO> result = recommendationService.recommendJobsByJobTypeAndDistance(userId);
+		return ResponseEntity.ok(result);
 	}
 
-	@GetMapping("/career")
-	public ApiResponse<List<RecommendationResponseDTO>> recommendByCareer(@RequestParam Long userId) {
-		List<RecommendationResponseDTO> recommendations = recommendationService.recommendJobsByCareer(userId);
-		return ApiResponse.of(SuccessStatus._OK,recommendations);
-	}
 	/**
 	// 직선 거리 기반 추천
 	@GetMapping("/recommendations")

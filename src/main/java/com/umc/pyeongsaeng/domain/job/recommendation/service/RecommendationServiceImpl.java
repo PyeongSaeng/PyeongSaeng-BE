@@ -1,13 +1,12 @@
 package com.umc.pyeongsaeng.domain.job.recommendation.service;
 
+import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import com.umc.pyeongsaeng.domain.job.recommendation.converter.RecommendationConverter;
 import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.RecommendationResponseDTO;
 import com.umc.pyeongsaeng.domain.job.recommendation.util.DistanceUtil;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostImageRepository;
-import com.umc.pyeongsaeng.domain.job.search.dto.request.JobSearchRequest;
-import com.umc.pyeongsaeng.domain.job.search.dto.response.JobSearchResult;
-import com.umc.pyeongsaeng.domain.job.search.enums.JobSortType;
+import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
 import com.umc.pyeongsaeng.domain.job.search.service.JobPostSearchService;
 import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
 import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
@@ -43,6 +42,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
 		double userLat = profile.getLatitude();
 		double userLng = profile.getLongitude();
+		String jobKeyword = profile.getJob().getKorName();
 
 		return jobPostRepository.findAll().stream()
 			.filter(job -> job.getLatitude() != null && job.getLongitude() != null)
@@ -75,28 +75,54 @@ public class RecommendationServiceImpl implements RecommendationService {
 	}
 
 	@Override
-	public List<RecommendationResponseDTO> recommendJobsByCareer(Long userId) {
+	public List<RecommendationResponseDTO> recommendJobsByJobTypeAndDistance(Long userId) {
+		// 1. 시니어 프로필에서 위치 + 직무 키워드
 		SeniorProfile profile = seniorProfileRepository.findBySeniorId(userId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+		double userLat = profile.getLatitude();
+		double userLng = profile.getLongitude();
+		String jobKeyword = profile.getJob().getKorName();
 
-		// 1. 경력 → 키워드 변환 (enum에서 korName 직접 사용)
-		String keyword = profile.getJob().getKorName();
+		// 2. ElasticSearch에서 직무 키워드 기반 검색
+		List<JobPostDocument> filteredDocs = jobPostSearchService.findByJobType(jobKeyword);
 
-		// 2. 검색 요청 DTO 생성
-		JobSearchRequest request = JobSearchRequest.builder()
-			.keyword(keyword)
-			.lat(profile.getLatitude())
-			.lon(profile.getLongitude())
-			.sort(JobSortType.DISTANCE_ASC)
-			.size(10)
-			.build();
+		// 💡 결과 없으면 fallback: 거리 기준 전체 추천
+		if (filteredDocs.isEmpty()) {
+			log.warn("[RECOMMEND] 직무 기반 결과 없음 → 거리 기준 추천 fallback");
+			return recommendJobsByDistance(userId);
+		}
 
-		// 3. Elastic 검색
-		JobSearchResult result = jobPostSearchService.search(request);
+		// 3. 결과에서 jobPostId 추출 후 DB 조회
+		List<Long> jobPostIds = filteredDocs.stream()
+			.map(doc -> Long.parseLong(doc.getId()))
+			.toList();
+		List<JobPost> jobPosts = jobPostRepository.findAllById(jobPostIds);
 
-		// 4. 검색 결과 → 추천 DTO로 변환
-		return result.getResults().stream()
-			.map(RecommendationConverter::fromJobSearchResponse)
-			.collect(Collectors.toList());
+		// 4. 거리 계산 + Presigned URL
+		return jobPosts.stream()
+			.filter(job -> job.getLatitude() != null && job.getLongitude() != null)
+			.map(job -> {
+				double distance = DistanceUtil.calculateDistance(userLat, userLng, job.getLatitude(), job.getLongitude());
+				String imageUrl = getPresignedImage(job.getId());
+				return RecommendationConverter.toRecommendationResponseDTO(job, distance, imageUrl);
+			})
+			.sorted(Comparator.comparingDouble(RecommendationResponseDTO::distanceKm))
+			.limit(10)
+			.toList();
 	}
+
+	private String getPresignedImage(Long jobPostId) {
+		try {
+			return jobPostImageRepository.findFirstByJobPostIdOrderByIdAsc(jobPostId)
+				.map(img -> s3Service.getPresignedToDownload(
+					S3DTO.PresignedUrlToDownloadRequest.builder()
+						.keyName(img.getKeyName())
+						.build()
+				).getUrl()).orElse(null);
+		} catch (Exception e) {
+			log.error("이미지 presigned URL 생성 실패: {}", e.getMessage());
+			return null;
+		}
+	}
+
 }
