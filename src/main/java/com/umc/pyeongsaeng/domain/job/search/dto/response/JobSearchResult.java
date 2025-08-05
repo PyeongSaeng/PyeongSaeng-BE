@@ -10,4 +10,6 @@ import lombok.Data;
 public class JobSearchResult {
 	private List<JobSearchResponse> results;
 	private List<Object> searchAfter;
+	private long totalCount;	// 전체 검색 결과 개수
+	private boolean hasNext;	// 다음 페이지 여부
 }
