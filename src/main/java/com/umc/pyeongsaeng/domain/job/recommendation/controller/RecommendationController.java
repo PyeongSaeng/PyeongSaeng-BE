@@ -28,6 +28,7 @@ public class RecommendationController {
 	private final TravelTimeService travelTimeService;
 	private final RecommendationService recommendationService;
 
+
 	@GetMapping("/recommendations")
 	public ApiResponse<List<RecommendationResponseDTO>> recommendJobsByDistance() {
 		Long userId = 2L; // 🧪 테스트용 하드코딩

@@ -5,6 +5,7 @@ import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.Recommendation
 import com.umc.pyeongsaeng.domain.job.recommendation.util.DistanceUtil;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostImageRepository;
+import com.umc.pyeongsaeng.domain.job.search.dto.request.JobSearchRequest;
 import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
 import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
@@ -67,5 +68,6 @@ public class RecommendationServiceImpl implements RecommendationService {
 			.sorted(Comparator.comparingDouble(RecommendationResponseDTO::distanceKm))
 			.limit(10)
 			.collect(Collectors.toList());
+
 	}
 }
