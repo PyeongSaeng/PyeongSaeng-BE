@@ -3,8 +3,8 @@ package com.umc.pyeongsaeng.domain.job.controller;
 import com.umc.pyeongsaeng.domain.job.converter.FormFieldConverter;
 import com.umc.pyeongsaeng.domain.job.converter.JobPostConverter;
 import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
+import com.umc.pyeongsaeng.domain.job.dto.response.FormFieldResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
-import com.umc.pyeongsaeng.domain.job.dto.response.JobPostFormFieldResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.FormField;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
@@ -454,7 +454,7 @@ public class JobPostController {
 		)
 	})
 	@GetMapping("/{jobPostId}/questions")
-	public ApiResponse<JobPostFormFieldResponseDTO.FormFieldPreViewListDTO> getJobPostQuestions(
+	public ApiResponse<FormFieldResponseDTO.FormFieldPreViewListDTO> getJobPostQuestions(
 		@Parameter(name = "jobPostId", description = "채용공고 ID", example = "1") @PathVariable(name = "jobPostId") Long jobPostId) {
 
 		List<FormField> formFieldList = jobPostQueryService.getFormFieldList(jobPostId);

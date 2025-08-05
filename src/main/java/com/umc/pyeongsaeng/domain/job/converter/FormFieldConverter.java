@@ -5,6 +5,9 @@ import com.umc.pyeongsaeng.domain.job.dto.response.FormFieldResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.FormField;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class FormFieldConverter {
 
 	public static FormField toFormField(FormFieldRequestDTO.CreateDTO formField, JobPost newJobPost) {
@@ -24,13 +27,13 @@ public class FormFieldConverter {
 			.build();
 	}
 
-	public static JobPostFormFieldResponseDTO.FormFieldPreViewListDTO toFormFieldPreViewListDTO (List<FormField> formFieldList) {
+	public static FormFieldResponseDTO.FormFieldPreViewListDTO toFormFieldPreViewListDTO (List<FormField> formFieldList) {
 
-		List<JobPostFormFieldResponseDTO.FormFieldPreViewDTO> formFieldPreViewList = formFieldList.stream()
+		List<FormFieldResponseDTO.FormFieldPreViewDTO> formFieldPreViewList = formFieldList.stream()
 			.map(FormFieldConverter::toFormFieldPreViewDTO)
 			.collect(Collectors.toList());
 
-		return JobPostFormFieldResponseDTO.FormFieldPreViewListDTO.builder()
+		return FormFieldResponseDTO.FormFieldPreViewListDTO.builder()
 			.formFieldList(formFieldPreViewList)
 			.build();
 	}
