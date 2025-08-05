@@ -6,6 +6,9 @@ import com.umc.pyeongsaeng.domain.job.recommendation.util.DistanceUtil;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostImageRepository;
 import com.umc.pyeongsaeng.domain.job.search.dto.request.JobSearchRequest;
+import com.umc.pyeongsaeng.domain.job.search.dto.response.JobSearchResult;
+import com.umc.pyeongsaeng.domain.job.search.enums.JobSortType;
+import com.umc.pyeongsaeng.domain.job.search.service.JobPostSearchService;
 import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
 import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
@@ -30,6 +33,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 	private final JobPostRepository jobPostRepository;
 	private final JobPostImageRepository jobPostImageRepository;
 	private final SeniorProfileRepository seniorProfileRepository;
+	private final JobPostSearchService jobPostSearchService;
 	private final S3Service s3Service;
 
 	@Override
@@ -68,6 +72,31 @@ public class RecommendationServiceImpl implements RecommendationService {
 			.sorted(Comparator.comparingDouble(RecommendationResponseDTO::distanceKm))
 			.limit(10)
 			.collect(Collectors.toList());
+	}
 
+	@Override
+	public List<RecommendationResponseDTO> recommendJobsByCareer(Long userId) {
+		SeniorProfile profile = seniorProfileRepository.findBySeniorId(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		// 1. 경력 → 키워드 변환 (enum에서 korName 직접 사용)
+		String keyword = profile.getJob().getKorName();
+
+		// 2. 검색 요청 DTO 생성
+		JobSearchRequest request = JobSearchRequest.builder()
+			.keyword(keyword)
+			.lat(profile.getLatitude())
+			.lon(profile.getLongitude())
+			.sort(JobSortType.DISTANCE_ASC)
+			.size(10)
+			.build();
+
+		// 3. Elastic 검색
+		JobSearchResult result = jobPostSearchService.search(request);
+
+		// 4. 검색 결과 → 추천 DTO로 변환
+		return result.getResults().stream()
+			.map(RecommendationConverter::fromJobSearchResponse)
+			.collect(Collectors.toList());
 	}
 }

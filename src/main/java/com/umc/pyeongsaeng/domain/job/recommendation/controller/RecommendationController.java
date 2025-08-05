@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.umc.pyeongsaeng.domain.job.recommendation.dto.request.TravelTimeRequestDTO;
@@ -15,6 +16,7 @@ import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.Recommendation
 import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.TravelTimeResponseDTO;
 import com.umc.pyeongsaeng.domain.job.recommendation.service.RecommendationService;
 import com.umc.pyeongsaeng.domain.job.recommendation.service.TravelTimeService;
+import com.umc.pyeongsaeng.domain.job.search.elkoperation.ElasticOperationService;
 import com.umc.pyeongsaeng.domain.user.entity.User;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class RecommendationController {
 	private final TravelTimeService travelTimeService;
 	private final RecommendationService recommendationService;
+	private final ElasticOperationService elasticOperationService;
 
 
 	@GetMapping("/recommendations")
@@ -34,6 +37,12 @@ public class RecommendationController {
 		Long userId = 2L; // 🧪 테스트용 하드코딩
 		List<RecommendationResponseDTO> recommendations = recommendationService.recommendJobsByDistance(userId);
 		return ApiResponse.of(SuccessStatus._OK, recommendations);
+	}
+
+	@GetMapping("/career")
+	public ApiResponse<List<RecommendationResponseDTO>> recommendByCareer(@RequestParam Long userId) {
+		List<RecommendationResponseDTO> recommendations = recommendationService.recommendJobsByCareer(userId);
+		return ApiResponse.of(SuccessStatus._OK,recommendations);
 	}
 	/**
 	// 직선 거리 기반 추천
@@ -60,5 +69,11 @@ public class RecommendationController {
 
 		TravelTimeResponseDTO response = new TravelTimeResponseDTO(travelSummary);
 		return ResponseEntity.ok(ApiResponse.of(SuccessStatus._OK, response));
+	}
+
+	@GetMapping("/test/es-index")
+	public ResponseEntity<?> checkIndex() {
+		boolean exists = elasticOperationService.checkIfExistIndex("jobposts");
+		return ResponseEntity.ok("jobposts exists? → " + exists);
 	}
 }

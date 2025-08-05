@@ -123,6 +123,7 @@ public class SecurityConfig {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
 				.requestMatchers("/api/user/withdraw/cancel").permitAll()
+				.requestMatchers("/api/job/**").permitAll()
 				.requestMatchers("/api/user/protector/**").hasRole("PROTECTOR")
 				.requestMatchers("/api/user/senior/search").hasRole("PROTECTOR")
 				.requestMatchers("/api/user/senior/**").hasRole("SENIOR")

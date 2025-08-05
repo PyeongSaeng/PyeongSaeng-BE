@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface RecommendationService {
 	List<RecommendationResponseDTO> recommendJobsByDistance(Long userId);
+
+	List<RecommendationResponseDTO> recommendJobsByCareer(Long userId);
 }
