@@ -17,7 +17,7 @@ spring:
         registration:
           kakao:
             client-id: ${KAKAO_CLIENT_ID}
-            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            redirect-uri: https://api.pyeongsaeng.site/login/oauth2/code/kakao
             authorization-grant-type: authorization_code
             scope: profile_nickname, account_email
             client-name: Kakao

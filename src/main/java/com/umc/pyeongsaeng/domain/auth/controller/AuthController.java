@@ -66,7 +66,7 @@ public class AuthController {
     카카오 OAuth 로그인을 시작합니다.
 
     브라우저에서 직접 아래 URL로 접근하시면 됩니다:
-    ➤ http://localhost:8080/oauth2/authorization/kakao
+    ➤ https://api.pyeongsaeng.site/oauth2/authorization/kakao
 
     로그인 이후:
     http://localhost:3000/auth/callback?code=6518a349-5129-4989-918e-f26be5a428e3&isFirstLogin=false
