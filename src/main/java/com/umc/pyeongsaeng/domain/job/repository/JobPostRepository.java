@@ -21,15 +21,22 @@ public interface JobPostRepository extends JpaRepository<JobPost, Long> {
 
 	@Query(
 		value = """
-            SELECT jp.*
-            FROM job_post jp
-            INNER JOIN (
-                SELECT job_post_id, COUNT(*) AS application_count
-                FROM application
-                GROUP BY job_post_id
-            ) AS count_subquery ON jp.id = count_subquery.job_post_id
-            WHERE jp.company_id = :#{#company.id} AND jp.state = 'RECRUITING'
-            ORDER BY count_subquery.application_count DESC
+           SELECT jp.*
+           FROM job_post jp
+           INNER JOIN (
+               -- 이 서브쿼리 안에 WHERE 절을 추가하여 7일간의 데이터만 집계합니다.
+               SELECT
+                   job_post_id,
+                   COUNT(*) AS application_count
+               FROM
+                   application ap
+               WHERE
+                   ap.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) -- <<< 이 부분이 핵심 변경 사항입니다.
+               GROUP BY
+                   job_post_id
+           ) AS count_subquery ON jp.id = count_subquery.job_post_id
+           WHERE jp.company_id = :#{#company.id} AND jp.state = 'RECRUITING'
+           ORDER BY count_subquery.application_count DESC
             """,
 		countQuery = """
             SELECT count(jp.id)
