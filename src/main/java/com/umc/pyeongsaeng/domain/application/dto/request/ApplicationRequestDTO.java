@@ -46,7 +46,7 @@ public class ApplicationRequestDTO {
 	public static abstract class FieldAndAnswerDTO { // 추상 클래스로 선언
 		// 공통 필드
 		private Long formFieldId;
-		private String formFieldName;
+//		private String formFieldName;
 
 		private FieldType fieldType;
 	}
