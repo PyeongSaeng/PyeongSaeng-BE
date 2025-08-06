@@ -204,39 +204,7 @@ public class ApplicationController {
 		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
 		@io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "지원서 제출 요청 DTO",
-            required = true,
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ApplicationRequestDTO.RegistrationRequestDTO.class),
-                examples = @ExampleObject(
-                    name = "지원서 제출 예시",
-                    value = "{\n" +
-                        "  \"jobPostId\": 1,\n" +
-                        "  \"seniorId\": 10,\n" +
-                        "  \"fieldAndAnswer\": [\n" +
-                        "    {\n" +
-                        "      \"formFieldId\": 2,\n" +
-						"      \"answerFieldId\": 3,\n" +
-                        "      \"formFieldName\": \"자격증\",\n" +
-                        "      \"fieldType\": \"IMAGE\",\n" +
-                        "      \"answer\": [\n" +
-                        "        {\n" +
-                        "          \"keyName\": \"file123\",\n" +
-                        "          \"originalFileName\": \"자격증사진.jpg\"\n" +
-                        "        }\n" +
-                        "      ]\n" +
-                        "    },\n" +
-                        "    {\n" +
-                        "      \"formFieldId\": 1,\n" +
-						"      \"answerFieldId\": 4,\n" +
-                        "      \"formFieldName\": \"자기소개\",\n" +
-                        "      \"fieldType\": \"TEXT\",\n" +
-                        "      \"answer\": \"나는 박지현이다\"\n" +
-                        "    }\n" +
-                        "  ]\n" +
-                        "}"
-                )
-            )
+            required = true
         )
 		@RequestBody @Valid ApplicationRequestDTO.RegistrationRequestDTO requestDTO) {
 		return ApiResponse.onSuccess(applicationCommandService.createApplication(requestDTO, userDetails.getUser()));
