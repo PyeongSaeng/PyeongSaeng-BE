@@ -27,6 +27,7 @@ public class ApplicationRequestDTO {
 
 		private Long jobPostId;
 		private Long seniorId;
+		private ApplicationStatus applicationStatus;
 
 		private List<FieldAndAnswerDTO> fieldAndAnswer;
 	}

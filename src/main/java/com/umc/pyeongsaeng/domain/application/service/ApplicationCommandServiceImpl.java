@@ -62,9 +62,9 @@ public class ApplicationCommandServiceImpl implements ApplicationCommandService 
 		// 지원서(Application) 생성 및 저장
 		Application newApplication = Application.builder()
 			.applicant(applicant)
+			.applicationStatus(requestDTO.getApplicationStatus())
 			.jobPost(jobPost)
 			.senior(senior)
-			.applicationStatus(ApplicationStatus.SUBMITTED)
 			.build();
 
 		Application savedApplication = applicationRepository.save(newApplication);
