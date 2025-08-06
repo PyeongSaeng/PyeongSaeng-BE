@@ -119,6 +119,11 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 		}
 	}
 
+	@Override
+	public void deleteJobPost(Long jobPostId) {
+		jobPostRepository.deleteById(jobPostId);
+	}
+
 
 
 }

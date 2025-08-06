@@ -471,4 +471,11 @@ public class JobPostController {
 		Page<JobPostResponseDTO.JobPostPreviewByCompanyDTO> jobPostList = jobPostQueryService.getJobPostPreViewPageByCompanyByPopularity(userDetails.getCompany(), page);
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewByCompanyListDTO(jobPostList));
 	}
+
+	@DeleteMapping("/posts/{jobPostId}")
+	public ApiResponse<Long> deleteJobPost(@PathVariable Long jobPostId) {
+		jobPostCommandService.deleteJobPost(jobPostId);
+
+		return ApiResponse.onSuccess(jobPostId);
+	}
 }
