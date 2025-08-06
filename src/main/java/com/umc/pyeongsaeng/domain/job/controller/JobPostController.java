@@ -461,4 +461,14 @@ public class JobPostController {
 
 		return ApiResponse.onSuccess(FormFieldConverter.toFormFieldPreViewListDTO(formFieldList));
 	}
+
+	@Operation(summary = "회사의 인기순 채용공고 목록 조회 API", description = "회사가 쓴 채용 공고 목록을 조회하는 API입니다.")
+	@GetMapping("/companies/me/posts/popularity")
+	public ApiResponse<JobPostResponseDTO.JobPostPreviewByCompanyListDTO> getJobPostByPopularity(
+		@Parameter(name = "page", description = "페이지 번호 (1부터 시작)", example = "1") @PageNumber Integer page,
+		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+		Page<JobPostResponseDTO.JobPostPreviewByCompanyDTO> jobPostList = jobPostQueryService.getJobPostPreViewPageByCompanyByPopularity(userDetails.getCompany(), page);
+		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewByCompanyListDTO(jobPostList));
+	}
 }
