@@ -38,9 +38,9 @@ public class OAuth2AuthService extends DefaultOAuth2UserService
 	implements AuthenticationSuccessHandler, AuthenticationFailureHandler {
 
 	private static final String KAKAO_PROVIDER = "KAKAO";
-	private static final String REDIRECT_URL_FORMAT = "http://localhost:3000/auth/callback?code=%s&isFirstLogin=%s";
-	private static final String SIGNUP_REDIRECT_URL_FORMAT = "http://localhost:3000/auth/signup/kakao?kakaoId=%s&nickname=%s";
-	private static final String ERROR_REDIRECT_URL = "http://localhost:3000/login?error=oauth_failed";
+	private static final String REDIRECT_URL_FORMAT = "http://localhost:5173/auth/callback?code=%s&isFirstLogin=%s";
+	private static final String SIGNUP_REDIRECT_URL_FORMAT = "http://localhost:5173/auth/signup/kakao?kakaoId=%s&nickname=%s";
+	private static final String ERROR_REDIRECT_URL = "http://localhost:5173/login?error=oauth_failed";
 
 	private final SocialAccountRepository socialAccountRepository;
 	private final TokenService tokenService;
@@ -85,9 +85,14 @@ public class OAuth2AuthService extends DefaultOAuth2UserService
 		Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
 		Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
+		String email = null;
+		if (kakaoAccount != null && kakaoAccount.containsKey("email")) {
+			email = (String) kakaoAccount.get("email");
+		}
+
 		return AuthResponse.KakaoUserInfoResponseDto.builder()
 			.id(Long.parseLong(attributes.get("id").toString()))
-			.email((String) kakaoAccount.get("email"))
+			.email(email)
 			.nickname((String) profile.get("nickname"))
 			.build();
 	}
