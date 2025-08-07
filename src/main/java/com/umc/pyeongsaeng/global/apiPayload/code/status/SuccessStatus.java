@@ -32,7 +32,7 @@ public enum SuccessStatus implements BaseCode {
 
 	// Question
 	SENIOR_QUESTION_CREATED(HttpStatus.OK, "QUESTION201", "질문이 생성되었습니다."),
-	SENIOR_QUESTION_ANSWER_SELECTED(HttpStatus.OK, "QUESTION202", "답변이 선택되었습니다.");
+	SENIOR_QUESTION_ANSWER_SELECTED(HttpStatus.OK, "QUESTION202", "추가 질문 답변이 새로 저장되었습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

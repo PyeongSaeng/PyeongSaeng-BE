@@ -1,5 +1,7 @@
 package com.umc.pyeongsaeng.domain.senior.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class SeniorQuestionCommandServiceImpl implements SeniorQuestionCommandSe
 	private final SeniorQuestionOptionRepository seniorQuestionOptionRepository;
 	private final SeniorQuestionAnswerRepository seniorQuestionAnswerRepository;
 
+	// 단건 질문 업데이트 - 후에 사라질 가능성
 	@Override
 	@Transactional
 	public void saveOrUpdateAnswer(Long seniorProfileId, SeniorQuestionRequestDTO.AnswerRequestDTO request) {
@@ -68,6 +71,46 @@ public class SeniorQuestionCommandServiceImpl implements SeniorQuestionCommandSe
 
 		return saved.getId();
 	}
+
+
+	@Override
+	@Transactional
+	public void saveOrUpdateAnswers(Long seniorProfileId, List<SeniorQuestionRequestDTO.AnswerRequestDTO> requests) {
+		SeniorProfile profile = seniorProfileRepository.findById(seniorProfileId).orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_NOT_FOUND));
+
+		// 기존 답변 전체 삭제
+		seniorQuestionAnswerRepository.deleteBySeniorProfile_SeniorId(seniorProfileId);
+
+		// 새로 저장할 답변 리스트
+		List<SeniorQuestionAnswer> answersToSave = new ArrayList<>();
+
+		for (SeniorQuestionRequestDTO.AnswerRequestDTO request : requests) {
+			Long questionId = request.getQuestionId();
+			Long optionId = request.getSelectedOptionId();
+
+			// 선택하지 않은 경우(null) -> skip
+			if (optionId == null) continue;
+
+			SeniorQuestion question = seniorQuestionRepository.findById(questionId).orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_QUESTION_NOT_FOUND));
+			SeniorQuestionOption option = seniorQuestionOptionRepository.findById(optionId).orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_QUESTION_OPTION_NOT_FOUND));
+
+			SeniorQuestionAnswer answer = SeniorQuestionAnswer.builder()
+				.seniorProfile(profile)
+				.question(question)
+				.build();
+
+			answer.updateSelectedOption(option);
+			answersToSave.add(answer);
+		}
+
+		seniorQuestionAnswerRepository.saveAll(answersToSave);
+	}
+
+
+
+
+
+
 
 
 }
