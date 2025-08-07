@@ -101,6 +101,65 @@ public class ApplicationCommandServiceImpl implements ApplicationCommandService 
 
 	}
 
+	@Override
+	public ApplicationResponseDTO.RegistrationResultDTO updateTmpApplicationToFinalApplication(
+		ApplicationRequestDTO.TmpToFinalRegistrationRequestDTO requestDTO,
+		Long applicationId,
+		User applicant) {
+
+		JobPost jobPost = jobPostRepository.findById(requestDTO.getJobPostId())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
+
+		User senior = userRepository.findById(requestDTO.getSeniorId())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+		Application exisitingApplication = applicationRepository.findById(applicationId)
+				.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_APPLICATION_ID));
+
+		applicationRepository.deleteById(applicationId);
+
+		// 지원서(Application) 생성 및 저장
+		Application newApplication = Application.builder()
+			.applicant(applicant)
+			.applicationStatus(ApplicationStatus.SUBMITTED)
+			.jobPost(jobPost)
+			.senior(senior)
+			.build();
+
+		Application savedApplication = applicationRepository.save(newApplication);
+
+		List<ApplicationAnswer> savedApplicationAnswer = new ArrayList<>();
+
+		// FormField 미리 조회
+		List<Long> formFieldIds = requestDTO.getFieldAndAnswer().stream()
+			.map(ApplicationRequestDTO.FieldAndAnswerDTO::getFormFieldId)
+			.collect(Collectors.toList());
+
+		// { formFieldId, formField }형식의 Map 생성
+		Map<Long, FormField> formFieldMap = formFieldRepository.findAllById(formFieldIds).stream()
+			.collect(Collectors.toMap(FormField::getId, Function.identity()));
+
+		// answer의 타입별 분기 처리
+		for (ApplicationRequestDTO.FieldAndAnswerDTO field : requestDTO.getFieldAndAnswer()) {
+			FormField formField = formFieldMap.get(field.getFormFieldId());
+			if (formField == null) {
+				throw new GeneralException(ErrorStatus.FORM_FIELD_NOT_FOUND);
+			}
+
+			// answer의 현재 타입별 저장
+			if (field instanceof ApplicationRequestDTO.TextFieldDTO) {
+				savedApplicationAnswer.add(saveTextAnswer((ApplicationRequestDTO.TextFieldDTO) field, savedApplication, formField));
+			} else if (field instanceof ApplicationRequestDTO.ImageFieldDTO) {
+				savedApplicationAnswer.add(saveImageAnswer((ApplicationRequestDTO.ImageFieldDTO) field, savedApplication, formField));
+			}
+
+		}
+
+		return ApplicationConverter.toRegistrationResultDTO(savedApplication, savedApplicationAnswer);
+
+	}
+
+
 	private ApplicationAnswer saveTextAnswer(ApplicationRequestDTO.TextFieldDTO textField, Application savedApplication, FormField formField) {
 		ApplicationAnswer applicationAnswer = ApplicationAnswer.builder()
 			.formField(formField)

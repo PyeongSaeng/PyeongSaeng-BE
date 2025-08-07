@@ -34,6 +34,16 @@ public class ApplicationRequestDTO {
 
 	@Getter
 	@NoArgsConstructor
+	public static class TmpToFinalRegistrationRequestDTO {
+
+		private Long jobPostId;
+		private Long seniorId;
+
+		private List<FieldAndAnswerDTO> fieldAndAnswer;
+	}
+
+	@Getter
+	@NoArgsConstructor
 	@JsonTypeInfo(
 		use = JsonTypeInfo.Id.NAME,
 		include = JsonTypeInfo.As.PROPERTY,

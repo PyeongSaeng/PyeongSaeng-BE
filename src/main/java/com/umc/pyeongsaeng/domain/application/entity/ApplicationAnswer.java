@@ -32,7 +32,7 @@ public class ApplicationAnswer extends BaseEntity {
 	@OneToMany(mappedBy = "applicationAnswer", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ApplicationAnswerFile> applicationFiles = new ArrayList<>();
 
-	@Column(columnDefinition = "TEXT", nullable = false)
+	@Column(columnDefinition = "TEXT", nullable = true)
 	private String answerText;
 
 
