@@ -23,13 +23,7 @@ public class JobSearchRequest {
 		example = "DISTANCE_ASC",
 		required = true
 	)
-	private JobSortType sort;
-
-	@Schema(description = "사용자의 위도", example = "37.5665", nullable = true)
-	private Double lat;
-
-	@Schema(description = "사용자의 경도", example = "126.9780", nullable = true)
-	private Double lon;
+	private String sort;
 
 	@Schema(description = "searchAfter 기반 페이징 필드", nullable = true)
 	private List<Object> searchAfter;

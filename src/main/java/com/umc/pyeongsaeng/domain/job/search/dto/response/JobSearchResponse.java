@@ -9,9 +9,8 @@ public class JobSearchResponse {
 	private String id;
 	private String title;
 	private String address;
-	private Integer hourlyWage;
-	private Integer monthlySalary;
-	private Integer yearSalary;
+	private String imageUrl;
 	private String displayDistance;
+	private Integer applicationCount;
 }
 

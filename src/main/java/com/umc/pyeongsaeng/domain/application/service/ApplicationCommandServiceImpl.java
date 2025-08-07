@@ -10,6 +10,7 @@ import com.umc.pyeongsaeng.domain.application.enums.ApplicationStatus;
 import com.umc.pyeongsaeng.domain.application.repository.ApplicationAnswerFileRepository;
 import com.umc.pyeongsaeng.domain.application.repository.ApplicationAnswerRepository;
 import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepository;
+import com.umc.pyeongsaeng.domain.application.service.event.ApplicationSubmittedEvent;
 import com.umc.pyeongsaeng.domain.job.entity.FormField;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import com.umc.pyeongsaeng.domain.job.repository.FormFieldRepository;
@@ -20,6 +21,8 @@ import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,6 +42,7 @@ public class ApplicationCommandServiceImpl implements ApplicationCommandService 
 	private final FormFieldRepository formFieldRepository;
 	private final ApplicationAnswerRepository applicationAnswerRepository;
 	private final ApplicationAnswerFileRepository applicationAnswerFileRepository;
+	private final ApplicationEventPublisher applicationEventPublisher;
 
 	@Override
 	public Application updateApplicationState(Long applicationId, ApplicationRequestDTO.ApplicationStatusRequestDTO requestDTO) {
@@ -71,6 +75,9 @@ public class ApplicationCommandServiceImpl implements ApplicationCommandService 
 
 		// DTO로 Return 해주기 위해서 저장된 Answeer
 		List<ApplicationAnswer> savedApplicationAnswer = new ArrayList<>();
+
+		// ES 채용공고 지원서 수 갱신
+		applicationEventPublisher.publishEvent(new ApplicationSubmittedEvent(jobPost.getId()));
 
 		// FormField 미리 조회
 		List<Long> formFieldIds = requestDTO.getFieldAndAnswer().stream()

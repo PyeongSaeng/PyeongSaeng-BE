@@ -6,6 +6,7 @@ import com.umc.pyeongsaeng.domain.job.dto.response.FormFieldResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
+import com.umc.pyeongsaeng.domain.job.entity.JobPostImage;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
 import com.umc.pyeongsaeng.global.client.google.GoogleGeocodingResult;
@@ -75,18 +76,20 @@ public class JobPostConverter {
 			.build();
 	}
 
+
 	public static JobPostDocument toDocument(JobPost jobPost, GoogleGeocodingResult convertedAddress){
+
+		// 대표 이미지
+		String previewKeyname = jobPost.getImages().stream()
+			.findFirst()
+			.map(JobPostImage::getKeyName)
+			.orElse(null);
 
 		return JobPostDocument.builder()
 			.id(String.valueOf(jobPost.getId()))
 			.title(jobPost.getTitle())
 			.description(jobPost.getDescription())
 			.note(jobPost.getNote())
-			//.companyName(jobPost.getCompany().getName())
-			.hourlyWage(jobPost.getHourlyWage())
-			.monthlySalary(jobPost.getMonthlySalary())
-			.yearSalary(jobPost.getYearSalary())
-			.recruitCount(jobPost.getRecruitCount())
 			.address(jobPost.getAddress())
 			.sido(convertedAddress.sido())
 			.sigungu(convertedAddress.sigungu())
@@ -96,6 +99,7 @@ public class JobPostConverter {
 			.createdAt(jobPost.getCreatedAt().atZone(ZoneId.systemDefault()).toInstant())
 			.geoPoint(convertedAddress.lat()+","+convertedAddress.lon())
 			.applicationCount(jobPost.getApplications() != null ? jobPost.getApplications().size() : 0)
+			.keyname(previewKeyname)
 			.build();
 	}
 

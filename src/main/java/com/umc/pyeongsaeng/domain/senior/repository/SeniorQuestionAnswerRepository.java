@@ -12,4 +12,7 @@ public interface SeniorQuestionAnswerRepository extends JpaRepository<SeniorQues
 	List<SeniorQuestionAnswer> findBySeniorProfile_SeniorId(Long seniorId);
 
 	Optional<SeniorQuestionAnswer> findBySeniorProfile_SeniorIdAndQuestion_Id(Long seniorId, Long questionId);
+
+	void deleteBySeniorProfile_SeniorId(Long seniorId);
+
 }
