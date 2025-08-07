@@ -96,8 +96,11 @@ public enum ErrorStatus implements BaseErrorCode {
 	JOB_POST_NOT_MATCH_COMPANY(HttpStatus.BAD_REQUEST, "JOB403", "기업이 작성한 게시글이 아닙니다."),
 	// Qusetion
 	SENIOR_QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND,"QUESTION401","해당 시니어 질문을 찾을 수 없습니다."),
-	SENIOR_QUESTION_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND,"QUESTION402","해당 시니어 질문의 옵션을 찾을 수 없습니다.");
+	SENIOR_QUESTION_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND,"QUESTION402","해당 시니어 질문의 옵션을 찾을 수 없습니다."),
 
+	// AI
+	AI_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI501", "AI 응답 파싱에 실패했습니다."),
+	AI_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI502", "AI 요청 중 오류가 발생했습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

@@ -66,3 +66,9 @@ odcloud:
     base-url: https://api.odcloud.kr/api/nts-businessman/v1/status
     service-key: ${ODCLOUD_SERVICE_KEY}
     return-type: JSON
+
+openai:
+  model: gpt-4o
+  api:
+    key: ${OPENAI_API_KEY}
+    url: https://api.openai.com/v1/chat/completions
