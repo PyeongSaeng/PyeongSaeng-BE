@@ -473,6 +473,7 @@ public class JobPostController {
 	}
 
 	@DeleteMapping("/posts/{jobPostId}")
+	@Operation(summary = "회사가 만들었던 공고 삭제", description = "회사가 만들었던 공고 삭제하는 API")
 	public ApiResponse<Long> deleteJobPost(@PathVariable Long jobPostId) {
 		jobPostCommandService.deleteJobPost(jobPostId);
 
