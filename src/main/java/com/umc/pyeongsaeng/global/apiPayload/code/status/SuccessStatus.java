@@ -32,7 +32,14 @@ public enum SuccessStatus implements BaseCode {
 
 	// Question
 	SENIOR_QUESTION_CREATED(HttpStatus.OK, "QUESTION201", "질문이 생성되었습니다."),
-	SENIOR_QUESTION_ANSWER_SELECTED(HttpStatus.OK, "QUESTION202", "추가 질문 답변이 새로 저장되었습니다.");
+	SENIOR_QUESTION_ANSWER_SELECTED(HttpStatus.OK, "QUESTION202", "추가 질문 답변이 새로 저장되었습니다."),
+
+	// Application
+	APPLICATION_NON_STARTED_CREATED(HttpStatus.OK, "APPLICATION201", "일자리 신청함에 저장되었습니다."),
+	APPLICATION_DELETED(HttpStatus.OK,"APPLICATION202", "일자리 신청함에서 지원서가 삭제되었습니다."),
+
+	// Bookmark
+	BOOKMARK_DELETED(HttpStatus.OK,"Bookmark201", "일자리 저장함에서 채용공고 북마크가 삭제되었습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

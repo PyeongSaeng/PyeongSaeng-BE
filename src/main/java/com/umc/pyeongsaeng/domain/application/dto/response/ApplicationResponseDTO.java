@@ -10,7 +10,6 @@ import lombok.*;
 
 import java.util.List;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class ApplicationResponseDTO {
@@ -144,5 +143,33 @@ public class ApplicationResponseDTO {
 		private String keyName;
 		private String originalFileName;
 	}
+
+	// 본인(시니어)가 신청함 조회하는 경우 DTO
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class ApplicationJobPostStatusDTO {
+		private Long applicationId;
+		private Long jobPostId;
+		private ApplicationStatus applicationStatus;
+	}
+
+	// 보호자가 연결된 시니어들의 신청함 조회하는 경우 DTO
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class ProtectorApplicationJobPostDTO {
+		private Long applicationId;
+		private Long seniorId;
+		private Long jobPostId;
+		private String seniorName;
+		private ApplicationStatus applicationStatus;
+	}
+
+
+
+
 
 }

@@ -87,6 +87,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	// Application
 	INVALID_APPLICATION_ID(HttpStatus.BAD_REQUEST, "APPLICATION400", "유효하지 않은 ApplicationId 입니다."),
 	APPLICATION_PARSING_ERROR(HttpStatus.BAD_REQUEST, "APPLICATION500", "결과 파싱에러 입니다. 관리자에게 문의해주세요"),
+	DRAFT_NOT_FOUND(HttpStatus.NOT_FOUND, "APPLICATION401","임시저장한 Application이 존재하지 않습니다."),
 
 	// FormField
 	FORM_FIELD_NOT_FOUND(HttpStatus.BAD_REQUEST, "FORMFIELD400", "유효하지 않은 formFieldId 입니다"),
@@ -100,7 +101,10 @@ public enum ErrorStatus implements BaseErrorCode {
 
 	// AI
 	AI_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI501", "AI 응답 파싱에 실패했습니다."),
-	AI_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI502", "AI 요청 중 오류가 발생했습니다.");
+	AI_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI502", "AI 요청 중 오류가 발생했습니다."),
+
+	// Bookmark
+	BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOKMARK401", "일자리 저장함에 해당 채용공고가 존재하지 않습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

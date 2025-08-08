@@ -1,5 +1,8 @@
 package com.umc.pyeongsaeng.domain.application.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import com.umc.pyeongsaeng.domain.application.entity.Application;
 import com.umc.pyeongsaeng.domain.application.enums.ApplicationStatus;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
@@ -14,4 +17,15 @@ public interface ApplicationRepository extends JpaRepository<Application, Long>,
 
 
 	long countByJobPostId(Long jobPostId);
+
+	// 특정 채용공고에 대한 지원서 조회
+	Optional<Application> findByJobPostIdAndSeniorId(Long jobPostId, Long seniorId);
+
+	// 특정 유저에 대한 모든 채용공고 조회
+	List<Application> findAllBySeniorIdAndApplicationStatusInOrderByUpdatedAtDesc(
+		Long seniorId,
+		List<ApplicationStatus> statuses
+	);
+
+	List<Application> findBySenior_IdInOrderByCreatedAtDesc(List<Long> seniorIds);
 }

@@ -1,6 +1,8 @@
 package com.umc.pyeongsaeng.domain.application.service;
 
 
+import java.util.List;
+
 import com.umc.pyeongsaeng.domain.application.converter.ApplicationConverter;
 import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDTO;
 import com.umc.pyeongsaeng.domain.application.entity.Application;
@@ -9,6 +11,7 @@ import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepository;
 import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepositoryCustom;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
+import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import jakarta.transaction.Transactional;
@@ -25,6 +28,7 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 	private final ApplicationRepository applicationRepository;
 	private final JobPostRepository jobPostRepository;
 	private final ApplicationConverter applicationConverter;
+	private final SeniorProfileRepository seniorProfileRepository;
 
 	public Page<Application> findCompanyApplications(Long jobPostId, Integer page) {
 
@@ -44,4 +48,40 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
 		return applicationConverter.toApplicationQnADetailPreViewDTO(queryResult);
 	}
+
+	@Override
+	public List<ApplicationResponseDTO.ApplicationJobPostStatusDTO> getApplicationsForSenior(Long seniorId) {
+		List<ApplicationStatus> statuses = List.of(ApplicationStatus.DRAFT, ApplicationStatus.NON_STARTED);
+
+		return applicationRepository
+			.findAllBySeniorIdAndApplicationStatusInOrderByUpdatedAtDesc(seniorId, statuses)
+			.stream()
+			.map(applicationConverter::toJobPostStatusDTO)
+			.toList();
+	}
+
+	@Override
+	public List<ApplicationResponseDTO.ProtectorApplicationJobPostDTO> getProtectorApplications(Long protectorId) {
+
+		// 보호자에 연결된 시니어 ID 리스트
+		List<Long> seniorIds = seniorProfileRepository.findByProtector_Id(protectorId)
+			.stream()
+			.map(sp -> sp.getSenior().getId())
+			.toList();
+
+		if (seniorIds.isEmpty()) return List.of();
+
+		// 시니어들의 신청서 (최신순)
+		return applicationRepository.findBySenior_IdInOrderByCreatedAtDesc(seniorIds)
+			.stream()
+			.map(a -> ApplicationResponseDTO.ProtectorApplicationJobPostDTO.builder()
+				.applicationId(a.getId())
+				.jobPostId(a.getJobPost().getId())
+				.seniorName(a.getSenior().getName())
+				.seniorId(a.getSenior().getId())
+				.applicationStatus(a.getApplicationStatus())
+				.build())
+			.toList();
+	}
+
 }

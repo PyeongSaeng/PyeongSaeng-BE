@@ -19,15 +19,19 @@ import com.umc.pyeongsaeng.domain.user.entity.User;
 import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
+import com.umc.pyeongsaeng.global.security.CustomUserDetails;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -200,5 +204,41 @@ public class ApplicationCommandServiceImpl implements ApplicationCommandService 
 
 		return savedAnswer;
 	}
+
+	@Transactional
+	public Application createIfNotExists(Long jobPostId, CustomUserDetails userDetails) {
+		Long seniorId = userDetails.getUser().getId();
+
+		// 이미 존재하는 Application 조회 (jobPostId + seniorId)
+		Optional<Application> existingApplication = applicationRepository.findByJobPostIdAndSeniorId(jobPostId, seniorId);
+
+		if (existingApplication.isPresent()) {
+			Application app = existingApplication.get();
+			app.setUpdatedAt(LocalDateTime.now()); // 클릭 시 최신화
+			return applicationRepository.save(app);
+		}
+
+		// JobPost 조회
+		JobPost jobPost = jobPostRepository.findById(jobPostId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
+
+		// 새 Application 생성
+		Application newApplication = Application.builder()
+			.jobPost(jobPost)
+			.senior(userDetails.getUser())
+			.applicationStatus(ApplicationStatus.NON_STARTED) // 작성 전 상태
+			.build();
+
+		return applicationRepository.save(newApplication);
+	}
+
+	@Transactional
+	public void deleteApplication(Long applicationId, Long userId) {
+		Application application = applicationRepository.findById(applicationId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_APPLICATION_ID));
+
+		applicationRepository.delete(application);
+	}
+
 
 }
