@@ -7,7 +7,7 @@ import com.umc.pyeongsaeng.domain.job.recommendation.util.DistanceUtil;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostImageRepository;
 import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
-import com.umc.pyeongsaeng.domain.job.search.service.JobPostSearchService;
+import com.umc.pyeongsaeng.domain.job.search.service.JobPostSearchQueryService;
 import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
 import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
@@ -32,7 +32,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 	private final JobPostRepository jobPostRepository;
 	private final JobPostImageRepository jobPostImageRepository;
 	private final SeniorProfileRepository seniorProfileRepository;
-	private final JobPostSearchService jobPostSearchService;
+	private final JobPostSearchQueryService jobPostSearchQueryService;
 	private final S3Service s3Service;
 
 	@Override
@@ -76,29 +76,24 @@ public class RecommendationServiceImpl implements RecommendationService {
 
 	@Override
 	public List<RecommendationResponseDTO> recommendJobsByJobTypeAndDistance(Long userId) {
-		// 1. 시니어 프로필에서 위치 + 직무 키워드
 		SeniorProfile profile = seniorProfileRepository.findBySeniorId(userId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 		double userLat = profile.getLatitude();
 		double userLng = profile.getLongitude();
 		String jobKeyword = profile.getJob().getKorName();
 
-		// 2. ElasticSearch에서 직무 키워드 기반 검색
-		List<JobPostDocument> filteredDocs = jobPostSearchService.findByJobType(jobKeyword);
+		List<JobPostDocument> filteredDocs = jobPostSearchQueryService.searchByJobType(userId);
 
-		// 💡 결과 없으면 fallback: 거리 기준 전체 추천
 		if (filteredDocs.isEmpty()) {
 			log.warn("[RECOMMEND] 직무 기반 결과 없음 → 거리 기준 추천 fallback");
 			return recommendJobsByDistance(userId);
 		}
 
-		// 3. 결과에서 jobPostId 추출 후 DB 조회
 		List<Long> jobPostIds = filteredDocs.stream()
 			.map(doc -> Long.parseLong(doc.getId()))
 			.toList();
 		List<JobPost> jobPosts = jobPostRepository.findAllById(jobPostIds);
 
-		// 4. 거리 계산 + Presigned URL
 		return jobPosts.stream()
 			.filter(job -> job.getLatitude() != null && job.getLongitude() != null)
 			.map(job -> {

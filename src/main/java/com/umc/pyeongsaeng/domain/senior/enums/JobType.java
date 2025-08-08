@@ -1,7 +1,7 @@
 package com.umc.pyeongsaeng.domain.senior.enums;
 
 public enum JobType {
-	HOUSEWIFE("주부"),
+	HOUSEWIFE("돌봄"),
 	EMPLOYEE("회사원"),
 	PUBLIC_OFFICER("공무원"),
 	PROFESSIONAL("전문직"),
