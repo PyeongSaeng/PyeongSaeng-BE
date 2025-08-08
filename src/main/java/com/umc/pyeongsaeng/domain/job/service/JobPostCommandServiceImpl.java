@@ -111,9 +111,7 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 
 	private void saveToElasticsearch(JobPost jobPost, GoogleGeocodingResult convertedAddress) {
 		try {
-			log.info("[SAVE_TO_ES] jobPost ID: {}", jobPost.getId());
 			JobPostDocument jobPostDocument = JobPostConverter.toDocument(jobPost, convertedAddress);
-			log.info("💡 ES 저장 시도 - id={}, index={}", jobPostDocument.getId(), "jobposts");
 			String result = elasticOperationServiceImpl.insertDocumentGeneric(jobPostDocument);
 			log.info("ES 저장 성공 - id={}, result={}", jobPostDocument.getId(), result);
 		} catch (Exception e) {
