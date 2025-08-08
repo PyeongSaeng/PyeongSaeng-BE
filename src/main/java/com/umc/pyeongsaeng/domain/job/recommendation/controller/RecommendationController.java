@@ -1,55 +1,83 @@
 package com.umc.pyeongsaeng.domain.job.recommendation.controller;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.umc.pyeongsaeng.domain.job.recommendation.dto.request.TravelTimeRequestDTO;
 import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.RecommendationResponseDTO;
 import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.TravelTimeResponseDTO;
 import com.umc.pyeongsaeng.domain.job.recommendation.service.RecommendationService;
 import com.umc.pyeongsaeng.domain.job.recommendation.service.TravelTimeService;
-import com.umc.pyeongsaeng.domain.job.search.elkoperation.ElasticOperationService;
-import com.umc.pyeongsaeng.domain.user.entity.User;
 import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/job")
+@Tag(name = "맞춤 추천 API", description = "시니어의 직무 선호도 및 위치를 바탕으로 한 채용 공고 추천")
 public class RecommendationController {
+
 	private final TravelTimeService travelTimeService;
 	private final RecommendationService recommendationService;
-	private final ElasticOperationService elasticOperationService;
 
-
-	@GetMapping("/recommend/test")
-	public ResponseEntity<?> testRecommendation(@RequestParam Long userId) {
-		List<RecommendationResponseDTO> result = recommendationService.recommendJobsByJobTypeAndDistance(userId);
-		return ResponseEntity.ok(result);
-	}
-
-	/**
-	// 직선 거리 기반 추천
+	@Operation(
+		summary = "맞춤 채용공고 추천",
+		description = "시니어의 경력 직무와 위치를 기준으로 맞춤형 채용공고를 추천합니다.\n" +
+			"직무 기반 결과가 없을 경우, 위치 기반 거리순으로 fallback 추천합니다."
+	)
+	@ApiResponses(value = {
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(
+			responseCode = "200",
+			description = "추천 성공",
+			content = @Content(
+				mediaType = "application/json",
+				schema = @Schema(implementation = ApiResponse.class),
+				examples = @ExampleObject(
+					name = "SuccessExample",
+					value = """
+						{
+						  "isSuccess": true,
+						  "code": "COMMON200",
+						  "message": "성공입니다.",
+						  "result": [
+						    {
+						      "jobPostId": 12,
+						      "title": "요양보호사 구인",
+						      "address": "서울특별시 종로구",
+						      "hourlyWage": 13000,
+						      "description": "가정 방문 요양보호사 모집",
+						      "distanceKm": 2.5,
+						      "imageUrl": "https://pyeongsaeng-bucket.s3.amazonaws.com/example.png"
+						    },
+						    ...
+						  ]
+						}
+					"""
+				)
+			)
+		)
+	})
 	@GetMapping("/recommendations")
-	public ApiResponse<List<RecommendationResponseDTO>> recommendJobsByDistance(
-		@AuthenticationPrincipal User user
+	public ResponseEntity<ApiResponse<List<RecommendationResponseDTO>>> recommendJobs(
+		@Parameter(name = "userId", description = "시니어 유저 ID", example = "1")
+		@RequestParam Long userId
 	) {
-		Long userId = user.getId();
-		List<RecommendationResponseDTO> recommendations = recommendationService.recommendJobsByDistance(userId);
-		return ApiResponse.of(SuccessStatus._OK, recommendations);
+		List<RecommendationResponseDTO> result = recommendationService.recommendJobsByJobTypeAndDistance(userId);
+		return ResponseEntity.ok(ApiResponse.of(SuccessStatus._OK, result));
 	}
-	 **/
 
+	@Operation(summary = "출발지-도착지 교통 시간 계산", description = "도보/버스를 포함한 예상 이동시간을 계산합니다.")
 	@PostMapping("/travel-time")
 	public ResponseEntity<ApiResponse<TravelTimeResponseDTO>> getTravelTime(
 		@RequestBody TravelTimeRequestDTO request
@@ -63,11 +91,5 @@ public class RecommendationController {
 
 		TravelTimeResponseDTO response = new TravelTimeResponseDTO(travelSummary);
 		return ResponseEntity.ok(ApiResponse.of(SuccessStatus._OK, response));
-	}
-
-	@GetMapping("/test/es-index")
-	public ResponseEntity<?> checkIndex() {
-		boolean exists = elasticOperationService.checkIfExistIndex("jobposts");
-		return ResponseEntity.ok("jobposts exists? → " + exists);
 	}
 }
