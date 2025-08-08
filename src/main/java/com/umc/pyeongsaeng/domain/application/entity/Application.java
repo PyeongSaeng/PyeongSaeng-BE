@@ -37,6 +37,7 @@ public class Application extends BaseEntity {
 	private User senior;
 
 	@Enumerated(EnumType.STRING)
+	@Column(length = 32)
 	private ApplicationStatus applicationStatus = ApplicationStatus.DRAFT;
 
 	private LocalDateTime submittedAt;
