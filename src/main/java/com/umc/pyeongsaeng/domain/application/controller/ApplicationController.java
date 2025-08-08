@@ -274,4 +274,13 @@ public class ApplicationController {
 		return ApiResponse.onSuccess(ApplicationConverter.toSubmittedApplicationResponseListDTO(submittedApplicationResponseDTOList));
 	}
 
+	@Operation(summary = "사용자가 자신이 작성한 제출된 지원서 하나를 상세조회", description = "마이페이지에서 사용자가 자신이 작성한 제출된 지원서하나를 상세 조회합니다.")
+	@GetMapping("/me/details/{applicationId}")
+	public ApiResponse<ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO> getSubmittedApplicationDetails(
+		@PathVariable Long applicationId,
+		@AuthenticationPrincipal CustomUserDetails customUserDetails
+	) {
+		return ApiResponse.onSuccess(applicationQueryService.getSubmittedApplicationDetails(applicationId, customUserDetails.getId()));
+	}
+
 }

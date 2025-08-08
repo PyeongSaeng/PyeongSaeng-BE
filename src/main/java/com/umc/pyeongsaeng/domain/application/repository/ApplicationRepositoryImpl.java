@@ -59,7 +59,7 @@ public class ApplicationRepositoryImpl implements ApplicationRepositoryCustom {
 			"                                 'originalFileName', af.original_file_name " +
 			"                             ) " +
 			"                             ) AS CHAR) " +
-			"                     FROM application_file af " +
+			"                     FROM application_answer_file af " +
 			"                     WHERE af.application_answer_id = ans.id) " +
 			"                ELSE " +
 			"                    ans.answer_text " +
@@ -79,18 +79,15 @@ public class ApplicationRepositoryImpl implements ApplicationRepositoryCustom {
 			"GROUP BY " +
 			"    app.id, jp.id";
 
-		// EntityManager를 사용하여 네이티브 쿼리를 실행하고, 결과를 Object 배열의 리스트로 받습니다.
-		@SuppressWarnings("unchecked") // 네이티브 쿼리 결과는 타입 캐스팅이 필요하므로 경고를 무시합니다.
+		@SuppressWarnings("unchecked")
 		List<Object[]> resultList = em.createNativeQuery(sql)
 			.setParameter(1, applicationId)
 			.getResultList();
 
-		// 결과가 없으면 빈 Optional을 반환
 		if (resultList.isEmpty()) {
 			return Optional.empty();
 		}
 
-		// 첫 번째 결과(Object 배열)를 가져옵니다.
 		Object[] result = resultList.get(0);
 
 		ApplicationDetailView detailView = new ApplicationDetailViewImpl(result);

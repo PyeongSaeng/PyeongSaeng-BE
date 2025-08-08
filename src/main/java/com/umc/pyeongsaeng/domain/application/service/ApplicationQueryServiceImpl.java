@@ -8,8 +8,11 @@ import com.umc.pyeongsaeng.domain.application.enums.ApplicationStatus;
 import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepository;
 import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepositoryCustom;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
-import com.umc.pyeongsaeng.domain.job.repository.JobPostImageRepository;
+import com.umc.pyeongsaeng.domain.job.entity.JobPostImage;
+import com.umc.pyeongsaeng.domain.job.recommendation.service.TravelTimeService;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
+import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
+import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
 import com.umc.pyeongsaeng.domain.user.entity.User;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
@@ -31,6 +34,8 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 	private final ApplicationRepository applicationRepository;
 	private final JobPostRepository jobPostRepository;
 	private final ApplicationConverter applicationConverter;
+	private final TravelTimeService travelTimeService;
+	private final SeniorProfileRepository seniorProfileRepository;
 	private final S3Service s3Service;
 
 	public Page<Application> findCompanyApplications(Long jobPostId, Integer page) {
@@ -73,5 +78,32 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 		});
 
 		return resultApplication;
+	}
+
+	public ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO getSubmittedApplicationDetails(Long applicationId, Long userId) {
+
+		ApplicationRepositoryCustom.ApplicationDetailView queryResult = applicationRepository.findApplicationQnADetailById(applicationId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_APPLICATION_ID));
+
+		SeniorProfile seniorProfile = seniorProfileRepository.findBySeniorId(userId).orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_PROFILE_NOT_FOUND));
+		JobPost jobPost = jobPostRepository.findByApplicationsId(applicationId).orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_APPLICATION_ID));
+
+		// 이동시간 계산
+		String travelTime = travelTimeService.getTravelTime(seniorProfile.getLatitude(), seniorProfile.getLongitude(), jobPost.getLatitude(), jobPost.getLongitude());
+
+		// Presigned URL 포함 이미지 리스트 변환
+		List<ApplicationResponseDTO.ImagePreviewWithUrlDTO> images = jobPost.getImages().stream()
+			.map((JobPostImage img) -> {
+				String presignedUrl = s3Service.getPresignedToDownload(
+					S3DTO.PresignedUrlToDownloadRequest.builder()
+						.keyName(img.getKeyName())
+						.build()
+				).getUrl();
+
+				return ApplicationConverter.toImagePreviewWithUrlDTO(img, presignedUrl);
+			})
+			.toList();
+
+		return applicationConverter.toSubmittedApplicationQnADetailResponseDTO(jobPost, queryResult, travelTime, images);
 	}
 }

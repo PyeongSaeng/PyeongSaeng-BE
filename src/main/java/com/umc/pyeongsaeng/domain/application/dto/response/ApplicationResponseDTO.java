@@ -180,4 +180,28 @@ public class ApplicationResponseDTO {
 		Boolean isLast;
 	}
 
+
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class SubmittedApplicationQnADetailResponseDTO {
+		private String title;
+		private String address;
+		private String detailAddress;
+		private String roadAddress;
+		private String zipcode;
+		private Integer hourlyWage;
+		private Integer monthlySalary;
+		private Integer yearSalary;
+		private String description;
+		private String workingTime;
+		private LocalDate deadline;
+		private Integer recruitCount;
+		private String note;
+		private List<ApplicationResponseDTO.ImagePreviewWithUrlDTO> images;
+		private String travelTime;
+		List<ApplicationQnADTO> questionAndAnswerList;
+	}
+
 }

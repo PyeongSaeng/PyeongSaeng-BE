@@ -12,4 +12,6 @@ public interface ApplicationQueryService {
 	ApplicationResponseDTO.ApplicationQnADetailPreViewDTO getApplicationQnADetail(Long applicationId);
 
 	Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> getSubmittedApplication(User seniorId, Integer page);
+
+	ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO getSubmittedApplicationDetails(Long applicationId, Long userId);
 }
