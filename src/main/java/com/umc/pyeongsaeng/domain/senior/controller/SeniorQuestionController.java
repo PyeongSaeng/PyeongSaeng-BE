@@ -19,6 +19,9 @@ import com.umc.pyeongsaeng.global.apiPayload.ApiResponse;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -37,14 +40,70 @@ public class SeniorQuestionController {
 		return ApiResponse.onSuccess(seniorQuestionQueryService.getAllSeniorQuestionsWithAnswers(seniorProfileId));
 	}
 
-	@Operation(summary = "추가 질문 답변 선택", description = "해당 시니어의 질문에 대해 답변을 선택하거나 수정합니다.")
+	@Operation(summary = "추가 질문 선택 저장", description = "시니어가 질문에 대해 선택한 옵션들을 한 번에 저장합니다.",
+		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+			content = @Content(
+				schema = @Schema(implementation = SeniorQuestionRequestDTO.AnswersSaveRequestDTO.class),
+				examples = @ExampleObject(
+					name = "답변 선택 예시",
+					value = """
+					{
+					  "answers": [
+					    {
+					      "questionId": 1,
+					      "selectedOptionId": 1
+					    },
+					    {
+					      "questionId": 2,
+					      "selectedOptionId": 5
+					    },
+					    {
+					      "questionId": 3,
+					      "selectedOptionId": 7
+					    }
+					  ]
+					}
+				"""
+				)
+			)
+		)
+	)
 	@PatchMapping("/{seniorProfileId}/answers")
-	public ApiResponse<Void> updateAnswer(@PathVariable Long seniorProfileId, @RequestBody SeniorQuestionRequestDTO.AnswerRequestDTO request) {
-		seniorQuestionCommandService.saveOrUpdateAnswer(seniorProfileId, request);
+	public ApiResponse<Void> updateAnswers(@PathVariable Long seniorProfileId, @RequestBody SeniorQuestionRequestDTO.AnswersSaveRequestDTO request) {
+		seniorQuestionCommandService.saveOrUpdateAnswers(seniorProfileId, request.getAnswers());
 		return ApiResponse.of(SuccessStatus.SENIOR_QUESTION_ANSWER_SELECTED, null);
 	}
 
-	@Operation(summary = "추가 질문 생성", description = "새로운 추가 질문과 선택 가능한 옵션을 생성합니다.")
+	@Operation(summary = "추가 질문 생성", description = "여러 개의 추가 질문과 옵션들을 한 번에 생성합니다.",
+		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+			content = @Content(
+				schema = @Schema(implementation = SeniorQuestionRequestDTO.QuestionRequestDTO.class),
+				examples = @ExampleObject(
+					name = "추가 질문 리스트 예시",
+					value = """
+					[
+					  {
+					    "question": "하루에 몇 시간 정도 일하고 싶으신가요?",
+					    "options": ["1시간 내외", "2시간 내외", "3시간 내외", "3시간 초과"]
+					  },
+					  {
+					    "question": "어디에서 일하는 것을 선호하시나요?",
+					    "options": ["실내", "실외"]
+					  },
+					  {
+					    "question": "일할 때 어떤 환경이 편하신가요?",
+					    "options": ["혼자서", "여럿이"]
+					  },
+					  {
+					    "question": "어떤 일을 할 때 가장 보람을 느끼시나요?",
+					    "options": ["환경 미화", "실내 청소", "조리", "아동 보호", "교육/강사"]
+					  }
+					]
+				"""
+				)
+			)
+		)
+	)
 	@PostMapping("/questions")
 	public ApiResponse<Long> createQuestion(@RequestBody SeniorQuestionRequestDTO.QuestionRequestDTO request) {
 		Long createdQuestionId = seniorQuestionCommandService.createQuestion(request);

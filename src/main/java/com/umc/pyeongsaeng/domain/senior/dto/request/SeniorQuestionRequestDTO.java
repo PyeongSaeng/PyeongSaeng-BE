@@ -28,4 +28,13 @@ public class SeniorQuestionRequestDTO {
 		private List<String> options;
 
 	}
+
+	@Getter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	@Builder
+	public static class AnswersSaveRequestDTO {
+		private List<AnswerRequestDTO> answers;
+	}
+
 }

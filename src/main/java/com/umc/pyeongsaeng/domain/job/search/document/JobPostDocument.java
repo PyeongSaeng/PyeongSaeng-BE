@@ -24,11 +24,6 @@ public class JobPostDocument extends BaseElkDocument {
 	private String description;
 	private String note;
 
-	private Integer hourlyWage;
-	private Integer monthlySalary;
-	private Integer yearSalary;
-	private Integer recruitCount;
-
 	private String address;
 	private String sido;     // 시/도
 	private String sigungu;  // 시/군/구
@@ -42,5 +37,7 @@ public class JobPostDocument extends BaseElkDocument {
 	private String geoPoint; // 근무지 위/경도
 
 	private Integer applicationCount; // 지원서 수
+
+	private String keyname;
 }
 

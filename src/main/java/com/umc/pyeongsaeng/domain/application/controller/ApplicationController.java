@@ -125,7 +125,7 @@ public class ApplicationController {
 	})
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class), examples = @ExampleObject(value =
-				"{\n" +
+			"{\n" +
 				"    \"isSuccess\": true,\n" +
 				"    \"code\": \"COMMON200\",\n" +
 				"    \"message\": \"성공입니다.\",\n" +

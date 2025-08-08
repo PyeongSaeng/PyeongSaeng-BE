@@ -1,10 +1,5 @@
 package com.umc.pyeongsaeng.global.apiPayload.code.status;
 
-import com.umc.pyeongsaeng.global.apiPayload.code.BaseErrorCode;
-import com.umc.pyeongsaeng.global.apiPayload.code.ErrorReasonDTO;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.*;
 
 import com.umc.pyeongsaeng.global.apiPayload.code.*;
@@ -60,7 +55,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	// SMS
 	SMS_VERIFICATION_FAILED(HttpStatus.BAD_REQUEST, "SMS401", "SMS 인증에 실패했습니다. 인증번호를 다시 확인하거나 재발송 해주세요."),
 	SMS_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "SMS402", "SMS 발송에 실패했습니다."),
-	SMS_RESEND_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "SMS403", "하루 인증 요청 가능 횟수를 초과했습니다. 제한 10회."),
+	SMS_RESEND_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "SMS403", "하루 인증 요청 가능 횟수를 초과했습니다. 제한 50회."),
 
 	// Travel-time
 	GOOGLE_DIRECTIONS_API_FAILED(HttpStatus.BAD_GATEWAY, "TRAVEL401", "Google Directions API 호출에 실패했습니다."),
@@ -101,8 +96,11 @@ public enum ErrorStatus implements BaseErrorCode {
 	JOB_POST_NOT_MATCH_COMPANY(HttpStatus.BAD_REQUEST, "JOB403", "기업이 작성한 게시글이 아닙니다."),
 	// Qusetion
 	SENIOR_QUESTION_NOT_FOUND(HttpStatus.NOT_FOUND,"QUESTION401","해당 시니어 질문을 찾을 수 없습니다."),
-	SENIOR_QUESTION_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND,"QUESTION402","해당 시니어 질문의 옵션을 찾을 수 없습니다.");
+	SENIOR_QUESTION_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND,"QUESTION402","해당 시니어 질문의 옵션을 찾을 수 없습니다."),
 
+	// AI
+	AI_RESPONSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI501", "AI 응답 파싱에 실패했습니다."),
+	AI_REQUEST_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "AI502", "AI 요청 중 오류가 발생했습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;
