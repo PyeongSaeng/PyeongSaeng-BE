@@ -24,9 +24,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RecommendationServiceImpl implements RecommendationService {
 
 	private final JobPostRepository jobPostRepository;
@@ -37,35 +37,15 @@ public class RecommendationServiceImpl implements RecommendationService {
 
 	@Override
 	public List<RecommendationResponseDTO> recommendJobsByDistance(Long userId) {
-		SeniorProfile profile = seniorProfileRepository.findBySeniorId(userId)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-
+		SeniorProfile profile = findProfile(userId);
 		double userLat = profile.getLatitude();
 		double userLng = profile.getLongitude();
-		String jobKeyword = profile.getJob().getKorName();
 
 		return jobPostRepository.findAll().stream()
 			.filter(job -> job.getLatitude() != null && job.getLongitude() != null)
 			.map(job -> {
-				log.info("추천 대상 jobPostId: {}", job.getId());
-
-				double distance = DistanceUtil.calculateDistance(userLat, userLng, job.getLatitude(), job.getLongitude());
-
-				String imageUrl = null;
-				try {
-					imageUrl = jobPostImageRepository.findFirstByJobPostIdOrderByIdAsc(job.getId())
-						.map(img -> {
-							log.info("대표 이미지 keyName = {}", img.getKeyName());
-							return s3Service.getPresignedToDownload(
-								S3DTO.PresignedUrlToDownloadRequest.builder()
-									.keyName(img.getKeyName())
-									.build()
-							).getUrl();
-						})
-						.orElse(null);
-				} catch (Exception e) {
-					log.error("이미지 presigned URL 생성 실패: {}", e.getMessage());
-				}
+				double distance = roundDistance(userLat, userLng, job);
+				String imageUrl = getPresignedImage(job.getId());
 
 				return RecommendationConverter.toRecommendationResponseDTO(job, distance, imageUrl);
 			})
@@ -76,11 +56,9 @@ public class RecommendationServiceImpl implements RecommendationService {
 
 	@Override
 	public List<RecommendationResponseDTO> recommendJobsByJobTypeAndDistance(Long userId) {
-		SeniorProfile profile = seniorProfileRepository.findBySeniorId(userId)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+		SeniorProfile profile = findProfile(userId);
 		double userLat = profile.getLatitude();
 		double userLng = profile.getLongitude();
-		String jobKeyword = profile.getJob().getKorName();
 
 		List<JobPostDocument> filteredDocs = jobPostSearchQueryService.searchByJobType(userId);
 
@@ -97,8 +75,9 @@ public class RecommendationServiceImpl implements RecommendationService {
 		return jobPosts.stream()
 			.filter(job -> job.getLatitude() != null && job.getLongitude() != null)
 			.map(job -> {
-				double distance = DistanceUtil.calculateDistance(userLat, userLng, job.getLatitude(), job.getLongitude());
+				double distance = roundDistance(userLat, userLng, job);
 				String imageUrl = getPresignedImage(job.getId());
+
 				return RecommendationConverter.toRecommendationResponseDTO(job, distance, imageUrl);
 			})
 			.sorted(Comparator.comparingDouble(RecommendationResponseDTO::distanceKm))
@@ -106,18 +85,30 @@ public class RecommendationServiceImpl implements RecommendationService {
 			.toList();
 	}
 
-	private String getPresignedImage(Long jobPostId) {
-		try {
-			return jobPostImageRepository.findFirstByJobPostIdOrderByIdAsc(jobPostId)
-				.map(img -> s3Service.getPresignedToDownload(
-					S3DTO.PresignedUrlToDownloadRequest.builder()
-						.keyName(img.getKeyName())
-						.build()
-				).getUrl()).orElse(null);
-		} catch (Exception e) {
-			log.error("이미지 presigned URL 생성 실패: {}", e.getMessage());
-			return null;
-		}
+	private SeniorProfile findProfile(Long userId) {
+		return seniorProfileRepository.findBySeniorId(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 	}
 
+	private String getPresignedImage(Long jobPostId) {
+		return jobPostImageRepository.findFirstByJobPostIdOrderByIdAsc(jobPostId)
+			.map(img -> {
+				try {
+					return s3Service.getPresignedToDownload(
+						S3DTO.PresignedUrlToDownloadRequest.builder()
+							.keyName(img.getKeyName())
+							.build()
+					).getUrl();
+				} catch (Exception e) {
+					log.error("이미지 URL 생성 실패 - keyName: {}", img.getKeyName(), e);
+					return null;
+				}
+			})
+			.orElse(null);
+	}
+
+	private double roundDistance(double userLat, double userLng, JobPost job) {
+		double raw = DistanceUtil.calculateDistance(userLat, userLng, job.getLatitude(), job.getLongitude());
+		return Math.round(raw * 10.0) / 10.0;
+	}
 }
