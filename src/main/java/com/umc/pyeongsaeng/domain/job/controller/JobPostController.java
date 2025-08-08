@@ -462,6 +462,24 @@ public class JobPostController {
 		return ApiResponse.onSuccess(FormFieldConverter.toFormFieldPreViewListDTO(formFieldList));
 	}
 
+	@Operation(summary = "회사의 인기순 채용공고 목록 조회 API", description = "회사가 쓴 채용 공고 목록을 조회하는 API입니다.")
+	@GetMapping("/companies/me/posts/popularity")
+	public ApiResponse<JobPostResponseDTO.JobPostPreviewByCompanyListDTO> getJobPostByPopularity(
+		@Parameter(name = "page", description = "페이지 번호 (1부터 시작)", example = "1") @PageNumber Integer page,
+		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+		Page<JobPostResponseDTO.JobPostPreviewByCompanyDTO> jobPostList = jobPostQueryService.getJobPostPreViewPageByCompanyByPopularity(userDetails.getCompany(), page);
+		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewByCompanyListDTO(jobPostList));
+	}
+
+	@DeleteMapping("/posts/{jobPostId}")
+	@Operation(summary = "회사가 만들었던 공고 삭제", description = "회사가 만들었던 공고 삭제하는 API")
+	public ApiResponse<Long> deleteJobPost(@PathVariable Long jobPostId) {
+		jobPostCommandService.deleteJobPost(jobPostId);
+
+		return ApiResponse.onSuccess(jobPostId);
+	}
+  
 	@Operation(summary = "시니어가 채용공고 상세 조회 API", description = "특정 채용공고를 클릭했을 때, 해당 공고의 상세 정보를 조회하는 API입니다.")
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(

@@ -159,7 +159,7 @@ public class ApplicationController {
 	}
 
 	@PostMapping("")
-	@Operation(summary = "사용자 지원서 최종 제출 API", description = "사용자가 특정 채용 공고에 지원서를 제출하는 API입니다.")
+	@Operation(summary = "사용자 지원서 최종 제출 or 임시저장 API", description = "사용자가 특정 채용 공고에 지원서를 제출하는 API입니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class), examples = @ExampleObject(value =
 			"{\n" +
@@ -204,42 +204,63 @@ public class ApplicationController {
 		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
 		@io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "지원서 제출 요청 DTO",
-            required = true,
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ApplicationRequestDTO.RegistrationRequestDTO.class),
-                examples = @ExampleObject(
-                    name = "지원서 제출 예시",
-                    value = "{\n" +
-                        "  \"jobPostId\": 1,\n" +
-                        "  \"seniorId\": 10,\n" +
-                        "  \"fieldAndAnswer\": [\n" +
-                        "    {\n" +
-                        "      \"formFieldId\": 2,\n" +
-						"      \"answerFieldId\": 3,\n" +
-                        "      \"formFieldName\": \"자격증\",\n" +
-                        "      \"fieldType\": \"IMAGE\",\n" +
-                        "      \"answer\": [\n" +
-                        "        {\n" +
-                        "          \"keyName\": \"file123\",\n" +
-                        "          \"originalFileName\": \"자격증사진.jpg\"\n" +
-                        "        }\n" +
-                        "      ]\n" +
-                        "    },\n" +
-                        "    {\n" +
-                        "      \"formFieldId\": 1,\n" +
-						"      \"answerFieldId\": 4,\n" +
-                        "      \"formFieldName\": \"자기소개\",\n" +
-                        "      \"fieldType\": \"TEXT\",\n" +
-                        "      \"answer\": \"나는 박지현이다\"\n" +
-                        "    }\n" +
-                        "  ]\n" +
-                        "}"
-                )
-            )
+            required = true
         )
 		@RequestBody @Valid ApplicationRequestDTO.RegistrationRequestDTO requestDTO) {
 		return ApiResponse.onSuccess(applicationCommandService.createApplication(requestDTO, userDetails.getUser()));
+	}
+
+	@PutMapping("/{applicationId}")
+	@Operation(summary = "사용자 지원서 임시 저장 -> 최종 제출로 변경", description = "사용자가 임시 저장했던 지원서를 최종 제출로 변경하는 API")
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class), examples = @ExampleObject(value =
+			"{\n" +
+				"    \"isSuccess\": true,\n" +
+				"    \"code\": \"COMMON200\",\n" +
+				"    \"message\": \"성공입니다.\",\n" +
+				"    \"result\": {\n" +
+				"        \"applicationId\": 1,\n" +
+				"        \"jobPostId\": 1,\n" +
+				"        \"applicationStatus\": \"SUBMITTED\",\n" +
+				"        \"createdAt\": \"2025-08-03T15:00:00\",\n" +
+				"        \"answers\": [\n" +
+				"            {\n" +
+				"                \"fieldType\": \"TEXT\",\n" +
+				"                \"formFieldId\": 1,\n" +
+				"                \"formFieldName\": \"성함\",\n" +
+				"                \"answer\": \"김시니어\"\n" +
+				"            },\n" +
+				"            {\n" +
+				"                \"fieldType\": \"IMAGE\",\n" +
+				"                \"formFieldId\": 2,\n" +
+				"                \"formFieldName\": \"경력 증명서\",\n" +
+				"                \"answer\": [\n" +
+				"                    {\n" +
+				"                        \"keyName\": \"a1b2c3d4\",\n" +
+				"                        \"originalFileName\": \"career_certificate.png\"\n" +
+				"                    }\n" +
+				"                ]\n" +
+				"            }\n" +
+				"        ]\n" +
+				"    }\n" +
+				"}"))),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "존재하지 않는 공고 또는 사용자", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class), examples = @ExampleObject(value =
+			"{\n" +
+				"    \"isSuccess\": false,\n" +
+				"    \"code\": \"JOB_POST_NOT_FOUND\",\n" +
+				"    \"message\": \"해당하는 공고를 찾을 수 없습니다.\",\n" +
+				"    \"result\": null\n" +
+				"}")))
+	})
+		public ApiResponse<ApplicationResponseDTO.RegistrationResultDTO> updateTmpApplicationToFinalApplication(
+		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+		@PathVariable Long applicationId,
+		@io.swagger.v3.oas.annotations.parameters.RequestBody(
+			description = "지원서 최종제출 요청 DTO",
+			required = true
+		)
+		@RequestBody @Valid ApplicationRequestDTO.TmpToFinalRegistrationRequestDTO requestDTO) {
+		return ApiResponse.onSuccess(applicationCommandService.updateTmpApplicationToFinalApplication(requestDTO, applicationId, userDetails.getUser()));
 	}
 
 }

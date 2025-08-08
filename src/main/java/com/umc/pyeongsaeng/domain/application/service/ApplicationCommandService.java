@@ -26,4 +26,7 @@ public interface ApplicationCommandService  {
 	 */
 	ApplicationResponseDTO.RegistrationResultDTO createApplication(ApplicationRequestDTO.RegistrationRequestDTO requestDTO, User applicant);
 
+	ApplicationResponseDTO.RegistrationResultDTO updateTmpApplicationToFinalApplication(ApplicationRequestDTO.TmpToFinalRegistrationRequestDTO requestDTO, Long applicationId, User applicant);
+
+
 }

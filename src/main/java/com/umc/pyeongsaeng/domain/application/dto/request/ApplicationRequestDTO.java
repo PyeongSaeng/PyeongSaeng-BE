@@ -27,6 +27,17 @@ public class ApplicationRequestDTO {
 
 		private Long jobPostId;
 		private Long seniorId;
+		private ApplicationStatus applicationStatus;
+
+		private List<FieldAndAnswerDTO> fieldAndAnswer;
+	}
+
+	@Getter
+	@NoArgsConstructor
+	public static class TmpToFinalRegistrationRequestDTO {
+
+		private Long jobPostId;
+		private Long seniorId;
 
 		private List<FieldAndAnswerDTO> fieldAndAnswer;
 	}
@@ -46,7 +57,7 @@ public class ApplicationRequestDTO {
 	public static abstract class FieldAndAnswerDTO { // 추상 클래스로 선언
 		// 공통 필드
 		private Long formFieldId;
-		private String formFieldName;
+//		private String formFieldName;
 
 		private FieldType fieldType;
 	}

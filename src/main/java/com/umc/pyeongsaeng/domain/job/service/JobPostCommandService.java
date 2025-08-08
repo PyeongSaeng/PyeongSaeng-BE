@@ -13,4 +13,7 @@ public interface JobPostCommandService {
 
 	// 회사에서 채용공고 상세조회
 	JobPost getJobPostDetail(Long jobPostId);
+
+	// 회사 채용공고 삭제
+	void deleteJobPost(Long jobPostId);
 }
