@@ -59,7 +59,7 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 			.toList();
 
 		formFieldRepository.saveAll(savedFormFields);
-		newJobPost.getFormField().addAll(savedFormFields);
+		newJobPost.getFormFields().addAll(savedFormFields);
 
 		saveToElasticsearch(newJobPost, convertedAddress);
 		return newJobPost;
@@ -95,13 +95,13 @@ public class JobPostCommandServiceImpl implements JobPostCommandService {
 		}
 
 		if (requestDTO.getFormFieldList() != null) {
-			formFieldRepository.deleteAll(jobPost.getFormField());
+			formFieldRepository.deleteAll(jobPost.getFormFields());
 			List<FormField> newFormField = requestDTO.getFormFieldList().stream()
 				.map(formField -> FormFieldConverter.toFormField(formField, jobPost))
 				.toList();
 			formFieldRepository.saveAll(newFormField);
-			jobPost.getFormField().clear();
-			jobPost.getFormField().addAll(newFormField);
+			jobPost.getFormFields().clear();
+			jobPost.getFormFields().addAll(newFormField);
 		}
 
 		saveToElasticsearch(jobPost, convertedAddress);

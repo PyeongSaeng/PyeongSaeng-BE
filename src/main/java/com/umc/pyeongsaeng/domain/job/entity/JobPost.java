@@ -29,8 +29,8 @@ public class JobPost extends BaseEntity {
 	@JoinColumn(name = "company_id")
 	private Company company;
 
-	@OneToMany(cascade = CascadeType.ALL,  fetch = FetchType.LAZY, orphanRemoval = true)
-	private List<FormField> formField = new ArrayList<>();
+	@OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<FormField> formFields = new ArrayList<>();
 
 	@OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Application> applications = new ArrayList<>();
