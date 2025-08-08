@@ -47,22 +47,26 @@ public class RecommendationController {
 					name = "SuccessExample",
 					value = """
 						{
-						  "isSuccess": true,
-						  "code": "COMMON200",
-						  "message": "성공입니다.",
-						  "result": [
-						    {
-						      "jobPostId": 12,
-						      "title": "요양보호사 구인",
-						      "address": "서울특별시 종로구",
-						      "hourlyWage": 13000,
-						      "description": "가정 방문 요양보호사 모집",
-						      "distanceKm": 2.5,
-						      "imageUrl": "https://pyeongsaeng-bucket.s3.amazonaws.com/example.png"
-						    },
-						    ...
-						  ]
-						}
+						      "isSuccess": true,
+						      "code": "COMMON200",
+						      "message": "성공입니다.",
+						      "result": [
+						          {
+						              "jobPostId": 116,
+						              "workplaceName": "시니어 돌보미 채용 주부 돌봄 요양",
+						              "description": "어르신과 함께 즐거운 시간을 보내실 분을 찾습니다. 주 3회, 오후 시간에 근무하며, 식사 준비 및 말벗이 주된 업무입니다.",
+						              "imageUrl": "https://pyeongsaeng-bucket.s3.amazonaws.com/file5123?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=",
+						              "distanceKm": 12.6
+						          },
+						          {
+						              "jobPostId": 117,
+						              "workplaceName": "시니어 돌보미 채용 주부 돌봄 요양",
+						              "description": "어르신과 함께 즐거운 시간을 보내실 분을 찾습니다. 주 3회, 오후 시간에 근무하며, 식사 준비 및 말벗이 주된 업무입니다.",
+						              "imageUrl": "https://pyeongsaeng-bucket.s3.amazonaws.com/file5123?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=",
+						              "distanceKm": 21.9
+						          }
+						      ]
+						  }
 					"""
 				)
 			)
