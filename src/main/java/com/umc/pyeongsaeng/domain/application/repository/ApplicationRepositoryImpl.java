@@ -1,17 +1,29 @@
 package com.umc.pyeongsaeng.domain.application.repository;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.umc.pyeongsaeng.domain.application.entity.Application;
+import com.umc.pyeongsaeng.domain.application.enums.ApplicationStatus;
+import com.umc.pyeongsaeng.domain.user.entity.User;
 import jakarta.persistence.EntityManager;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+import static com.umc.pyeongsaeng.domain.application.entity.QApplication.application;
+import static com.umc.pyeongsaeng.domain.job.entity.QJobPost.jobPost;
+import static com.umc.pyeongsaeng.domain.job.entity.QJobPostImage.jobPostImage;
+
 @Repository
 @RequiredArgsConstructor
 public class ApplicationRepositoryImpl implements ApplicationRepositoryCustom {
 
+	private final JPAQueryFactory queryFactory;
 	private final EntityManager em;
 
 	@Getter
@@ -84,5 +96,29 @@ public class ApplicationRepositoryImpl implements ApplicationRepositoryCustom {
 		ApplicationDetailView detailView = new ApplicationDetailViewImpl(result);
 
 		return Optional.of(detailView);
+	}
+
+	@Override
+	public Page<Application> findApplicationsWithDetails(User senior, Pageable pageable) {
+
+		List<Application> content = queryFactory
+			.selectFrom(application).distinct()
+			.join(application.jobPost, jobPost).fetchJoin()
+			.leftJoin(jobPost.images, jobPostImage).fetchJoin()
+			.where(application.senior.eq(senior)
+				.and(application.applicationStatus.ne(ApplicationStatus.DRAFT)))
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.orderBy(application.createdAt.desc())
+			.fetch();
+
+		Long total = queryFactory
+			.select(application.count())
+			.from(application)
+			.where(application.senior.eq(senior)
+				.and(application.applicationStatus.ne(ApplicationStatus.DRAFT)))
+			.fetchOne();
+
+		return new PageImpl<>(content, pageable, total);
 	}
 }

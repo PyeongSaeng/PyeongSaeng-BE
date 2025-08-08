@@ -263,4 +263,15 @@ public class ApplicationController {
 		return ApiResponse.onSuccess(applicationCommandService.updateTmpApplicationToFinalApplication(requestDTO, applicationId, userDetails.getUser()));
 	}
 
+	@Operation(summary = "사용자가 자신이 작성한 제출된 지원서를 조회", description = "마이페이지에서 사용자가 자신이 작성한 제출된 지원서를 조회합니다.")
+	@GetMapping("/me/submitted")
+	public ApiResponse<ApplicationResponseDTO.SubmittedApplicationResponseListDTO> getSubmittedApplication(
+		@AuthenticationPrincipal CustomUserDetails customUserDetails,
+		@PageNumber Integer page
+	) {
+		Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> submittedApplicationResponseDTOList = applicationQueryService.getSubmittedApplication(customUserDetails.getUser(), page);
+
+		return ApiResponse.onSuccess(ApplicationConverter.toSubmittedApplicationResponseListDTO(submittedApplicationResponseDTOList));
+	}
+
 }

@@ -7,6 +7,8 @@ import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDT
 import com.umc.pyeongsaeng.domain.application.entity.Application;
 import com.umc.pyeongsaeng.domain.application.entity.ApplicationAnswer;
 import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepositoryCustom;
+import com.umc.pyeongsaeng.domain.job.entity.JobPost;
+import com.umc.pyeongsaeng.domain.job.entity.JobPostImage;
 import com.umc.pyeongsaeng.domain.job.enums.FieldType;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
@@ -123,4 +125,41 @@ public class ApplicationConverter {
 			.answers(answerResultList)
 			.build();
 	}
+
+	public static ApplicationResponseDTO.ImagePreviewWithUrlDTO toImagePreviewWithUrlDTO(JobPostImage jobPostImage, String imageUrl) {
+
+		return ApplicationResponseDTO.ImagePreviewWithUrlDTO.builder()
+			.originalFileName(jobPostImage.getOriginalFileName())
+			.keyName(jobPostImage.getKeyName())
+			.imageId(jobPostImage.getId())
+			.imageUrl(imageUrl)
+			.build();
+	}
+
+	public static ApplicationResponseDTO.SubmittedApplicationResponseDTO toSubmittedApplicationResponseDTO(
+		Application application, JobPost jobPost, List<ApplicationResponseDTO.ImagePreviewWithUrlDTO> images) {
+
+		return ApplicationResponseDTO.SubmittedApplicationResponseDTO.builder()
+			.applicationId(application.getId())
+			.deadline(jobPost.getDeadline())
+			.title(jobPost.getTitle())
+			.images(images)
+			.build();
+	}
+
+	public static ApplicationResponseDTO.SubmittedApplicationResponseListDTO toSubmittedApplicationResponseListDTO(
+		Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> submittedApplicationResponseDTOList) {
+
+		return ApplicationResponseDTO.SubmittedApplicationResponseListDTO.builder()
+			.applicationList(submittedApplicationResponseDTOList.getContent())
+			.isFirst(submittedApplicationResponseDTOList.isFirst())
+			.isLast(submittedApplicationResponseDTOList.isLast())
+			.listSize(submittedApplicationResponseDTOList.getContent().size())
+			.totalElements(submittedApplicationResponseDTOList.getTotalElements())
+			.totalPage(submittedApplicationResponseDTOList.getTotalPages())
+			.build();
+	}
+
+
+
 }
