@@ -13,7 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnswerGenerationRequestDTO {
-	private List<SeniorQuestionResponseDTO.QuestionAnswerResponseDTO> answers;
-	private String question;
-	private String selectedKeyword;
+	private List<SeniorQuestionResponseDTO.QuestionAnswerResponseDTO> answers;	//시니어 추가정보
+	private String question;	//지원서 질문
+	private String selectedKeyword;	//선택된 키워드
+	private String generatedAnswer; //생성된 답변
+	private String addedExperience;	//관련 추가 정보
 }
