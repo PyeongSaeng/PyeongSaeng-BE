@@ -1,11 +1,9 @@
 package com.umc.pyeongsaeng.domain.job.controller;
 
-import com.umc.pyeongsaeng.domain.job.converter.FormFieldConverter;
 import com.umc.pyeongsaeng.domain.job.converter.JobPostConverter;
 import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.FormFieldResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
-import com.umc.pyeongsaeng.domain.job.entity.FormField;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import com.umc.pyeongsaeng.domain.job.service.JobPostCommandService;
@@ -453,13 +451,73 @@ public class JobPostController {
 			)
 		)
 	})
-	@GetMapping("/{jobPostId}/questions")
-	public ApiResponse<FormFieldResponseDTO.FormFieldPreViewListDTO> getJobPostQuestions(
-		@Parameter(name = "jobPostId", description = "채용공고 ID", example = "1") @PathVariable(name = "jobPostId") Long jobPostId) {
+	@GetMapping("/{jobPostId}/questions/direct")
+	public ApiResponse<List<FormFieldResponseDTO.FormFieldPreview>> getJobPostQuestions(
+		@Parameter(name = "jobPostId", description = "채용공고 ID", example = "1") @PathVariable(name = "jobPostId") Long jobPostId,
+		@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-		List<FormField> formFieldList = jobPostQueryService.getFormFieldList(jobPostId);
+		return ApiResponse.onSuccess(jobPostQueryService.getFormFieldListDirect(jobPostId, customUserDetails.getUser()));
 
-		return ApiResponse.onSuccess(FormFieldConverter.toFormFieldPreViewListDTO(formFieldList));
+	}
+
+	@Operation(summary = "채용공고 지원서 질문 목록 조회 API", description = "채용공고 지원서의 질문 목록을 조회하는 API입니다.")
+	@ApiResponses(value = {
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "질문 목록 조회 성공",
+			content = @Content(
+				mediaType = "application/json",
+				schema = @Schema(implementation = ApiResponse.class),
+				examples = @ExampleObject(
+					name = "SuccessExample",
+					value = """
+						{
+						  "isSuccess": true,
+						  "code": "200",
+						  "message": "요청에 성공하였습니다.",
+						  "result": {
+						    "formFieldList": [
+						      {
+						        "formField": "이름",
+						        "fieldType": "TEXT"
+						      },
+						      {
+						        "formField": "연락처",
+						        "fieldType": "TEXT"
+						      },
+						      {
+						        "formField": "자기소개",
+						        "fieldType": "TEXT"
+						      },
+						      {
+						        "formField": "자기소개",
+						        "fieldType": "IMAGE"
+						      }
+						    ]
+						  }
+						}
+						"""
+				)
+			)
+		),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "존재하지 않는 채용공고",
+			content = @Content(
+				mediaType = "application/json",
+				schema = @Schema(implementation = ApiResponse.class),
+				examples = @ExampleObject(
+					name = "NotFoundExample",
+					value = "{\"isSuccess\": false, \"code\": \"JOBPOST404\", \"message\": \"존재하지 않는 채용공고입니다.\", \"result\": null}"
+				)
+			)
+		)
+	})
+	@GetMapping("/{jobPostId}/questions/delegate/{seniorId}")
+	public ApiResponse<FormFieldResponseDTO.FormFieldPreViewListDTO> getJobPostQuestionsByDelegate(
+		@Parameter(name = "jobPostId", description = "채용공고 ID", example = "1") @PathVariable(name = "jobPostId") Long jobPostId,
+		@Parameter(name = "seniorId", description = "시니어 ID", example = "1") @PathVariable(name = "seniorId") Long seniorId) {
+
+//		List<FormField> formFieldList = jobPostQueryService.getFormFieldList(jobPostId);
+
+		return null;
+//		return ApiResponse.onSuccess(FormFieldConverter.toFormFieldPreViewListDTO(formFieldList));
 	}
 
 	@Operation(summary = "회사의 인기순 채용공고 목록 조회 API", description = "회사가 쓴 채용 공고 목록을 조회하는 API입니다.")
@@ -479,7 +537,7 @@ public class JobPostController {
 
 		return ApiResponse.onSuccess(jobPostId);
 	}
-  
+
 	@Operation(summary = "시니어가 채용공고 상세 조회 API", description = "특정 채용공고를 클릭했을 때, 해당 공고의 상세 정보를 조회하는 API입니다.")
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(
