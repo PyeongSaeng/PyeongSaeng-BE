@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -122,6 +123,60 @@ public class JobPostSearchQueryServiceImpl implements JobPostSearchQueryService 
 			}
 
 			throw new GeneralException(ErrorStatus.ES_REQUEST_ERROR);
+		}
+	}
+
+	public List<JobPostDocument> searchByJobType(Long seniorId) {
+		SeniorProfile profile = seniorProfileRepository.findBySeniorId(seniorId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_NOT_FOUND));
+
+		String jobType = Optional.ofNullable(profile.getJob())
+			.map(job -> job.getKorName())
+			.orElse(null);
+
+		if (jobType == null || jobType.trim().isEmpty()) {
+			log.warn("[ES] 시니어의 선호 직무가 비어있음 - seniorId: {}", seniorId);
+			return List.of();
+		}
+
+		log.info("[ES] 직무 키워드 검색 시작 - keyword: {}", jobType);
+
+		try {
+			SearchResponse<JobPostDocument> response = esClient.search(searchReq -> searchReq
+					.index("jobposts")
+					.query(mainQuery -> mainQuery.bool(boolQ -> boolQ
+						.should(q1 -> q1.matchPhrasePrefix(mpp -> mpp.field("title").query(jobType)))
+						.should(q2 -> q2.matchPhrasePrefix(mpp -> mpp.field("description").query(jobType)))
+						.should(q3 -> q3.matchPhrasePrefix(mpp -> mpp.field("note").query(jobType)))
+						.minimumShouldMatch("1")
+						.filter(f -> f.range(r -> r.date(d -> d.field("deadline").gte(LocalDate.now().toString()))))
+					))
+					.sort(sort -> sort.geoDistance(g -> g
+						.field("geoPoint")
+						.location(GeoLocation.of(loc -> loc
+							.latlon(LatLonGeoLocation.of(geo -> geo
+								.lat(profile.getLatitude())
+								.lon(profile.getLongitude())
+							))
+						))
+						.unit(DistanceUnit.Kilometers)
+						.order(SortOrder.Asc)
+					))
+					.size(50),
+				JobPostDocument.class
+			);
+
+			List<JobPostDocument> results = response.hits().hits().stream()
+				.map(Hit::source)
+				.filter(Objects::nonNull)
+				.toList();
+
+			log.info("[ES] 직무 검색 결과 수: {}", results.size());
+			return results;
+
+		} catch (IOException e) {
+			log.error("[ES] 직무 기반 검색 실패 - keyword: {}", jobType, e);
+			throw new GeneralException(ErrorStatus.ES_CONNECTION_ERROR);
 		}
 	}
 

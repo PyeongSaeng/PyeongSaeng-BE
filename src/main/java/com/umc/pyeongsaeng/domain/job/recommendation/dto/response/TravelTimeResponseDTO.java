@@ -1,5 +1,5 @@
 package com.umc.pyeongsaeng.domain.job.recommendation.dto.response;
 
-public record TravelTimeResponse(
+public record TravelTimeResponseDTO(
 	String travelSummary
 ) {}
