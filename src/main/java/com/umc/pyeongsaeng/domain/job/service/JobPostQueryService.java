@@ -15,5 +15,7 @@ public interface JobPostQueryService {
 
 	FormFieldResponseDTO.FormFieldPreViewWithAnswerListDTO getFormFieldListDirect(Long jobPostId, User senior);
 
+	FormFieldResponseDTO.FormFieldPreViewWithAnswerListDTO getFormFieldListDelegate(Long jobPostId, Long seniorId);
+
 	JobPostResponseDTO.JobPostDetailDTO getJobPostDetail(Long jobPostId, Long userId);
 }

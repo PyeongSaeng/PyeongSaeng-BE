@@ -400,7 +400,7 @@ public class JobPostController {
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostPreviewByCompanyListDTO(jobPostList));
 	}
 
-@Operation(summary = "채용공고 지원서 질문 목록 조회 API", description = "채용공고 지원서의 질문 목록을 조회하는 API입니다.")
+	@Operation(summary = "시니어가 직접 신청서를 작성할 때 질문 조회 API", description = "시니어가 직접 신청서를 작성할 때 질문 조회하는 API입니다. 필수 질문(전화번호, 연락처, 성함, 주소)는 답을 채워서 보내줍니다.")
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "질문 목록 조회 성공",
 			content = @Content(
@@ -417,11 +417,13 @@ public class JobPostController {
 						    "formFieldList": [
 						      {
 						        "formField": "이름",
-						        "fieldType": "TEXT"
+						        "fieldType": "TEXT",
+						        "answer": "김시니어"
 						      },
 						      {
 						        "formField": "연락처",
-						        "fieldType": "TEXT"
+						        "fieldType": "TEXT",
+						        "answer": "01024424423".
 						      },
 						      {
 						        "formField": "자기소개",
@@ -458,7 +460,7 @@ public class JobPostController {
 
 	}
 
-	@Operation(summary = "채용공고 지원서 질문 목록 조회 API", description = "채용공고 지원서의 질문 목록을 조회하는 API입니다.")
+	@Operation(summary = "보호자가 시니어 대신 신청서를 작성할 때 질문 조회 API", description = "보호자가 신청서를 대신 작성할 때 질문 조회하는 API입니다. 필수 질문(전화번호, 연락처, 성함, 주소)는 답을 채워서 보내줍니다.")
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "질문 목록 조회 성공",
 			content = @Content(
@@ -475,11 +477,13 @@ public class JobPostController {
 						    "formFieldList": [
 						      {
 						        "formField": "이름",
-						        "fieldType": "TEXT"
+						        "fieldType": "TEXT",
+						        "answer": "김시니어"
 						      },
 						      {
 						        "formField": "연락처",
-						        "fieldType": "TEXT"
+						        "fieldType": "TEXT",
+						        "answer": "01024424423".
 						      },
 						      {
 						        "formField": "자기소개",
@@ -508,14 +512,12 @@ public class JobPostController {
 		)
 	})
 	@GetMapping("/{jobPostId}/questions/delegate/{seniorId}")
-	public ApiResponse<FormFieldResponseDTO.FormFieldPreViewListDTO> getJobPostQuestionsByDelegate(
+	public ApiResponse<FormFieldResponseDTO.FormFieldPreViewWithAnswerListDTO> getJobPostQuestionsByDelegate(
 		@Parameter(name = "jobPostId", description = "채용공고 ID", example = "1") @PathVariable(name = "jobPostId") Long jobPostId,
 		@Parameter(name = "seniorId", description = "시니어 ID", example = "1") @PathVariable(name = "seniorId") Long seniorId) {
 
-//		List<FormField> formFieldList = jobPostQueryService.getFormFieldList(jobPostId);
 
-		return null;
-//		return ApiResponse.onSuccess(FormFieldConverter.toFormFieldPreViewListDTO(formFieldList));
+		return ApiResponse.onSuccess(jobPostQueryService.getFormFieldListDelegate(jobPostId, seniorId));
 	}
 
 	@Operation(summary = "회사의 인기순 채용공고 목록 조회 API", description = "회사가 쓴 채용 공고 목록을 조회하는 API입니다.")
