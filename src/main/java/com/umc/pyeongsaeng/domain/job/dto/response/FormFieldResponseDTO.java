@@ -7,11 +7,18 @@ import java.util.List;
 
 public class FormFieldResponseDTO {
 
+
+	public interface FormFieldPreview {
+		Long getId();
+		String getFieldName();
+		FieldType getFieldType();
+	}
+
 	@Getter
 	@Builder
 	@AllArgsConstructor
 	@NoArgsConstructor
-	public static class FormFieldPreViewDTO {
+	public static class FormFieldPreViewDTO implements FormFieldPreview {
 		Long id;
 		String fieldName;
 		FieldType fieldType;
@@ -20,10 +27,30 @@ public class FormFieldResponseDTO {
 
 	@Getter
 	@Builder
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class FormFieldPreViewWithAnswerDTO implements FormFieldPreview{
+		Long id;
+		String fieldName;
+		FieldType fieldType;
+		String answer;
+	}
+
+	@Getter
+	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class FormFieldPreViewListDTO {
 		List<FormFieldResponseDTO.FormFieldPreViewDTO> formFieldList;
+
+	}
+
+	@Getter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class FormFieldPreViewWithAnswerListDTO {
+		List<FormFieldResponseDTO.FormFieldPreview> formFieldList;
 
 	}
 }

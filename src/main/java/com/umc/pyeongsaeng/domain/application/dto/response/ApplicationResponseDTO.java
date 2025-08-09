@@ -8,7 +8,7 @@ import com.umc.pyeongsaeng.domain.job.enums.FieldType;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import lombok.*;
 
-import java.util.List;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -143,6 +143,65 @@ public class ApplicationResponseDTO {
 	public static class ImageInfoDTO {
 		private String keyName;
 		private String originalFileName;
+	}
+
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class ImagePreviewWithUrlDTO {
+		Long imageId;
+		private String keyName;
+		private String imageUrl;
+		private String originalFileName;
+	}
+
+	@Getter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class SubmittedApplicationResponseDTO {
+		private Long applicationId;
+		private String title;
+		private LocalDate deadline;
+		private List<ImagePreviewWithUrlDTO> images;
+	}
+
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class SubmittedApplicationResponseListDTO {
+		List<SubmittedApplicationResponseDTO> applicationList;
+		Integer listSize;
+		Integer totalPage;
+		Long totalElements;
+		Boolean isFirst;
+		Boolean isLast;
+	}
+
+
+	@Builder
+	@Getter
+	@AllArgsConstructor
+	@NoArgsConstructor
+	public static class SubmittedApplicationQnADetailResponseDTO {
+		private String title;
+		private String address;
+		private String detailAddress;
+		private String roadAddress;
+		private String zipcode;
+		private Integer hourlyWage;
+		private Integer monthlySalary;
+		private Integer yearSalary;
+		private String description;
+		private String workingTime;
+		private LocalDate deadline;
+		private Integer recruitCount;
+		private String note;
+		private List<ApplicationResponseDTO.ImagePreviewWithUrlDTO> images;
+		private String travelTime;
+		List<ApplicationQnADTO> questionAndAnswerList;
 	}
 
 }

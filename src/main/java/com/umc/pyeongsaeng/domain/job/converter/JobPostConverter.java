@@ -40,7 +40,7 @@ public class JobPostConverter {
 			.state(JobPostState.RECRUITING)
 			.company(requestCompany)
 			.images(new ArrayList<>())
-			.formField(new ArrayList<>())
+			.formFields(new ArrayList<>())
 			.note(requestDTO.getNote())
 			.latitude(convertedAddress.lat())
 			.longitude(convertedAddress.lon())
@@ -52,7 +52,7 @@ public class JobPostConverter {
 		List<JobPostImageResponseDTO.JobPostImagePreviewDTO> jobPostImagePreviewDTOList = jobPost.getImages().stream()
 			.map(JobPostImageConverter::toJobPostImagePreViewDTO).collect(Collectors.toList());
 
-		List<FormFieldResponseDTO.FormFieldPreViewDTO> jobPostFormFieldPreviewDTOList = jobPost.getFormField().stream()
+		List<FormFieldResponseDTO.FormFieldPreViewDTO> jobPostFormFieldPreviewDTOList = jobPost.getFormFields().stream()
 			.map(FormFieldConverter::toFormFieldPreViewDTO).collect(Collectors.toList());
 
 		return JobPostResponseDTO.JobPostPreviewDTO.builder()

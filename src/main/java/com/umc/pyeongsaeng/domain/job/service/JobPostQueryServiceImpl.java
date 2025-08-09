@@ -1,8 +1,10 @@
 package com.umc.pyeongsaeng.domain.job.service;
 
 import com.umc.pyeongsaeng.domain.company.entity.Company;
+import com.umc.pyeongsaeng.domain.job.converter.FormFieldConverter;
 import com.umc.pyeongsaeng.domain.job.converter.JobPostConverter;
 import com.umc.pyeongsaeng.domain.job.converter.JobPostImageConverter;
+import com.umc.pyeongsaeng.domain.job.dto.response.FormFieldResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
 import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
 import com.umc.pyeongsaeng.domain.job.entity.FormField;
@@ -14,6 +16,8 @@ import com.umc.pyeongsaeng.domain.job.repository.FormFieldRepository;
 import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
 import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
 import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
+import com.umc.pyeongsaeng.domain.user.entity.User;
+import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import com.umc.pyeongsaeng.global.s3.dto.S3DTO;
@@ -26,6 +30,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -36,6 +41,7 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 	private final JobPostRepository jobPostRepository;
 	private final FormFieldRepository formFieldRepository;
 	private final TravelTimeService travelTimeService;
+	private final UserRepository userRepository;
 	private final SeniorProfileRepository seniorProfileRepository;
 	private final S3Service s3Service;
 
@@ -98,14 +104,49 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 	}
 
 	@Override
-	public List<FormField> getFormFieldList(Long jobPostId) {
+	public FormFieldResponseDTO.FormFieldPreViewWithAnswerListDTO getFormFieldListDirect(Long jobPostId, User senior) {
+
 		JobPost jobPost = jobPostRepository.findById(jobPostId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
 
+		SeniorProfile seniorProfile = seniorProfileRepository.findBySeniorId(senior.getId())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_NOT_FOUND));
+
 		List<FormField> formFieldList = formFieldRepository.findByJobPost(jobPost);
 
+		Map<String, String> formFieldAnswerMap = Map.ofEntries(
+			Map.entry("성함", senior.getName()),
+			Map.entry("연세", String.valueOf(seniorProfile.getAge())),
+			Map.entry("거주지", seniorProfile.getRoadAddress()),
+			Map.entry("전화번호", seniorProfile.getPhoneNum())
+		);
 
-		return formFieldList;
+		return FormFieldConverter.toFormFieldPreViewWithAnswerListDTO(formFieldList, formFieldAnswerMap);
+
+	}
+	@Override
+	public FormFieldResponseDTO.FormFieldPreViewWithAnswerListDTO getFormFieldListDelegate(Long jobPostId, Long seniorId) {
+
+		JobPost jobPost = jobPostRepository.findById(jobPostId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
+
+		User senior = userRepository.findById(seniorId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_NOT_FOUND));
+
+		SeniorProfile seniorProfile = seniorProfileRepository.findBySeniorId(senior.getId())
+			.orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_NOT_FOUND));
+
+		List<FormField> formFieldList = formFieldRepository.findByJobPost(jobPost);
+
+		Map<String, String> formFieldAnswerMap = Map.ofEntries(
+			Map.entry("성함", senior.getName()),
+			Map.entry("연세", String.valueOf(seniorProfile.getAge())),
+			Map.entry("거주지", seniorProfile.getRoadAddress()),
+			Map.entry("전화번호", seniorProfile.getPhoneNum())
+		);
+
+		return FormFieldConverter.toFormFieldPreViewWithAnswerListDTO(formFieldList, formFieldAnswerMap);
+
 	}
 
 	@Override

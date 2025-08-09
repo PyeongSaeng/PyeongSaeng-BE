@@ -7,6 +7,8 @@ import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDT
 import com.umc.pyeongsaeng.domain.application.entity.Application;
 import com.umc.pyeongsaeng.domain.application.entity.ApplicationAnswer;
 import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepositoryCustom;
+import com.umc.pyeongsaeng.domain.job.entity.JobPost;
+import com.umc.pyeongsaeng.domain.job.entity.JobPostImage;
 import com.umc.pyeongsaeng.domain.job.enums.FieldType;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
@@ -123,4 +125,93 @@ public class ApplicationConverter {
 			.answers(answerResultList)
 			.build();
 	}
+
+	public static ApplicationResponseDTO.ImagePreviewWithUrlDTO toImagePreviewWithUrlDTO(JobPostImage jobPostImage, String imageUrl) {
+
+		return ApplicationResponseDTO.ImagePreviewWithUrlDTO.builder()
+			.originalFileName(jobPostImage.getOriginalFileName())
+			.keyName(jobPostImage.getKeyName())
+			.imageId(jobPostImage.getId())
+			.imageUrl(imageUrl)
+			.build();
+	}
+
+	public static ApplicationResponseDTO.SubmittedApplicationResponseDTO toSubmittedApplicationResponseDTO(
+		Application application, JobPost jobPost, List<ApplicationResponseDTO.ImagePreviewWithUrlDTO> images) {
+
+		return ApplicationResponseDTO.SubmittedApplicationResponseDTO.builder()
+			.applicationId(application.getId())
+			.deadline(jobPost.getDeadline())
+			.title(jobPost.getTitle())
+			.images(images)
+			.build();
+	}
+
+	public static ApplicationResponseDTO.SubmittedApplicationResponseListDTO toSubmittedApplicationResponseListDTO(
+		Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> submittedApplicationResponseDTOList) {
+
+		return ApplicationResponseDTO.SubmittedApplicationResponseListDTO.builder()
+			.applicationList(submittedApplicationResponseDTOList.getContent())
+			.isFirst(submittedApplicationResponseDTOList.isFirst())
+			.isLast(submittedApplicationResponseDTOList.isLast())
+			.listSize(submittedApplicationResponseDTOList.getContent().size())
+			.totalElements(submittedApplicationResponseDTOList.getTotalElements())
+			.totalPage(submittedApplicationResponseDTOList.getTotalPages())
+			.build();
+	}
+
+
+	public ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO toSubmittedApplicationQnADetailResponseDTO(
+		JobPost jobPost,
+		ApplicationRepositoryCustom.ApplicationDetailView result,
+		String travelTime,
+		List<ApplicationResponseDTO.ImagePreviewWithUrlDTO> images
+	) {
+		List<ApplicationResponseDTO.ApplicationQnADTO> questionAndAnswerList;
+
+		try {
+			String jsonQnAString = result.getQuestionAndAnswer();
+			if (jsonQnAString == null || jsonQnAString.isEmpty() || "null".equalsIgnoreCase(jsonQnAString)) {
+				questionAndAnswerList = new ArrayList<>();
+			} else {
+				questionAndAnswerList = objectMapper.readValue(
+					jsonQnAString,
+					new TypeReference<List<ApplicationResponseDTO.ApplicationQnADTO>>() {}
+				);
+
+				for (ApplicationResponseDTO.ApplicationQnADTO qna : questionAndAnswerList) {
+					if ("IMAGE".equals(qna.getFieldType()) && qna.getAnswerContent() instanceof String) {
+						String imageJsonString = (String) qna.getAnswerContent();
+						List<ApplicationResponseDTO.ApplicationFilePreViewDTO> imageFiles = objectMapper.readValue(
+							imageJsonString,
+							new TypeReference<List<ApplicationResponseDTO.ApplicationFilePreViewDTO>>() {}
+						);
+						qna.setAnswerContent(imageFiles); // 기존 문자열을 파싱된 객체 리스트로 교체
+					}
+				}
+			}
+		} catch (JsonProcessingException e) {
+			throw new GeneralException(ErrorStatus.APPLICATION_PARSING_ERROR);
+		}
+
+		return ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO.builder()
+			.title(jobPost.getTitle())
+			.address(jobPost.getAddress())
+			.detailAddress(jobPost.getDetailAddress())
+			.roadAddress(jobPost.getRoadAddress())
+			.zipcode(jobPost.getZipcode())
+			.hourlyWage(jobPost.getHourlyWage())
+			.monthlySalary(jobPost.getMonthlySalary())
+			.yearSalary(jobPost.getYearSalary())
+			.description(jobPost.getDescription())
+			.workingTime(jobPost.getWorkingTime())
+			.deadline(jobPost.getDeadline())
+			.recruitCount(jobPost.getRecruitCount())
+			.note(jobPost.getNote())
+			.images(images)
+			.travelTime(travelTime)
+			.questionAndAnswerList(questionAndAnswerList)
+			.build();
+	}
+
 }
