@@ -52,9 +52,11 @@ public class FormFieldConverter {
 //	}
 
 
-	private static final Set<String> ANSWER_REQUIRED_FIELDS = Set.of("성함", "거주지", "연세", "전화번호");
 
 	public static FormFieldResponseDTO.FormFieldPreview toFormFieldPreview(FormField field, Map<String, String> answers) {
+
+		final Set<String> ANSWER_REQUIRED_FIELDS = Set.of("성함", "거주지", "연세", "전화번호");
+
 		String fieldName = field.getFieldName();
 
 		if (ANSWER_REQUIRED_FIELDS.contains(fieldName)) {
@@ -71,5 +73,15 @@ public class FormFieldConverter {
 				.fieldType(field.getFieldType())
 				.build();
 		}
+	}
+	public static FormFieldResponseDTO.FormFieldPreViewWithAnswerListDTO toFormFieldPreViewWithAnswerListDTO(List<FormField> formFieldList, Map<String, String> formFieldAnswerMap) {
+
+		List<FormFieldResponseDTO.FormFieldPreview> formFieldPreViewWithAnswerListDTO = formFieldList.stream()
+			.map(field -> FormFieldConverter.toFormFieldPreview(field, formFieldAnswerMap))
+			.toList();
+
+		return FormFieldResponseDTO.FormFieldPreViewWithAnswerListDTO.builder()
+			.formFieldList(formFieldPreViewWithAnswerListDTO)
+			.build();
 	}
 }

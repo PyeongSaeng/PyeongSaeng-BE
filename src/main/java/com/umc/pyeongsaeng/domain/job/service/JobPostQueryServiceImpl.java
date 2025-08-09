@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -103,7 +102,7 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 	}
 
 	@Override
-	public List<FormFieldResponseDTO.FormFieldPreview> getFormFieldListDirect(Long jobPostId, User senior) {
+	public FormFieldResponseDTO.FormFieldPreViewWithAnswerListDTO getFormFieldListDirect(Long jobPostId, User senior) {
 
 		JobPost jobPost = jobPostRepository.findById(jobPostId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
@@ -120,9 +119,7 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 			Map.entry("전화번호", seniorProfile.getPhoneNum())
 		);
 
-		return formFieldList.stream()
-			.map(field -> FormFieldConverter.toFormFieldPreview(field, formFieldAnswerMap))
-			.collect(Collectors.toList());
+		return FormFieldConverter.toFormFieldPreViewWithAnswerListDTO(formFieldList, formFieldAnswerMap);
 
 	}
 

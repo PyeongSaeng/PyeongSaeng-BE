@@ -23,8 +23,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Tag(name = "채용 API", description = "채용공고 관련 API")
 @RequestMapping("/api/job")
 @RestController
@@ -452,7 +450,7 @@ public class JobPostController {
 		)
 	})
 	@GetMapping("/{jobPostId}/questions/direct")
-	public ApiResponse<List<FormFieldResponseDTO.FormFieldPreview>> getJobPostQuestions(
+	public ApiResponse<FormFieldResponseDTO.FormFieldPreViewWithAnswerListDTO> getJobPostQuestions(
 		@Parameter(name = "jobPostId", description = "채용공고 ID", example = "1") @PathVariable(name = "jobPostId") Long jobPostId,
 		@AuthenticationPrincipal CustomUserDetails customUserDetails) {
 

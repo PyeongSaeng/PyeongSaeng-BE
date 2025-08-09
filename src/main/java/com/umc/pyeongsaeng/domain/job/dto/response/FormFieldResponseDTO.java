@@ -49,7 +49,7 @@ public class FormFieldResponseDTO {
 	@Builder
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class FormFieldPreViewListWithAnswerDTO {
+	public static class FormFieldPreViewWithAnswerListDTO {
 		List<FormFieldResponseDTO.FormFieldPreview> formFieldList;
 
 	}
