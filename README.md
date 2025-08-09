@@ -96,7 +96,7 @@
 ---
 
 ## 📖 API 명세서
-- [📗 평생 백엔드 스웨거](https://api.pyeongsaeng.site/swagger-ui/index.html#/)  /  [🔍 API 명세 WIKI](https://github.com/PyeongSaeng/PyeongSaeng-BE/wiki/1.-API-%EB%AA%85%EC%84%B8%EC%84%9C)
+- [📗 평생 백엔드 스웨거](https://api.pyeongsaeng.site/swagger-ui/index.html#/)  /  [🔍 API 명세서 WIKI](https://github.com/PyeongSaeng/PyeongSaeng-BE/wiki/1.-API-%EB%AA%85%EC%84%B8%EC%84%9C)
 - [🔍 기능 테스트 WIKI](https://github.com/PyeongSaeng/PyeongSaeng-BE/wiki/2.-%EA%B8%B0%EB%8A%A5-%ED%85%8C%EC%8A%A4%ED%8A%B8)
 
 ---
