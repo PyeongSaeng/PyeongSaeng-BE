@@ -29,18 +29,18 @@
       <td><img src="https://avatars.githubusercontent.com/wlgusqkr" alt="박지현님 사진"></td>
       <td><img src="https://avatars.githubusercontent.com/leewatertrue" alt="이수진 사진"></td>
       <td><img src="https://avatars.githubusercontent.com/songhee9327" alt="안송희님 사진"></td>
-      <td><img src="https://avatars.githubusercontent.com/odds2698" alt="김우진님 사진"></td>
+      <td><img src="https://avatars.githubusercontent.com/zzaengee" alt="김우진님 사진"></td>
     </tr>
     <tr>
       <td><a href="https://github.com/wlgusqkr">@wlgusqkr</a></td>
       <td><a href="https://github.com/leewatertrue">@leewatertrue</a></td>
-      <td><a href="https://github.com/songhee9327">@songhee9327</a></td>
-      <td><a href="https://github.com/odds2698">@odds2698</td>
+      <td><a href="https://github.com/songhee9327">@soooii</a></td>
+      <td><a href="https://github.com/zzaengee">@zzaengee</td>
     </tr>
     <tr>
       <td>기업-[홈 화면]<br>기업-[신청서 입력 플로우]<br>기업-[받은 신청서 플로우]<br>개인-[일자리 신청 플로우]</td>
       <td>개인-[로그인/회원가입 플로우]<br>기업-[로그인/회원가입 플로우]<br>개인-[내 정보 플로우]<br>기업-[내 기업 정보 플로우]</td>
-      <td>개인-[일자리 추천 및<br>저장 플로우]에서 조회 기능<br>개인-[추가 질문 답변]<br>개인-[일자리 추천 및 저장함<br>신청함 플로우]</td>
+      <td>개인-[일자리 추천 및<br>저장 플로우]에서 조회 기능<br>개인-[추가 질문 답변]<br>개인-[일자리 추천 및 저장함<br>신청함 플로우]<br>[채용 공고 검색] 기능</td>
       <td>개인-[일자리 추천 및<br>저장 플로우]<br>일자리 신청 플로우에서 AI를 통해 질문 만들기</td>
     </tr>
   </tbody>
@@ -87,19 +87,24 @@
 ---
 ## 🏗 서버 아키텍처
 <div align="center">
-  <img src="https://i.postimg.cc/25pGJ5XY/2-drawio.png">
+  <a href="https://github.com/PyeongSaeng/PyeongSaeng-BE/wiki/4.-%EC%8B%9C%EC%8A%A4%ED%85%9C-%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98">
+    <strong><big>🔍 아키텍처 WIKI 바로가기</big></strong><br>
+    <img src="https://i.postimg.cc/25pGJ5XY/2-drawio.png">
+  </a>
 </div>
 
 ---
 
 ## 📖 API 명세서
-- **Swagger 문서 링크**: https://api.pyeongsaeng.site/swagger-ui/index.html#/
-
-### API 엔드포인트
-[협의 필요]
+- [📗 평생 백엔드 스웨거](https://api.pyeongsaeng.site/swagger-ui/index.html#/)  /  [🔍 API 명세 WIKI](https://github.com/PyeongSaeng/PyeongSaeng-BE/wiki/1.-API-%EB%AA%85%EC%84%B8%EC%84%9C)
+- [🔍 기능 테스트 WIKI](https://github.com/PyeongSaeng/PyeongSaeng-BE/wiki/2.-%EA%B8%B0%EB%8A%A5-%ED%85%8C%EC%8A%A4%ED%8A%B8)
 
 ---
+## 🚀 성능 개선
+- [🔍 성능 개선 WIKI](https://github.com/PyeongSaeng/PyeongSaeng-BE/wiki/5.-%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0)
+---
 ## 🌳 브랜치 전략 및 컨벤션
+- [🔍 코드 컨벤션 WIKI](https://github.com/PyeongSaeng/PyeongSaeng-BE/wiki/3.-%EC%BD%94%EB%93%9C-%EC%BB%A8%EB%B2%A4%EC%85%98)
 
 > ### Git 브랜치 전략
 > **Git Flow** 전략을 사용하였습니다.
