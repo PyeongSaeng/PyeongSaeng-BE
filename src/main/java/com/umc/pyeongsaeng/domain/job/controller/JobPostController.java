@@ -538,7 +538,7 @@ public class JobPostController {
 		return ApiResponse.onSuccess(jobPostId);
 	}
 
-	@Operation(summary = "시니어가 채용공고 상세 조회 API", description = "특정 채용공고를 클릭했을 때, 해당 공고의 상세 정보를 조회하는 API입니다.")
+	@Operation(summary = "[시니어] - 시니어가 채용공고 상세 조회 API", description = "특정 채용공고를 클릭했을 때, 해당 공고의 상세 정보를 조회하는 API입니다.")
 	@ApiResponses(value = {
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(
 			responseCode = "200",
@@ -610,5 +610,12 @@ public class JobPostController {
 		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails){
 		return ApiResponse.onSuccess(jobPostQueryService.getJobPostDetail(jobPostId, userDetails.getUser().getId()));
 	}
+
+	@Operation(summary = "[보호자] - 보호자가 특정 시니어 지원 채용공고 상세 조회", description = "보호자가 연결된 시니어의 ID와 채용공고 ID를 기반으로  채용공고 상세 정보를 조회합니다.")
+	@GetMapping("/protector/seniors/{seniorId}/posts/{jobPostId}")
+	public ApiResponse<JobPostResponseDTO.JobPostDetailDTO> getJobPostDetailForProtector(@PathVariable Long seniorId, @PathVariable Long jobPostId) {
+		return ApiResponse.onSuccess(jobPostQueryService.getJobPostDetail(jobPostId, seniorId));
+	}
+
 
 }

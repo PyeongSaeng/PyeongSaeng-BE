@@ -214,4 +214,12 @@ public class ApplicationConverter {
 			.build();
 	}
 
+	public ApplicationResponseDTO.ApplicationJobPostStatusDTO toJobPostStatusDTO(Application application) {
+		return ApplicationResponseDTO.ApplicationJobPostStatusDTO.builder()
+			.applicationId(application.getId())
+			.jobPostId(application.getJobPost().getId())
+			.applicationStatus(application.getApplicationStatus())
+			.build();
+	}
+
 }

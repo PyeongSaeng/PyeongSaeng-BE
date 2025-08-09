@@ -17,4 +17,6 @@ public interface SeniorProfileRepository extends JpaRepository<SeniorProfile, Lo
 	Optional<SeniorProfile> findBySeniorId(Long seniorId);
 	List<SeniorProfile> findByProtectorId(Long protectorId);
 	boolean existsBySeniorIdAndProtectorId(Long seniorId, Long protectorId);
+
+	List<SeniorProfile> findByProtector_Id(Long protectorId);
 }

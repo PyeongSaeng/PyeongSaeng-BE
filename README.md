@@ -34,7 +34,7 @@
     <tr>
       <td><a href="https://github.com/wlgusqkr">@wlgusqkr</a></td>
       <td><a href="https://github.com/leewatertrue">@leewatertrue</a></td>
-      <td><a href="https://github.com/songhee9327">@soooii</a></td>
+      <td><a href="https://github.com/soooii">@soooii</a></td>
       <td><a href="https://github.com/zzaengee">@zzaengee</td>
     </tr>
     <tr>
