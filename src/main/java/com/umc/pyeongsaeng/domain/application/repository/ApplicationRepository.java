@@ -15,7 +15,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long>,
 	void deleteBySeniorId(Long seniorId);
 	Page<Application> findAllByJobPostAndApplicationStatusNot(JobPost jobPost, ApplicationStatus status, Pageable pageable);
 
-
 	long countByJobPostId(Long jobPostId);
 
 	// 특정 채용공고에 대한 지원서 조회

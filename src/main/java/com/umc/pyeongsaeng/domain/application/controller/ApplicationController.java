@@ -161,8 +161,8 @@ public class ApplicationController {
 		return ApiResponse.onSuccess(ApplicationConverter.toApplicationStateResponseDTO(updatedApplication));
 	}
 
-	@PostMapping("")
-	@Operation(summary = "사용자 지원서 최종 제출 or 임시저장 API", description = "사용자가 특정 채용 공고에 지원서를 제출하는 API입니다.")
+	@PostMapping("/delegate")
+	@Operation(summary = "사용자 지원서 대리로 최종 제출 or 임시저장 API", description = "대리자가 사용자의 특정 채용 공고에 지원서를 제출하는 API입니다.")
 	@ApiResponses({
 		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class), examples = @ExampleObject(value =
 			"{\n" +
@@ -203,15 +203,68 @@ public class ApplicationController {
 			"    \"result\": null\n" +
 			"}")))
 	})
-	public ApiResponse<ApplicationResponseDTO.RegistrationResultDTO> registerUserApplication(
+	public ApiResponse<ApplicationResponseDTO.RegistrationResultDTO> registerUserApplicationByDelegate(
 		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
 		@io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "지원서 제출 요청 DTO",
             required = true
         )
-		@RequestBody @Valid ApplicationRequestDTO.RegistrationRequestDTO requestDTO) {
-		return ApiResponse.onSuccess(applicationCommandService.createApplication(requestDTO, userDetails.getUser()));
+		@RequestBody @Valid ApplicationRequestDTO.DelegateRegistrationRequestDTO requestDTO) {
+		return ApiResponse.onSuccess(applicationCommandService.createDelegateApplication(requestDTO, userDetails.getUser()));
 	}
+
+	@PostMapping("/direct")
+	@Operation(summary = "사용자 지원서 직접 최종 제출 or 임시저장 API 직접", description = "사용자가 특정 채용 공고에 직접 지원서를 제출하는 API입니다.")
+	@ApiResponses({
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class), examples = @ExampleObject(value =
+			"{\n" +
+				"    \"isSuccess\": true,\n" +
+				"    \"code\": \"COMMON200\",\n" +
+				"    \"message\": \"성공입니다.\",\n" +
+				"    \"result\": {\n" +
+				"        \"applicationId\": 1,\n" +
+				"        \"jobPostId\": 1,\n" +
+				"        \"applicationStatus\": \"SUBMITTED\",\n" +
+				"        \"createdAt\": \"2025-08-03T15:00:00\",\n" +
+				"        \"answers\": [\n" +
+				"            {\n" +
+				"                \"fieldType\": \"TEXT\",\n" +
+				"                \"formFieldId\": 1,\n" +
+				"                \"formFieldName\": \"성함\",\n" +
+				"                \"answer\": \"김시니어\"\n" +
+				"            },\n" +
+				"            {\n" +
+				"                \"fieldType\": \"IMAGE\",\n" +
+				"                \"formFieldId\": 2,\n" +
+				"                \"formFieldName\": \"경력 증명서\",\n" +
+				"                \"answer\": [\n" +
+				"                    {\n" +
+				"                        \"keyName\": \"a1b2c3d4\",\n" +
+				"                        \"originalFileName\": \"career_certificate.png\"\n" +
+				"                    }\n" +
+				"                ]\n" +
+				"            }\n" +
+				"        ]\n" +
+				"    }\n" +
+				"}"))),
+		@io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "존재하지 않는 공고 또는 사용자", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class), examples = @ExampleObject(value =
+			"{\n" +
+				"    \"isSuccess\": false,\n" +
+				"    \"code\": \"JOB_POST_NOT_FOUND\",\n" +
+				"    \"message\": \"해당하는 공고를 찾을 수 없습니다.\",\n" +
+				"    \"result\": null\n" +
+				"}")))
+	})
+	public ApiResponse<ApplicationResponseDTO.RegistrationResultDTO> registerUserApplicationDirect(
+		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails,
+		@io.swagger.v3.oas.annotations.parameters.RequestBody(
+			description = "지원서 제출 요청 DTO",
+			required = true
+		)
+		@RequestBody @Valid ApplicationRequestDTO.DirectRegistrationRequestDTO requestDTO) {
+		return ApiResponse.onSuccess(applicationCommandService.createDirectApplication(requestDTO, userDetails.getUser()));
+	}
+
 
 	@PutMapping("/{applicationId}")
 	@Operation(summary = "사용자 지원서 임시 저장 -> 최종 제출로 변경", description = "사용자가 임시 저장했던 지원서를 최종 제출로 변경하는 API")
@@ -266,6 +319,25 @@ public class ApplicationController {
 		return ApiResponse.onSuccess(applicationCommandService.updateTmpApplicationToFinalApplication(requestDTO, applicationId, userDetails.getUser()));
 	}
 
+	@Operation(summary = "사용자가 자신이 작성한 제출된 지원서를 조회", description = "마이페이지에서 사용자가 자신이 작성한 제출된 지원서를 조회합니다.")
+	@GetMapping("/me/submitted")
+	public ApiResponse<ApplicationResponseDTO.SubmittedApplicationResponseListDTO> getSubmittedApplication(
+		@AuthenticationPrincipal CustomUserDetails customUserDetails,
+		@PageNumber Integer page
+	) {
+		Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> submittedApplicationResponseDTOList = applicationQueryService.getSubmittedApplication(customUserDetails.getUser(), page);
+
+		return ApiResponse.onSuccess(ApplicationConverter.toSubmittedApplicationResponseListDTO(submittedApplicationResponseDTOList));
+	}
+
+	@Operation(summary = "사용자가 자신이 작성한 제출된 지원서 하나를 상세조회", description = "마이페이지에서 사용자가 자신이 작성한 제출된 지원서하나를 상세 조회합니다.")
+	@GetMapping("/me/details/{applicationId}")
+	public ApiResponse<ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO> getSubmittedApplicationDetails(
+		@PathVariable Long applicationId,
+		@AuthenticationPrincipal CustomUserDetails customUserDetails
+	) {
+		return ApiResponse.onSuccess(applicationQueryService.getSubmittedApplicationDetails(applicationId, customUserDetails.getId()));
+	}
 
 	@Operation(summary = "[시니어] 일자리 신청함 - 목록 조회", description = "로그인한 본인의 신청함을 조회합니다. 각 신청서에 해당하는 채용공고는 시니어 채용공고 상세 조회 API를 이용해주세요. NON_STARTED(작성 전), DRAFT(임시저장) 신청서 기준")
 	@GetMapping("/mine")
@@ -295,8 +367,5 @@ public class ApplicationController {
 		Long protectorId = userDetails.getUser().getId();
 		return ApiResponse.onSuccess(applicationQueryService.getProtectorApplications(protectorId));
 	}
-
-
-
 
 }

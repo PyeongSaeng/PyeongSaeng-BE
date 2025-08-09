@@ -5,9 +5,11 @@ import java.util.List;
 import com.umc.pyeongsaeng.domain.job.search.enums.JobSortType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 @Schema(description = "채용공고 검색 요청 DTO")
 public class JobSearchRequest {
 

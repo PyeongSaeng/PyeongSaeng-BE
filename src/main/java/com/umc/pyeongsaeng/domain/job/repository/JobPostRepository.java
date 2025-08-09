@@ -9,8 +9,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface JobPostRepository extends JpaRepository<JobPost, Long> {
-	Page<JobPost> findAllByCompany(Company company, PageRequest pageRequest);
+	Optional<JobPost> findByApplicationsId(Long jobPostId);
+
 	void deleteByCompanyId(Long companyId);
 
 	@Query("SELECT jp FROM JobPost jp WHERE jp.company = :company AND (jp.deadline > CURRENT_TIMESTAMP AND jp.state = 'RECRUITING')")

@@ -3,16 +3,19 @@ package com.umc.pyeongsaeng.domain.application.service;
 import java.util.List;
 
 import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDTO;
-import org.springframework.data.domain.Page;
-
 import com.umc.pyeongsaeng.domain.application.entity.Application;
-import com.umc.pyeongsaeng.domain.application.enums.ApplicationStatus;
+import com.umc.pyeongsaeng.domain.user.entity.User;
+import org.springframework.data.domain.Page;
 
 public interface ApplicationQueryService {
 
 	Page<Application> findCompanyApplications(Long jobPostId,Integer page);
 
 	ApplicationResponseDTO.ApplicationQnADetailPreViewDTO getApplicationQnADetail(Long applicationId);
+
+	Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> getSubmittedApplication(User seniorId, Integer page);
+
+	ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO getSubmittedApplicationDetails(Long applicationId, Long userId);
 
 	/**
 	 * 특정 시니어(본인)의 신청함 목록을 조회합니다.
@@ -37,5 +40,4 @@ public interface ApplicationQueryService {
 	 * @return 연결된 시니어들의 신청서 목록 DTO 리스트
 	 */
 	List<ApplicationResponseDTO.ProtectorApplicationJobPostDTO> getProtectorApplications(Long protectorId);
-
 }

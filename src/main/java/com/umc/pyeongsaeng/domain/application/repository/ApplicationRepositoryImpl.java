@@ -1,17 +1,29 @@
 package com.umc.pyeongsaeng.domain.application.repository;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.umc.pyeongsaeng.domain.application.entity.Application;
+import com.umc.pyeongsaeng.domain.application.enums.ApplicationStatus;
+import com.umc.pyeongsaeng.domain.user.entity.User;
 import jakarta.persistence.EntityManager;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+import static com.umc.pyeongsaeng.domain.application.entity.QApplication.application;
+import static com.umc.pyeongsaeng.domain.job.entity.QJobPost.jobPost;
+import static com.umc.pyeongsaeng.domain.job.entity.QJobPostImage.jobPostImage;
+
 @Repository
 @RequiredArgsConstructor
 public class ApplicationRepositoryImpl implements ApplicationRepositoryCustom {
 
+	private final JPAQueryFactory queryFactory;
 	private final EntityManager em;
 
 	@Getter
@@ -47,7 +59,7 @@ public class ApplicationRepositoryImpl implements ApplicationRepositoryCustom {
 			"                                 'originalFileName', af.original_file_name " +
 			"                             ) " +
 			"                             ) AS CHAR) " +
-			"                     FROM application_file af " +
+			"                     FROM application_answer_file af " +
 			"                     WHERE af.application_answer_id = ans.id) " +
 			"                ELSE " +
 			"                    ans.answer_text " +
@@ -67,22 +79,43 @@ public class ApplicationRepositoryImpl implements ApplicationRepositoryCustom {
 			"GROUP BY " +
 			"    app.id, jp.id";
 
-		// EntityManager를 사용하여 네이티브 쿼리를 실행하고, 결과를 Object 배열의 리스트로 받습니다.
-		@SuppressWarnings("unchecked") // 네이티브 쿼리 결과는 타입 캐스팅이 필요하므로 경고를 무시합니다.
+		@SuppressWarnings("unchecked")
 		List<Object[]> resultList = em.createNativeQuery(sql)
 			.setParameter(1, applicationId)
 			.getResultList();
 
-		// 결과가 없으면 빈 Optional을 반환
 		if (resultList.isEmpty()) {
 			return Optional.empty();
 		}
 
-		// 첫 번째 결과(Object 배열)를 가져옵니다.
 		Object[] result = resultList.get(0);
 
 		ApplicationDetailView detailView = new ApplicationDetailViewImpl(result);
 
 		return Optional.of(detailView);
+	}
+
+	@Override
+	public Page<Application> findApplicationsWithDetails(User senior, Pageable pageable) {
+
+		List<Application> content = queryFactory
+			.selectFrom(application).distinct()
+			.join(application.jobPost, jobPost).fetchJoin()
+			.leftJoin(jobPost.images, jobPostImage).fetchJoin()
+			.where(application.senior.eq(senior)
+				.and(application.applicationStatus.ne(ApplicationStatus.DRAFT)))
+			.offset(pageable.getOffset())
+			.limit(pageable.getPageSize())
+			.orderBy(application.createdAt.desc())
+			.fetch();
+
+		Long total = queryFactory
+			.select(application.count())
+			.from(application)
+			.where(application.senior.eq(senior)
+				.and(application.applicationStatus.ne(ApplicationStatus.DRAFT)))
+			.fetchOne();
+
+		return new PageImpl<>(content, pageable, total);
 	}
 }

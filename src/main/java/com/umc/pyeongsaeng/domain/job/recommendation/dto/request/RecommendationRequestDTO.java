@@ -6,6 +6,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RecommendationRequest {
+public class RecommendationRequestDTO {
 	private Long userId;
 }
