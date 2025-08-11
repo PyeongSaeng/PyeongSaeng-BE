@@ -48,9 +48,9 @@ public interface ApplicationCommandService  {
 	 *
 	 * @param jobPostId   신청할 채용공고 ID
 	 * @param userDetails 인증 사용자 정보(시니어)
-	 * @return 생성되었거나(또는 존재하던) Application 엔티티
+	 * @return updated 여부
 	 */
-	Application createIfNotExists(Long jobPostId, CustomUserDetails userDetails);
+	boolean createIfNotExists(Long jobPostId, CustomUserDetails userDetails);
 
 	/**
 	 * 본인(시니어)가 특정 지원서를 삭제합니다.

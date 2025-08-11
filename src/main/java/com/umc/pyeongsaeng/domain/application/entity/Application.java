@@ -45,4 +45,8 @@ public class Application extends BaseEntity {
 	@OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ApplicationAnswer> applicationAnswers = new ArrayList<>();
 
+	public void refreshUpdatedAt() {
+		updateTimestamp();
+	}
+
 }

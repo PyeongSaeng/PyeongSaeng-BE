@@ -18,7 +18,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long>,
 	long countByJobPostId(Long jobPostId);
 
 	// 특정 채용공고에 대한 지원서 조회
-	Optional<Application> findByJobPostIdAndSeniorId(Long jobPostId, Long seniorId);
+	Optional<Application> findByJobPost_IdAndSenior_Id(Long jobPostId, Long seniorId);
 
 	// 특정 유저에 대한 모든 채용공고 조회
 	List<Application> findAllBySeniorIdAndApplicationStatusInOrderByUpdatedAtDesc(
