@@ -43,6 +43,8 @@ public class JobPostResponseDTO {
 		Long id;
 		JobPostState state;
 		String title;
+		String roadAddress;
+		String description;
 		List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> images;
 	}
 

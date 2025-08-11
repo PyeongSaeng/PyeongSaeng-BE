@@ -109,6 +109,8 @@ public class JobPostConverter {
 			.id(jobPost.getId())
 			.state(jobPost.getState())
 			.title(jobPost.getTitle())
+			.description(jobPost.getDescription())
+			.roadAddress(jobPost.getRoadAddress())
 			.images(images)
 			.build();
 	}
