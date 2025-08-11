@@ -21,7 +21,7 @@ public class BookmarkQueryServiceImpl implements BookmarkQueryService {
 
 	@Override
 	public BookmarkSummaryListDTO getBookmarkSummaryList(Long seniorProfileId) {
-		List<Bookmark> bookmarks = bookmarkRepository.findAllBySeniorProfile_SeniorId(seniorProfileId);
+		List<Bookmark> bookmarks = bookmarkRepository.findAllBySeniorProfile_SeniorIdOrderByUpdatedAtDesc(seniorProfileId);;
 
 		List<BookmarkSummaryDTO> bookmarkSummaryDTOList = bookmarkConverter.toSummaryDTOList(bookmarks, seniorProfileId);
 

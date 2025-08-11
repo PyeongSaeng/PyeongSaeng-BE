@@ -25,20 +25,35 @@ public class BookmarkCommandServiceImpl implements BookmarkCommandService {
 	private final SeniorProfileRepository seniorProfileRepository;
 
 	@Override
-	public CreatedBookmarkDTO createBookmark(Long JobPostId, Long seniorProfileId) {
-		JobPost jobPost = jobPostRepository.findById(JobPostId).orElseThrow(()-> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
+	public CreatedBookmarkDTO createBookmark(Long jobPostId, Long seniorProfileId) {
+		JobPost jobPost = jobPostRepository.findById(jobPostId).orElseThrow(()-> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
 		SeniorProfile seniorProfile = seniorProfileRepository.findBySeniorId(seniorProfileId).orElseThrow(()->new GeneralException(ErrorStatus.SENIOR_PROFILE_NOT_FOUND));
+
+		Optional<Bookmark> existing = bookmarkRepository.findByJobPost_IdAndSeniorProfile_SeniorId(jobPostId, seniorProfileId);
+
+		if (existing.isPresent()) {
+			Bookmark bookmark = existing.get();
+			bookmark.refreshUpdatedAt();
+			bookmarkRepository.save(bookmark);
+			return CreatedBookmarkDTO.builder()
+				.bookmarkId(bookmark.getId())
+				.updated(true)
+				.build();
+		}
 
 		Bookmark bookmark = Bookmark.builder().jobPost(jobPost).seniorProfile(seniorProfile).build();
 
 		bookmarkRepository.save(bookmark);
-		return new CreatedBookmarkDTO(bookmark.getId());
+		return CreatedBookmarkDTO.builder()
+			.bookmarkId(bookmark.getId())
+			.updated(false)
+			.build();
 	}
 
 	@Override
 	@Transactional
 	public void deleteBookmark(Long jobPostId, Long seniorProfileId) {
-		Optional<Bookmark> bookmarkOptional = bookmarkRepository.findByJobPostIdAndSeniorProfile_SeniorId(jobPostId, seniorProfileId);
+		Optional<Bookmark> bookmarkOptional = bookmarkRepository.findByJobPost_IdAndSeniorProfile_SeniorId(jobPostId, seniorProfileId);
 
 		if (bookmarkOptional.isPresent()) {
 			bookmarkRepository.delete(bookmarkOptional.get());

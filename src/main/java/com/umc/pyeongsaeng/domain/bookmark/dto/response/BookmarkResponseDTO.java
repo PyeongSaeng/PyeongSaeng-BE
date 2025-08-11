@@ -20,6 +20,7 @@ public class BookmarkResponseDTO {
 	@Builder
 	public static class CreatedBookmarkDTO {
 		private Long bookmarkId;
+		private boolean updated;
 	}
 
 	/**

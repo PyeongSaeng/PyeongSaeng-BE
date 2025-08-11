@@ -11,7 +11,7 @@ import com.umc.pyeongsaeng.domain.bookmark.entity.Bookmark;
 
 @Repository
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
-	List<Bookmark> findAllBySeniorProfile_SeniorId(Long seniorId);
-	Optional<Bookmark> findByJobPostIdAndSeniorProfile_SeniorId(Long jobPostId, Long seniorProfileId);
+	List<Bookmark> findAllBySeniorProfile_SeniorIdOrderByUpdatedAtDesc(Long seniorProfileId);
+	Optional<Bookmark> findByJobPost_IdAndSeniorProfile_SeniorId(Long jobPostId, Long seniorProfileId);
 
 }
