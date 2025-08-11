@@ -476,7 +476,7 @@ public class JobPostController {
 						  "result": {
 						    "formFieldList": [
 						      {
-						        "formField": "이름",
+						        "formField": "이름",1
 						        "fieldType": "TEXT",
 						        "answer": "김시니어"
 						      },
