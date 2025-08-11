@@ -17,11 +17,13 @@ import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
 import com.umc.pyeongsaeng.global.security.CustomUserDetails;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/bookmarks")
 @RequiredArgsConstructor
+@Tag(name = "북마크 API", description = "채용공고 북마크 관련 API")
 public class BookmarkController {
 
 	private final BookmarkCommandService bookmarkCommandService;
