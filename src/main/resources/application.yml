@@ -1,7 +1,6 @@
 spring:
   profiles:
     active: local
-    #default: local
 
   config:
     import: optional:file:.env[.properties]
