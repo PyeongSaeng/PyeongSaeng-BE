@@ -345,18 +345,19 @@ public class ApplicationController {
 		return ApiResponse.onSuccess(applicationQueryService.getApplicationsForSenior(userDetails.getUser().getId()));
 	}
 
-	@Operation(summary = "[시니어] 일자리 저장함 - 신청 버튼", description = " 추천/상세 화면에서 '신청' 클릭 시 호출합니다. 해당 채용공고에 대한 신청이 없으면 NON_STARTED(작성 전) 상태로 생성합니다. 생성만 하고 끝나며, 목록은 /applications/mine에서 별도 조회하세요.")
+	@Operation(summary = "[시니어] 추천/상세페이지 신청 버튼 + 일자리 저장함 - 보호자 신청 버튼", description = " 추천/상세 화면에서 '신청' 클릭 시 호출합니다. 해당 채용공고에 대한 신청이 없으면 NON_STARTED(작성 전) 상태로 생성합니다. 생성만 하고 끝나며, 목록은 /applications/mine에서 별도 조회하세요.")
 	@PostMapping("/ensure")
-	public ApiResponse<Long> ensureApplication(@Parameter(description = "신청할 채용공고 ID", example = "1") @RequestParam Long jobPostId, @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
-		Long applicationId = applicationCommandService.createIfNotExists(jobPostId, userDetails).getId();
-		return ApiResponse.of(SuccessStatus.APPLICATION_NON_STARTED_CREATED, applicationId);
+	public ApiResponse<Void> ensureApplication(@Parameter(description = "신청할 채용공고 ID", example = "1") @RequestParam Long jobPostId, @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+		boolean updated =  applicationCommandService.createIfNotExists(jobPostId, userDetails);
+		SuccessStatus status = updated ? SuccessStatus.APPLICATION_ALREADY_UPDATED : SuccessStatus.APPLICATION_NON_STARTED_CREATED;
+		return ApiResponse.of(status, null);
 	}
 
 	@Operation(summary = "[시니어] 일자리 신청함 - 신청 삭제", description = "본인 신청서를 삭제합니다.")
 	@DeleteMapping("/{applicationId}")
-	public ApiResponse<SuccessStatus> deleteApplication( @Parameter(description = "삭제할 신청서 ID", example = "1")@PathVariable Long applicationId, @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
+	public ApiResponse<Void> deleteApplication( @Parameter(description = "삭제할 신청서 ID", example = "1")@PathVariable Long applicationId, @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails) {
 		applicationCommandService.deleteApplication(applicationId, userDetails.getUser().getId());
-		return ApiResponse.onSuccess(SuccessStatus.APPLICATION_DELETED);
+		return ApiResponse.of(SuccessStatus.APPLICATION_DELETED, null);
 	}
 
 	@Operation(summary = "[보호자] 일자리 신청함 - 연결 시니어 신청함 목록 조회", description = "보호자 계정으로 로그인 시, 연결된 모든 시니어의 신청 목록을 조회합니다. 각 채용공고는 보호자 채용공고 상세조회 API에서 seniorId와 jobPostId를 전달해 호출하세요.")

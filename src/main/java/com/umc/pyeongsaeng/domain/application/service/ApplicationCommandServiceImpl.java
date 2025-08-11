@@ -255,31 +255,31 @@ public class ApplicationCommandServiceImpl implements ApplicationCommandService 
 	}
 
 	@Transactional
-	public Application createIfNotExists(Long jobPostId, CustomUserDetails userDetails) {
+	public boolean createIfNotExists(Long jobPostId, CustomUserDetails userDetails) {
 		Long seniorId = userDetails.getUser().getId();
 
-		// 이미 존재하는 Application 조회 (jobPostId + seniorId)
-		Optional<Application> existingApplication = applicationRepository.findByJobPostIdAndSeniorId(jobPostId, seniorId);
+		Optional<Application> existingApplication = applicationRepository.findByJobPost_IdAndSenior_Id(jobPostId, seniorId);
 
 		if (existingApplication.isPresent()) {
-			Application app = existingApplication.get();
-			app.setUpdatedAt(LocalDateTime.now()); // 클릭 시 최신화
-			return applicationRepository.save(app);
+			Application application = existingApplication.get();
+			application.refreshUpdatedAt();
+			applicationRepository.save(application);
+			return true;
 		}
 
-		// JobPost 조회
 		JobPost jobPost = jobPostRepository.findById(jobPostId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
 
-		// 새 Application 생성
 		Application newApplication = Application.builder()
 			.jobPost(jobPost)
 			.senior(userDetails.getUser())
-			.applicationStatus(ApplicationStatus.NON_STARTED) // 작성 전 상태
+			.applicationStatus(ApplicationStatus.NON_STARTED)
 			.build();
 
-		return applicationRepository.save(newApplication);
+		applicationRepository.save(newApplication);
+		return false;
 	}
+
 
 	@Transactional
 	public void deleteApplication(Long applicationId, Long userId) {

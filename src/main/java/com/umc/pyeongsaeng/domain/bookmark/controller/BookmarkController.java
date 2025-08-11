@@ -17,21 +17,24 @@ import com.umc.pyeongsaeng.global.apiPayload.code.status.SuccessStatus;
 import com.umc.pyeongsaeng.global.security.CustomUserDetails;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/bookmarks")
 @RequiredArgsConstructor
+@Tag(name = "북마크 API", description = "채용공고 북마크 관련 API")
 public class BookmarkController {
 
 	private final BookmarkCommandService bookmarkCommandService;
 	private final BookmarkQueryService bookmarkQueryService;
 
-	// Todo - 이미 북마크한 채용공고 저장 클릭 시 처리 로직 추가 필요
 	@Operation(summary = "[시니어] 추천/상세 페이지- 채용공고 저장 버튼", description = "시니어 본인이 특정 채용공고를 북마크(저장)합니다.")
 	@PostMapping("/{jobPostId}")
 	public ApiResponse<CreatedBookmarkDTO> createBookmark(@PathVariable Long jobPostId, @AuthenticationPrincipal CustomUserDetails userDetails) {
-		return ApiResponse.onSuccess(bookmarkCommandService.createBookmark(jobPostId, userDetails.getId()));
+		CreatedBookmarkDTO bookmarkDTO = bookmarkCommandService.createBookmark(jobPostId, userDetails.getId());
+		SuccessStatus status = bookmarkDTO.isUpdated() ? SuccessStatus.BOOKMARK_ALREADY_UPDATED : SuccessStatus.BOOKMARK_CREATED;
+		return ApiResponse.of(status, bookmarkDTO);
 	}
 
 	@Operation(summary = "[시니어] 일자리 저장함 - 목록 조회", description = "시니어 본인 일자리 저장함(북마크) 목록을 조회합니다.")

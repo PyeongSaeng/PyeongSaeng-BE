@@ -37,9 +37,13 @@ public enum SuccessStatus implements BaseCode {
 	// Application
 	APPLICATION_NON_STARTED_CREATED(HttpStatus.OK, "APPLICATION201", "일자리 신청함에 저장되었습니다."),
 	APPLICATION_DELETED(HttpStatus.OK,"APPLICATION202", "일자리 신청함에서 지원서가 삭제되었습니다."),
+	APPLICATION_ALREADY_UPDATED(HttpStatus.OK, "APPLICATION203", "이미 신청한 채용공고입니다. 업데이트했습니다."),
 
 	// Bookmark
-	BOOKMARK_DELETED(HttpStatus.OK,"Bookmark201", "일자리 저장함에서 채용공고 북마크가 삭제되었습니다.");
+	BOOKMARK_DELETED(HttpStatus.OK,"BOOKMARK201", "일자리 저장함에서 채용공고 북마크가 삭제되었습니다."),
+	BOOKMARK_ALREADY_UPDATED(HttpStatus.OK, "BOOKMARK202", "이미 저장한 채용공고입니다. 업데이트했습니다."),
+	BOOKMARK_CREATED(HttpStatus.OK, "BOOKMARK203", "일자리 저장함에 북마크되었습니다.");
+
 
 	private final HttpStatus httpStatus;
 	private final String code;

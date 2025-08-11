@@ -35,6 +35,8 @@ public class Bookmark extends BaseEntity {
 	@JoinColumn(name="job_post_id", nullable = false)
 	private JobPost jobPost;
 
-
+	public void refreshUpdatedAt() {
+		updateTimestamp();
+	}
 
 }
