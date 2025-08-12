@@ -81,31 +81,17 @@ public class SeniorQuestionController {
 		return ApiResponse.of(SuccessStatus.SENIOR_QUESTION_ANSWER_SELECTED, null);
 	}
 
-	@Operation(summary = "추가 질문 생성", description = "여러 개의 추가 질문과 옵션들을 한 번에 생성합니다.",
+	@Operation(summary = "추가 질문 생성", description = "하나의 추가 질문과 해당 옵션들을 생성합니다.",
 		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
 			content = @Content(
 				schema = @Schema(implementation = SeniorQuestionRequestDTO.QuestionRequestDTO.class),
 				examples = @ExampleObject(
-					name = "추가 질문 리스트 예시",
+					name = "추가 질문 예시",
 					value = """
-					[
 					  {
 					    "question": "하루에 몇 시간 정도 일하고 싶으신가요?",
 					    "options": ["1시간 내외", "2시간 내외", "3시간 내외", "3시간 초과"]
-					  },
-					  {
-					    "question": "어디에서 일하는 것을 선호하시나요?",
-					    "options": ["실내", "실외"]
-					  },
-					  {
-					    "question": "일할 때 어떤 환경이 편하신가요?",
-					    "options": ["혼자서", "여럿이"]
-					  },
-					  {
-					    "question": "어떤 일을 할 때 가장 보람을 느끼시나요?",
-					    "options": ["환경 미화", "실내 청소", "조리", "아동 보호", "교육/강사"]
 					  }
-					]
 				"""
 				)
 			)
