@@ -164,6 +164,7 @@ public class ApplicationResponseDTO {
 		private Long applicationId;
 		private String title;
 		private LocalDate deadline;
+		private ApplicationStatus applicationStatus;
 		private List<ImagePreviewWithUrlDTO> images;
 	}
 
@@ -199,6 +200,7 @@ public class ApplicationResponseDTO {
 		private LocalDate deadline;
 		private Integer recruitCount;
 		private String note;
+		private ApplicationStatus applicationStatus;
 		private List<ApplicationResponseDTO.ImagePreviewWithUrlDTO> images;
 		private String travelTime;
 		List<ApplicationQnADTO> questionAndAnswerList;

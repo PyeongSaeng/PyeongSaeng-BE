@@ -103,7 +103,11 @@ public class ApplicationRepositoryImpl implements ApplicationRepositoryCustom {
 			.join(application.jobPost, jobPost).fetchJoin()
 			.leftJoin(jobPost.images, jobPostImage).fetchJoin()
 			.where(application.senior.eq(senior)
-				.and(application.applicationStatus.ne(ApplicationStatus.DRAFT)))
+				.and(application.applicationStatus.notIn(
+					ApplicationStatus.DRAFT,
+					ApplicationStatus.NON_STARTED
+				))
+			)
 			.offset(pageable.getOffset())
 			.limit(pageable.getPageSize())
 			.orderBy(application.createdAt.desc())
