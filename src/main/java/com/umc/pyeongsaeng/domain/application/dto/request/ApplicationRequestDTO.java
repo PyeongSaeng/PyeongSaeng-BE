@@ -39,11 +39,8 @@ public class ApplicationRequestDTO {
 	@Getter
 	@NoArgsConstructor
 	public static class DirectRegistrationRequestDTO {
-		@NotBlank
 		private Long jobPostId;
-		@NotBlank
 		private ApplicationStatus applicationStatus;
-		@NotBlank
 		private List<FieldAndAnswerDTO> fieldAndAnswer;
 	}
 
