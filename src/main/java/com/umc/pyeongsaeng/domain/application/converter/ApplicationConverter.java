@@ -143,6 +143,7 @@ public class ApplicationConverter {
 			.applicationId(application.getId())
 			.deadline(jobPost.getDeadline())
 			.title(jobPost.getTitle())
+			.applicationStatus(application.getApplicationStatus())
 			.images(images)
 			.build();
 	}
@@ -209,7 +210,6 @@ public class ApplicationConverter {
 			.recruitCount(jobPost.getRecruitCount())
 			.note(jobPost.getNote())
 			.images(images)
-			.travelTime(travelTime)
 			.questionAndAnswerList(questionAndAnswerList)
 			.build();
 	}
