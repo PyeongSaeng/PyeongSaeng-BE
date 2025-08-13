@@ -606,7 +606,7 @@ public class JobPostController {
 	@GetMapping("/posts/{jobPostId}")
 	public ApiResponse<JobPostResponseDTO.JobPostDetailDTO> getJobPostDetail(
 		@Parameter(name = "jobPostId", description = "조회할 채용공고 ID", example = "1")
-		@RequestParam Long jobPostId,
+		@PathVariable Long jobPostId,
 		@Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails userDetails){
 		return ApiResponse.onSuccess(jobPostQueryService.getJobPostDetail(jobPostId, userDetails.getUser().getId()));
 	}
