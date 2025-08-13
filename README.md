@@ -15,7 +15,8 @@
 ---
 
 ## 🚀 백엔드 팀원 소개
-<table>
+
+<table align="center">
   <thead>
     <tr>
       <th>박박지현/박지현</th>
@@ -26,22 +27,22 @@
   </thead>
   <tbody>
     <tr>
-      <td><img src="https://avatars.githubusercontent.com/wlgusqkr" alt="박지현님 사진"></td>
-      <td><img src="https://avatars.githubusercontent.com/leewatertrue" alt="이수진 사진"></td>
-      <td><img src="https://avatars.githubusercontent.com/songhee9327" alt="안송희님 사진"></td>
-      <td><img src="https://avatars.githubusercontent.com/zzaengee" alt="김우진님 사진"></td>
+      <td align="center"><img src="https://avatars.githubusercontent.com/wlgusqkr" alt="박지현님 사진" width="200" height="200"></td>
+      <td align="center"><img src="https://avatars.githubusercontent.com/leewatertrue" alt="이수진 사진" width="200" height="200"></td>
+      <td align="center"><img src="https://avatars.githubusercontent.com/soooii" alt="안송희님 사진" width="200" height="200"></td>
+      <td align="center"><img src="https://avatars.githubusercontent.com/zzaengee" alt="김우진님 사진" width="200" height="200"></td>
     </tr>
     <tr>
-      <td><a href="https://github.com/wlgusqkr">@wlgusqkr</a></td>
-      <td><a href="https://github.com/leewatertrue">@leewatertrue</a></td>
-      <td><a href="https://github.com/soooii">@soooii</a></td>
-      <td><a href="https://github.com/zzaengee">@zzaengee</td>
+      <td align="center"><a href="https://github.com/wlgusqkr">@wlgusqkr</a></td>
+      <td align="center"><a href="https://github.com/leewatertrue">@leewatertrue</a></td>
+      <td align="center"><a href="https://github.com/soooii">@soooii</a></td>
+      <td align="center"><a href="https://github.com/zzaengee">@zzaengee</a></td>
     </tr>
     <tr>
-      <td>기업-[홈 화면]<br>기업-[신청서 입력 플로우]<br>기업-[받은 신청서 플로우]<br>개인-[일자리 신청 플로우]</td>
-      <td>개인-[로그인/회원가입 플로우]<br>기업-[로그인/회원가입 플로우]<br>개인-[내 정보 플로우]<br>기업-[내 기업 정보 플로우]</td>
-      <td>개인-[일자리 추천 및<br>저장 플로우]에서 조회 기능<br>개인-[추가 질문 답변]<br>개인-[일자리 추천 및 저장함<br>신청함 플로우]<br>[채용 공고 검색] 기능</td>
-      <td>개인-[일자리 추천 및<br>저장 플로우]<br>일자리 신청 플로우에서 AI를 통해 질문 만들기</td>
+      <td align="center">기업-[홈 화면]<br>기업-[신청서 입력 플로우]<br>기업-[받은 신청서 플로우]<br>개인-[일자리 신청 플로우]<br>CICD 배포 (AWS)</td>
+      <td align="center">개인-[로그인/회원가입<br> 플로우] 기업-[로그인/<br>회원가입 플로우] <br>개인-[내 정보 플로우]<br>기업-[내 기업 정보 플로우]<br>토큰, SMS</td>
+      <td align="center">개인-[일자리 추천 및 저장<br>플로우]에서 조회 기능<br>개인-[추가 질문 답변]<br>개인-[일자리 추천 및 <br>저장함 신청함 플로우]<br>[채용 공고 검색] 기능</td>
+      <td align="center">개인-[일자리 추천 및<br>저장 플로우]<br>일자리 신청 플로우에서<br>AI를 통해 질문 만들기</td>
     </tr>
   </tbody>
 </table>
