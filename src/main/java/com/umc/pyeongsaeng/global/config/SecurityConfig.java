@@ -68,6 +68,7 @@ public class SecurityConfig {
 		configuration.addAllowedOrigin("http://localhost:5174");
 		configuration.addAllowedOrigin("http://localhost:5173");
 		configuration.addAllowedOrigin("https://api.pyeongsaeng.site");
+		configuration.addAllowedOrigin("https://pyeong-saeng-fe.vercel.app");
 		configuration.addAllowedMethod("*");
 		configuration.addAllowedHeader("*");
 		configuration.setAllowCredentials(true);
