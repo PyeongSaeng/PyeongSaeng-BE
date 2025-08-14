@@ -1,11 +1,11 @@
 package com.umc.pyeongsaeng.domain.application.service;
 
-import java.util.List;
-
 import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDTO;
 import com.umc.pyeongsaeng.domain.application.entity.Application;
 import com.umc.pyeongsaeng.domain.user.entity.User;
 import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 public interface ApplicationQueryService {
 
@@ -16,6 +16,8 @@ public interface ApplicationQueryService {
 	Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> getSubmittedApplication(User seniorId, Integer page);
 
 	ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO getSubmittedApplicationDetails(Long applicationId, Long userId);
+
+	Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> getSubmittedApplicationByProtector(Long seniorId, Integer page);
 
 	/**
 	 * 특정 시니어(본인)의 신청함 목록을 조회합니다.

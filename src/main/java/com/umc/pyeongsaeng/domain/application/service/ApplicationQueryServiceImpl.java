@@ -14,6 +14,7 @@ import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
 import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
 import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
 import com.umc.pyeongsaeng.domain.user.entity.User;
+import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import com.umc.pyeongsaeng.global.s3.dto.S3DTO;
@@ -32,6 +33,7 @@ import java.util.List;
 public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
 	private final ApplicationRepository applicationRepository;
+	private final UserRepository userRepository;
 	private final JobPostRepository jobPostRepository;
 	private final ApplicationConverter applicationConverter;
 	private final TravelTimeService travelTimeService;
@@ -59,6 +61,31 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
 	@Override
 	public Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> getSubmittedApplication(User senior, Integer page) {
+
+		Page<Application> applicationPage = applicationRepository.findApplicationsWithDetails(senior, PageRequest.of(page, 10));
+
+		Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> resultApplication = applicationPage.map(application -> {
+
+			List<ApplicationResponseDTO.ImagePreviewWithUrlDTO> imagesWithUrl = application.getJobPost().getImages().stream()
+				.map(img -> {
+					String presignedUrl = s3Service.getPresignedToDownload(
+						S3DTO.PresignedUrlToDownloadRequest.builder()
+							.keyName(img.getKeyName())
+							.build()
+					).getUrl();
+					return ApplicationConverter.toImagePreviewWithUrlDTO(img, presignedUrl);
+				})
+				.toList();
+			return ApplicationConverter.toSubmittedApplicationResponseDTO(application, application.getJobPost(), imagesWithUrl);
+		});
+
+		return resultApplication;
+	}
+
+	@Override
+	public Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> getSubmittedApplicationByProtector(Long seniorId, Integer page) {
+
+		User senior = userRepository.findById(seniorId).orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_NOT_FOUND));
 
 		Page<Application> applicationPage = applicationRepository.findApplicationsWithDetails(senior, PageRequest.of(page, 10));
 
