@@ -1,7 +1,5 @@
 package com.umc.pyeongsaeng.domain.application.controller;
 
-import java.util.List;
-
 import com.umc.pyeongsaeng.domain.application.converter.ApplicationConverter;
 import com.umc.pyeongsaeng.domain.application.dto.request.ApplicationRequestDTO;
 import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDTO;
@@ -26,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -330,7 +330,18 @@ public class ApplicationController {
 		return ApiResponse.onSuccess(ApplicationConverter.toSubmittedApplicationResponseListDTO(submittedApplicationResponseDTOList));
 	}
 
-	@Operation(summary = "사용자가 자신이 작성한 제출된 지원서 하나를 상세조회", description = "마이페이지에서 사용자가 자신이 작성한 제출된 지원서하나를 상세 조회합니다.")
+	@Operation(summary = "보호자가 시니어가 작성한 제출된 지원서를 조회", description = "마이페이지에서 보호자가 시니어가 작성한 제출된 지원서를 조회합니다.")
+	@GetMapping("/senior/{seniorId}/submitted")
+	public ApiResponse<ApplicationResponseDTO.SubmittedApplicationResponseListDTO> getSubmittedApplicationByProtector(
+		@PathVariable Long seniorId,
+		@PageNumber Integer page
+	) {
+		Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> submittedApplicationResponseDTOList = applicationQueryService.getSubmittedApplicationByProtector(seniorId, page);
+
+		return ApiResponse.onSuccess(ApplicationConverter.toSubmittedApplicationResponseListDTO(submittedApplicationResponseDTOList));
+	}
+
+	@Operation(summary = "보호자가 작성한 제출된 지원서 하나를 상세조회", description = "마이페이지에서 사용자가 자신이 작성한 제출된 지원서하나를 상세 조회합니다.")
 	@GetMapping("/me/details/{applicationId}")
 	public ApiResponse<ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO> getSubmittedApplicationDetails(
 		@PathVariable Long applicationId,
