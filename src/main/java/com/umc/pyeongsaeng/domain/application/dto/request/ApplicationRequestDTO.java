@@ -7,6 +7,7 @@ import com.umc.pyeongsaeng.domain.job.enums.FieldType;
 import com.umc.pyeongsaeng.global.common.annotation.ValidEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,11 +27,11 @@ public class ApplicationRequestDTO {
 	@NoArgsConstructor
 	public static class DelegateRegistrationRequestDTO {
 
-		@NotBlank
+		@NotNull
 		private Long jobPostId;
-		@NotBlank
+		@NotNull
 		private Long seniorId;
-		@NotBlank
+		@NotNull
 		private ApplicationStatus applicationStatus;
 
 		private List<FieldAndAnswerDTO> fieldAndAnswer;
