@@ -1,19 +1,17 @@
 package com.umc.pyeongsaeng.global.s3.service;
 
-import java.util.Date;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.umc.pyeongsaeng.global.s3.dto.S3DTO;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -55,6 +53,23 @@ public class S3Service {
 
 		GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucket,
 			presignedUrlToDownloadRequest.getKeyName())
+			.withMethod(HttpMethod.GET)
+			.withExpiration(expiration);
+
+		return S3DTO.PresignedUrlToDownloadResponse.builder()
+			.url(amazonS3.generatePresignedUrl(generatePresignedUrlRequest).toString())
+			.build();
+	}
+
+	public S3DTO.PresignedUrlToDownloadResponse getPresignedToDownload(String keyName) {
+
+		Date expiration = new Date();
+		long expTime = expiration.getTime();
+		expTime += TimeUnit.MINUTES.toMillis(3);
+		expiration.setTime(expTime);
+
+		GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucket,
+			keyName)
 			.withMethod(HttpMethod.GET)
 			.withExpiration(expiration);
 
