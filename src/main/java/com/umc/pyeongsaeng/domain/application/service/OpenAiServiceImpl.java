@@ -48,6 +48,16 @@ public class OpenAiServiceImpl implements OpenAiService {
 		return extractStringFromResponse(callOpenAi(prompt));
 	}
 
+	@Override
+	public String generateUpdatedAnswer(AnswerGenerationRequestDTO request) {
+		final String prompt =
+			(request.getAddedExperience() != null && !request.getAddedExperience().isBlank())
+				? OpenAiPromptBuilder.buildUpdateAnswerPrompt(request)
+				: OpenAiPromptBuilder.buildAnswerPrompt(request);
+
+		return extractStringFromResponse(callOpenAi(prompt));
+	}
+
 	private String callOpenAi(String prompt) {
 		Map<String, Object> requestBody = Map.of(
 			"model", model,

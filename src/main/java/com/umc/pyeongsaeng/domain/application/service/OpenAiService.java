@@ -8,4 +8,5 @@ import com.umc.pyeongsaeng.domain.application.dto.request.KeywordGenerationReque
 public interface OpenAiService {
 	List<String> generateKeywords(KeywordGenerationRequestDTO request);
 	String generateAnswer(AnswerGenerationRequestDTO request);
+	String generateUpdatedAnswer(AnswerGenerationRequestDTO request);
 }
