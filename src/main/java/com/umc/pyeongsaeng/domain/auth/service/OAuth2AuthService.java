@@ -38,13 +38,13 @@ public class OAuth2AuthService extends DefaultOAuth2UserService
 	implements AuthenticationSuccessHandler, AuthenticationFailureHandler {
 
 	private static final String KAKAO_PROVIDER = "KAKAO";
-	// private static final String REDIRECT_URL_FORMAT = "https://pyeong-saeng-fe.vercel.app/auth/callback?code=%s&isFirstLogin=%s";
-	// private static final String SIGNUP_REDIRECT_URL_FORMAT = "https://pyeong-saeng-fe.vercel.app/auth/signup/kakao?kakaoId=%s&nickname=%s";
-	// private static final String ERROR_REDIRECT_URL = "https://pyeong-saeng-fe.vercel.app/login?error=oauth_failed";
+	private static final String REDIRECT_URL_FORMAT = "https://pyeong-saeng-fe.vercel.app/auth/callback?code=%s&isFirstLogin=%s";
+	private static final String SIGNUP_REDIRECT_URL_FORMAT = "https://pyeong-saeng-fe.vercel.app/auth/signup/kakao?kakaoId=%s&nickname=%s";
+	private static final String ERROR_REDIRECT_URL = "https://pyeong-saeng-fe.vercel.app/login?error=oauth_failed";
 
-	private static final String REDIRECT_URL_FORMAT = "http://localhost:5173/auth/callback?code=%s&isFirstLogin=%s";
-	private static final String SIGNUP_REDIRECT_URL_FORMAT = "http://localhost:5173/auth/signup/kakao?kakaoId=%s&nickname=%s";
-	private static final String ERROR_REDIRECT_URL = "http://localhost:5173/login?error=oauth_failed";
+	// private static final String REDIRECT_URL_FORMAT = "http://localhost:5173/auth/callback?code=%s&isFirstLogin=%s";
+	// private static final String SIGNUP_REDIRECT_URL_FORMAT = "http://localhost:5173/auth/signup/kakao?kakaoId=%s&nickname=%s";
+	// private static final String ERROR_REDIRECT_URL = "http://localhost:5173/login?error=oauth_failed";
 
 	private final SocialAccountRepository socialAccountRepository;
 	private final TokenService tokenService;
