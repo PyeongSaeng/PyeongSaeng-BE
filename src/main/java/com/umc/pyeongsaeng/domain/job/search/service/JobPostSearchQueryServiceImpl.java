@@ -18,6 +18,7 @@ import com.umc.pyeongsaeng.domain.job.search.enums.JobSortType;
 import com.umc.pyeongsaeng.domain.job.search.dto.response.JobSearchResponse;
 import com.umc.pyeongsaeng.domain.job.search.dto.response.JobSearchResult;
 import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
+import com.umc.pyeongsaeng.domain.senior.enums.JobType;
 import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
 import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
 import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
@@ -33,6 +34,7 @@ import co.elastic.clients.elasticsearch._types.GeoLocation;
 import co.elastic.clients.elasticsearch._types.LatLonGeoLocation;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 
@@ -130,24 +132,25 @@ public class JobPostSearchQueryServiceImpl implements JobPostSearchQueryService 
 		SeniorProfile profile = seniorProfileRepository.findBySeniorId(seniorId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_NOT_FOUND));
 
-		String jobType = Optional.ofNullable(profile.getJob())
-			.map(job -> job.getKorName())
-			.orElse(null);
+		JobType jobType = profile.getJob();
 
-		if (jobType == null || jobType.trim().isEmpty()) {
+		if (jobType == null) {
 			log.warn("[ES] 시니어의 선호 직무가 비어있음 - seniorId: {}", seniorId);
 			return List.of();
 		}
 
-		log.info("[ES] 직무 키워드 검색 시작 - keyword: {}", jobType);
+		List<String> keywords = jobType.getRelatedSeniorJobs();
+		log.info("[ES] 직무 키워드 검색 시작 - keywords: {}", keywords);
 
 		try {
 			SearchResponse<JobPostDocument> response = esClient.search(searchReq -> searchReq
 					.index("jobposts")
 					.query(mainQuery -> mainQuery.bool(boolQ -> boolQ
-						.should(q1 -> q1.matchPhrasePrefix(mpp -> mpp.field("title").query(jobType)))
-						.should(q2 -> q2.matchPhrasePrefix(mpp -> mpp.field("description").query(jobType)))
-						.should(q3 -> q3.matchPhrasePrefix(mpp -> mpp.field("note").query(jobType)))
+						.should(s -> s.multiMatch(m -> m
+							.query(String.join(" ", keywords)) // 키워드들을 하나로 묶음
+							.fields("title", "description", "note")
+							.operator(Operator.Or)
+						))
 						.minimumShouldMatch("1")
 						.filter(f -> f.range(r -> r.date(d -> d.field("deadline").gte(LocalDate.now().toString()))))
 					))
@@ -175,7 +178,7 @@ public class JobPostSearchQueryServiceImpl implements JobPostSearchQueryService 
 			return results;
 
 		} catch (IOException e) {
-			log.error("[ES] 직무 기반 검색 실패 - keyword: {}", jobType, e);
+			log.error("[ES] 직무 기반 검색 실패 - keywords: {}", keywords, e);
 			throw new GeneralException(ErrorStatus.ES_CONNECTION_ERROR);
 		}
 	}
