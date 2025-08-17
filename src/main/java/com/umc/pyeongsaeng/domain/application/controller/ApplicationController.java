@@ -351,7 +351,7 @@ public class ApplicationController {
 	}
 
 	@Operation(summary = "보호자가 시니어가 작성한 제출된 지원서 하나를 상세조회", description = "마이페이지에서 보호자가 시니어가 작성한 제출된 지원서하나를 상세 조회합니다.")
-	@GetMapping("/projector/senior/{seniorId}/details/{applicationId}")
+	@GetMapping("/protector/senior/{seniorId}/details/{applicationId}")
 	public ApiResponse<ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO> getSubmittedApplicationDetailsByProtector(
 		@PathVariable Long applicationId,
 		@PathVariable Long seniorId
