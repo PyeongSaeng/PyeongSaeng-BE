@@ -141,6 +141,7 @@ public class ApplicationConverter {
 
 		return ApplicationResponseDTO.SubmittedApplicationResponseDTO.builder()
 			.applicationId(application.getId())
+			.jobPostId(jobPost.getId())
 			.deadline(jobPost.getDeadline())
 			.title(jobPost.getTitle())
 			.applicationStatus(application.getApplicationStatus())

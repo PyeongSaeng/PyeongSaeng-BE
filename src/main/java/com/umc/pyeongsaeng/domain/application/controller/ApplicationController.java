@@ -341,13 +341,22 @@ public class ApplicationController {
 		return ApiResponse.onSuccess(ApplicationConverter.toSubmittedApplicationResponseListDTO(submittedApplicationResponseDTOList));
 	}
 
-	@Operation(summary = "보호자가 작성한 제출된 지원서 하나를 상세조회", description = "마이페이지에서 사용자가 자신이 작성한 제출된 지원서하나를 상세 조회합니다.")
+	@Operation(summary = "시니어가 작성한 제출된 지원서 하나를 상세조회", description = "마이페이지에서 사용자가 자신이 작성한 제출된 지원서하나를 상세 조회합니다.")
 	@GetMapping("/me/details/{applicationId}")
 	public ApiResponse<ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO> getSubmittedApplicationDetails(
 		@PathVariable Long applicationId,
 		@AuthenticationPrincipal CustomUserDetails customUserDetails
 	) {
 		return ApiResponse.onSuccess(applicationQueryService.getSubmittedApplicationDetails(applicationId, customUserDetails.getId()));
+	}
+
+	@Operation(summary = "보호자가 시니어가 작성한 제출된 지원서 하나를 상세조회", description = "마이페이지에서 보호자가 시니어가 작성한 제출된 지원서하나를 상세 조회합니다.")
+	@GetMapping("/projector/senior/{seniorId}/details/{applicationId}")
+	public ApiResponse<ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO> getSubmittedApplicationDetailsByProtector(
+		@PathVariable Long applicationId,
+		@PathVariable Long seniorId
+	) {
+		return ApiResponse.onSuccess(applicationQueryService.getSubmittedApplicationDetails(applicationId, seniorId));
 	}
 
 	@Operation(summary = "[시니어] 일자리 신청함 - 목록 조회", description = "로그인한 본인의 신청함을 조회합니다. 각 신청서에 해당하는 채용공고는 시니어 채용공고 상세 조회 API를 이용해주세요. NON_STARTED(작성 전), DRAFT(임시저장) 신청서 기준")

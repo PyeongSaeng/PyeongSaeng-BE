@@ -162,6 +162,7 @@ public class ApplicationResponseDTO {
 	@AllArgsConstructor
 	public static class SubmittedApplicationResponseDTO {
 		private Long applicationId;
+		private Long jobPostId;
 		private String title;
 		private LocalDate deadline;
 		private ApplicationStatus applicationStatus;
