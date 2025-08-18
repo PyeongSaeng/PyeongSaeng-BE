@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.umc.pyeongsaeng.domain.auth.dto.*;
 import com.umc.pyeongsaeng.domain.auth.service.*;
-import com.umc.pyeongsaeng.domain.sms.service.*;
 import com.umc.pyeongsaeng.domain.token.service.*;
 import com.umc.pyeongsaeng.domain.user.dto.*;
 import com.umc.pyeongsaeng.domain.user.enums.*;
@@ -35,7 +34,6 @@ public class UserController {
 	private final UserQueryServiceImpl userQueryServiceImpl;
 	private final AuthCommandService authCommandService;
 	private final TokenService tokenService;
-	private final SmsService smsService;
 
 	@DeleteMapping("/withdraw")
 	@Operation(summary = "회원 탈퇴",
