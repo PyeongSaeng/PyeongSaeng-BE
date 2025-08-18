@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface JobPostRepository extends JpaRepository<JobPost, Long> {
+public interface JobPostRepository extends JpaRepository<JobPost, Long>, JobPostRepositoryCustom {
 	Optional<JobPost> findByApplicationsId(Long jobPostId);
 
 	void deleteByCompanyId(Long companyId);

@@ -617,5 +617,14 @@ public class JobPostController {
 		return ApiResponse.onSuccess(jobPostQueryService.getJobPostDetail(jobPostId, seniorId));
 	}
 
+	@Operation(summary = "요즘 뜨는 일자리 목록조회", description = "요즘 뜨는 일자리 목록조회을 조회합니다.")
+	@GetMapping("/trend")
+	public ApiResponse<JobPostResponseDTO.JobPostTrendingListDTO> getTrendingList(
+		@PageNumber Integer pageNumber
+	) {
+		Page<JobPostResponseDTO.JobPostTrendingDTO> result = jobPostQueryService.getJobPostTrending(pageNumber);
+
+		return ApiResponse.onSuccess(JobPostConverter.toJobPostTrendingLsitDTO(result));
+	}
 
 }

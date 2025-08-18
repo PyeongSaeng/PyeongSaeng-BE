@@ -148,4 +148,28 @@ public class JobPostConverter {
 			.travelTime(travelTime)
 			.build();
 	}
+
+	public static JobPostResponseDTO.JobPostTrendingDTO toJobPostTrendingDTO(JobPost jobPost,
+																							 List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> images) {
+		return JobPostResponseDTO.JobPostTrendingDTO.builder()
+			.id(jobPost.getId())
+			.title(jobPost.getTitle())
+			.description(jobPost.getDescription())
+			.address(jobPost.getAddress())
+			.images(images)
+			.build();
+	}
+
+	public static JobPostResponseDTO.JobPostTrendingListDTO toJobPostTrendingLsitDTO(Page<JobPostResponseDTO.JobPostTrendingDTO> jobPostList) {
+
+		return JobPostResponseDTO.JobPostTrendingListDTO.builder()
+			.jobPostList(jobPostList.getContent())
+			.isFirst(jobPostList.isFirst())
+			.isLast(jobPostList.isLast())
+			.totalElements(jobPostList.getTotalElements())
+			.totalPage(jobPostList.getTotalPages())
+			.listSize(jobPostList.getContent().size())
+			.build();
+	}
+
 }
