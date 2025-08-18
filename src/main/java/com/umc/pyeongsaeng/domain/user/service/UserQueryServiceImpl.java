@@ -70,10 +70,7 @@ public class UserQueryServiceImpl implements UserQueryService {
 		List<SeniorProfile> seniorProfiles = seniorProfileRepository.findByProtectorId(protectorId);
 
 		return seniorProfiles.stream()
-			.map(profile -> UserResponse.ConnectedSeniorDto.of(
-				profile.getSenior(),
-				profile.getPhoneNum()
-			))
+			.map(profile -> UserResponse.ConnectedSeniorDto.of(profile.getSenior(), profile))
 			.collect(Collectors.toList());
 	}
 

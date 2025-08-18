@@ -64,13 +64,21 @@ public class UserResponse {
 	public static class ConnectedSeniorDto {
 		private Long seniorId;
 		private String seniorName;
+		private Gender gender;
+		private Integer age;
 		private String seniorPhone;
+		private String roadAddress;
+		private String detailAddress;
 
-		public static ConnectedSeniorDto of(User senior, String seniorPhone) {
+		public static ConnectedSeniorDto of(User senior, SeniorProfile profile) {
 			return ConnectedSeniorDto.builder()
 				.seniorId(senior.getId())
 				.seniorName(senior.getName())
-				.seniorPhone(seniorPhone)
+				.gender(profile.getGender())
+				.age(profile.getAge())
+				.seniorPhone(profile.getPhoneNum())
+				.roadAddress(profile.getRoadAddress())
+				.detailAddress(profile.getDetailAddress())
 				.build();
 		}
 	}
