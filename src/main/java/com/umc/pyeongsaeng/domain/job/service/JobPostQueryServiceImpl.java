@@ -178,7 +178,7 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 
 		Page<JobPost> jobPostPage = jobPostRepository.findJobPostTrending(PageRequest.of(pageNumber, 10));
 
-		Page<JobPostResponseDTO.JobPostTrendingDTO> jobPostPageTrending = jobPostPage.map(jobPost -> {
+		Page<JobPostResponseDTO.JobPostTrendingDTO> jobPostPageTrendingWithUrl = jobPostPage.map(jobPost -> {
 			List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> imagesWithUrl = jobPost.getImages().stream()
 				.map(img -> {
 					String presignedUrl = s3Service.getPresignedToDownload(
@@ -193,7 +193,7 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 			return JobPostConverter.toJobPostTrendingDTO(jobPost, imagesWithUrl);
 		});
 
-		return jobPostPageTrending;
+		return jobPostPageTrendingWithUrl;
 
 
 	}
