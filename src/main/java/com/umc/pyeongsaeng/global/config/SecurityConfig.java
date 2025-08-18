@@ -48,6 +48,7 @@ public class SecurityConfig {
 		"/api/companies/login",
 		"/api/companies/check-username",
 		"/api/companies/withdraw/cancel",
+		"/api/job/trend",
 		"/actuator/**",
 		"/oauth2/authorization/**",
 		"/login/oauth2/**",

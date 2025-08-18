@@ -84,6 +84,29 @@ public class JobPostResponseDTO {
 		private String travelTime;
 	}
 
+	@Builder
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class JobPostTrendingDTO {
+		private Long id;
+		private String title;
+		private String description;
+		private String address;
+		List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> images;
+	}
 
+	@Builder
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class JobPostTrendingListDTO {
+		List<JobPostResponseDTO.JobPostTrendingDTO> jobPostList;
+		Integer listSize;
+		Integer totalPage;
+		Long totalElements;
+		Boolean isFirst;
+		Boolean isLast;
+	}
 
 }

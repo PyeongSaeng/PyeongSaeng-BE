@@ -18,4 +18,6 @@ public interface JobPostQueryService {
 	FormFieldResponseDTO.FormFieldPreViewWithAnswerListDTO getFormFieldListDelegate(Long jobPostId, Long seniorId);
 
 	JobPostResponseDTO.JobPostDetailDTO getJobPostDetail(Long jobPostId, Long userId);
+
+	Page<JobPostResponseDTO.JobPostTrendingDTO> getJobPostTrending(Integer pageNumber);
 }
