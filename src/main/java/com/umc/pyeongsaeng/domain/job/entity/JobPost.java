@@ -1,6 +1,7 @@
 package com.umc.pyeongsaeng.domain.job.entity;
 
 import com.umc.pyeongsaeng.domain.application.entity.Application;
+import com.umc.pyeongsaeng.domain.bookmark.entity.Bookmark;
 import com.umc.pyeongsaeng.domain.company.entity.Company;
 import com.umc.pyeongsaeng.domain.job.dto.request.JobPostRequestDTO;
 import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
@@ -78,6 +79,9 @@ public class JobPost extends BaseEntity {
 
 	// 경도
 	private Double longitude;
+
+	@OneToMany(mappedBy = "jobPost", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<Bookmark> bookmarks = new ArrayList<>();
 
 	public void update(JobPostRequestDTO.UpdateDTO requestDTO, GoogleGeocodingResult convertedAddress) {
 		this.state = JobPostState.RECRUITING;
