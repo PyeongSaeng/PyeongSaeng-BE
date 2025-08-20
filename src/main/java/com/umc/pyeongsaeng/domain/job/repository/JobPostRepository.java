@@ -59,7 +59,7 @@ public interface JobPostRepository extends JpaRepository<JobPost, Long>, JobPost
 		Pageable pageable
 	);
 
-	@Modifying(clearAutomatically = true) // 쿼리 실행 후 영속성 컨텍스트를 비워 데이터 불일치를 방지합니다.
+	@Modifying(clearAutomatically = true)
 	@Transactional
 	@Query("UPDATE JobPost jp SET jp.state = 'CLOSED' " +
 		"WHERE jp.state = 'RECRUITING' AND jp.deadline <= CURRENT_TIMESTAMP")

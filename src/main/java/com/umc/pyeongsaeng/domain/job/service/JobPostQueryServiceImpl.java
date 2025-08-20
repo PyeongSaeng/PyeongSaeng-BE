@@ -186,7 +186,6 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 		return jobPostPageTrendingWithUrl;
 	}
 
-	// 애매한건 같은 로직이지만 converter이 달라{
 	private List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> getJobPostImageUrl(JobPost jobPost) {
 		return jobPost.getImages().stream()
 			.map(img -> {
