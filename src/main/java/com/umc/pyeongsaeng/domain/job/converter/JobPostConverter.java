@@ -103,6 +103,27 @@ public class JobPostConverter {
 			.build();
 	}
 
+	public static JobPostResponseDTO.JobPostPreviewByCompanyDTO toJobPostPreviewByCompanyDTOWithState(JobPost jobPost,
+																							 JobPostState jobPostState,
+																							 List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> images) {
+		JobPostState state;
+
+		if(jobPostState == JobPostState.RECRUITING){
+			state = jobPost.getState();
+		} else {
+			state = JobPostState.CLOSED;
+		}
+
+		return JobPostResponseDTO.JobPostPreviewByCompanyDTO.builder()
+			.id(jobPost.getId())
+			.state(state)
+			.title(jobPost.getTitle())
+			.description(jobPost.getDescription())
+			.roadAddress(jobPost.getRoadAddress())
+			.images(images)
+			.build();
+	}
+
 	public static JobPostResponseDTO.JobPostPreviewByCompanyDTO toJobPostPreviewByCompanyDTO(JobPost jobPost,
 																							 List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> images) {
 		return JobPostResponseDTO.JobPostPreviewByCompanyDTO.builder()

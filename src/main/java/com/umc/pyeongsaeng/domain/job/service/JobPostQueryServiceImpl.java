@@ -49,6 +49,7 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 	public Page<JobPostResponseDTO.JobPostPreviewByCompanyDTO> getJobPostPreViewPageByCompany(Company company, Integer page, JobPostState jobPostState) {
 
 		Page<JobPost> jobPostPage;
+		Page<JobPostResponseDTO.JobPostPreviewByCompanyDTO> jobPostPreviewPageByCompany;
 
 		if (jobPostState.equals(JobPostState.CLOSED)) {
 			jobPostPage = jobPostRepository.findClosedJobPostsByCompany(company, PageRequest.of(page, 10));
@@ -58,22 +59,11 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 			throw new GeneralException(ErrorStatus.INVALID_JOB_POST_STATE);
 		}
 
-		Page<JobPostResponseDTO.JobPostPreviewByCompanyDTO> jobPostPreviewPageByCompany = jobPostPage.map(jobPost -> {
+		jobPostPreviewPageByCompany = jobPostPage.map(jobPost -> {
 			// 각 jobPost에 속한 이미지들을 DTO로 변환
-			List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> imagesWithUrl = jobPost.getImages().stream()
-				.map(img -> {
-					String presignedUrl = s3Service.getPresignedToDownload(
-						S3DTO.PresignedUrlToDownloadRequest.builder()
-							.keyName(img.getKeyName())
-							.build()
-					).getUrl();
-					return JobPostImageConverter.toJobPostImagePreViewWithUrlDTO(img, presignedUrl);
-				})
-				.toList();
-
-			return JobPostConverter.toJobPostPreviewByCompanyDTO(jobPost, imagesWithUrl);
+			List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> imagesWithUrl = getJobPostImageUrl(jobPost);
+			return JobPostConverter.toJobPostPreviewByCompanyDTOWithState(jobPost, jobPostState, imagesWithUrl);
 		});
-
 		return jobPostPreviewPageByCompany;
 	}
 
@@ -194,7 +184,18 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 		});
 
 		return jobPostPageTrendingWithUrl;
+	}
 
-
+	private List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> getJobPostImageUrl(JobPost jobPost) {
+		return jobPost.getImages().stream()
+			.map(img -> {
+				String presignedUrl = s3Service.getPresignedToDownload(
+					S3DTO.PresignedUrlToDownloadRequest.builder()
+						.keyName(img.getKeyName())
+						.build()
+				).getUrl();
+				return JobPostImageConverter.toJobPostImagePreViewWithUrlDTO(img, presignedUrl);
+			})
+			.toList();
 	}
 }
