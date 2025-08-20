@@ -6,8 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -57,5 +59,10 @@ public interface JobPostRepository extends JpaRepository<JobPost, Long>, JobPost
 		Pageable pageable
 	);
 
+	@Modifying(clearAutomatically = true) // 쿼리 실행 후 영속성 컨텍스트를 비워 데이터 불일치를 방지합니다.
+	@Transactional
+	@Query("UPDATE JobPost jp SET jp.state = 'CLOSED' " +
+		"WHERE jp.state = 'RECRUITING' AND jp.deadline <= CURRENT_TIMESTAMP")
+	int updateStatusForExpiredJobPosts();
 }
 
