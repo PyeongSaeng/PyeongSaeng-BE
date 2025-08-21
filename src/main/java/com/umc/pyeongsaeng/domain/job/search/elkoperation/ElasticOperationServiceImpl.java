@@ -13,6 +13,8 @@ import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch._types.Refresh;
+import co.elastic.clients.elasticsearch.core.DeleteRequest;
+import co.elastic.clients.elasticsearch.core.DeleteResponse;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
@@ -87,6 +89,25 @@ public class ElasticOperationServiceImpl implements ElasticOperationService {
 
 		log.error("[ES] GenericElkIndex 어노테이션 존재하지 않음 - class: {}", document.getClass().getName());
 		throw new GeneralException(ErrorStatus.ES_REQUEST_ERROR);
+	}
+
+	@Override
+	public String deleteDocumentGeneric(String indexName, String id) {
+		try {
+			DeleteRequest request = DeleteRequest.of(d -> d
+				.index(indexName)
+				.id(id));
+
+			DeleteResponse response = elasticsearchClient.delete(request);
+			return response.result().toString();
+
+		} catch (IOException e) {
+			log.error("[ES] doc 삭제 실패 - index: {}, id: {}", indexName, id, e);
+			throw new GeneralException(ErrorStatus.ES_CONNECTION_ERROR);
+		} catch (ElasticsearchException e) {
+			log.error("[ES] doc 삭제 요청 오류 - index: {}, id: {}", indexName, id, e);
+			throw new GeneralException(ErrorStatus.ES_REQUEST_ERROR);
+		}
 	}
 }
 

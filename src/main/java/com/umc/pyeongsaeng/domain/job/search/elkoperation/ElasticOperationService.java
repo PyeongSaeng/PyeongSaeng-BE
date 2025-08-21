@@ -8,4 +8,6 @@ public interface ElasticOperationService {
 	String createIndex(String indexName);
 	<T extends BaseElkDocument> String insertDocumentGeneric(T document);
 
+	String deleteDocumentGeneric(String indexName, String id);
+
 }
