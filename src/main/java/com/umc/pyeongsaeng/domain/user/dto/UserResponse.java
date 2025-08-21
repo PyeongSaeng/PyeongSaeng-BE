@@ -41,6 +41,7 @@ public class UserResponse {
 		private String detailAddress;
 		private JobType job;
 		private ExperiencePeriod experiencePeriod;
+		private Gender gender;
 
 		public static SeniorInfoDto of(User user, SeniorProfile profile) {
 			return SeniorInfoDto.builder()
@@ -53,6 +54,7 @@ public class UserResponse {
 				.detailAddress(profile.getDetailAddress())
 				.job(profile.getJob())
 				.experiencePeriod(profile.getExperiencePeriod())
+				.gender(profile.getGender())
 				.build();
 		}
 	}
