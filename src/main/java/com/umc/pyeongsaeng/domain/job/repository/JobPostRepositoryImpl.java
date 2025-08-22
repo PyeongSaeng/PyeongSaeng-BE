@@ -5,8 +5,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.umc.pyeongsaeng.domain.job.entity.JobPost;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -37,6 +37,12 @@ public class JobPostRepositoryImpl implements JobPostRepositoryCustom {
 			.select(jobPost.count())
 			.from(jobPost);
 
-		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+		Long total = queryFactory
+			.select(jobPost.count())
+			.from(jobPost)
+			.fetchOne();
+
+//		return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+		return new PageImpl<>(content, pageable, total);
 	}
 }
