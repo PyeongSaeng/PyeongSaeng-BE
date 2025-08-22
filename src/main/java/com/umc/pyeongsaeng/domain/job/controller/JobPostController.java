@@ -622,6 +622,7 @@ public class JobPostController {
 	public ApiResponse<JobPostResponseDTO.JobPostTrendingListDTO> getTrendingList(
 		@PageNumber Integer pageNumber
 	) {
+		pageNumber = 0;
 		Page<JobPostResponseDTO.JobPostTrendingDTO> result = jobPostQueryService.getJobPostTrending(pageNumber);
 
 		return ApiResponse.onSuccess(JobPostConverter.toJobPostTrendingLsitDTO(result));

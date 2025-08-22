@@ -64,5 +64,19 @@ public interface JobPostRepository extends JpaRepository<JobPost, Long>, JobPost
 	@Query("UPDATE JobPost jp SET jp.state = 'CLOSED' " +
 		"WHERE jp.state = 'RECRUITING' AND jp.deadline <= CURRENT_TIMESTAMP")
 	int updateStatusForExpiredJobPosts();
+
+	@Query(
+		value = """
+            SELECT jp.*
+            FROM job_post jp
+            LEFT JOIN application a ON jp.id = a.job_post_id
+            GROUP BY jp.id
+            ORDER BY COUNT(a.id) DESC
+        """,
+		countQuery = "SELECT COUNT(*) FROM job_post",
+		nativeQuery = true
+	)
+	Page<JobPost> findJobPostTrending(Pageable pageable);
+
 }
 
