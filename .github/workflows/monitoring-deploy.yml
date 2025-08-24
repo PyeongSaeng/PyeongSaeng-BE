@@ -1,0 +1,54 @@
+name: Deploy Monitoring Stack
+
+on:
+  workflow_dispatch:
+
+env:
+  TEST_EC2_HOST: ${{ secrets.TEST_EC2_HOST }}
+  TEST_EC2_USER: ubuntu
+  TEST_EC2_SSH_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+  MONITORING_DIR: /home/ubuntu/monitoring
+
+jobs:
+  deploy-monitoring:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Copy monitoring stack to TEST EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.TEST_EC2_HOST }}
+          username: ${{ env.TEST_EC2_USER }}
+          key: ${{ env.TEST_EC2_SSH_KEY }}
+          source: |
+            docker-compose.yml
+            prometheus/
+            nginx/
+            promtail/
+          target: ${{ env.MONITORING_DIR }}
+
+      - name: Start monitoring stack on TEST EC2
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ env.TEST_EC2_HOST }}
+          username: ${{ env.TEST_EC2_USER }}
+          key: ${{ env.TEST_EC2_SSH_KEY }}
+          script: |
+            cd ${{ env.MONITORING_DIR }}
+            docker compose pull
+            docker compose up -d
+
+      - name: Clean temporary files
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ env.TEST_EC2_HOST }}
+          username: ${{ env.TEST_EC2_USER }}
+          key: ${{ env.TEST_EC2_SSH_KEY }}
+          script: |
+            echo "Monitoring stack deployed successfully"
+
+
+

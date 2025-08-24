@@ -3,8 +3,7 @@ name: Deploy to AWS EC2 using Docker
 on:
   push:
     branches:
-      - dev
-      - main
+      #- dev
 
 env:
   DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_IMAGE_NAME }}
