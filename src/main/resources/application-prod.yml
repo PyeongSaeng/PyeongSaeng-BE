@@ -22,3 +22,11 @@ logging:
 swagger:
   server-url: https://api.pyeongsaeng.site
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+    prometheus:
+      enabled: true
+
