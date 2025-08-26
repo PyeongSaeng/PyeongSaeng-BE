@@ -1,4 +1,4 @@
-name: Deploy to AWS EC2 using Docker
+name: Deploy to AWS EC2 using Docker.
 
 on:
   push:
