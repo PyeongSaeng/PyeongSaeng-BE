@@ -26,11 +26,11 @@ services:
       - ES_PASSWORD=${ES_PASSWORD}
       - ODCLOUD_SERVICE_KEY=${ODCLOUD_SERVICE_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - JAVA_TOOL_OPTIONS=-XX:MaxRAMPercentage=75.0
+      - JAVA_TOOL_OPTIONS=-Djdk.internal.platform.Metrics.enabled=false -XX:+IgnoreUnrecognizedVMOptions -XX:-UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djdk.internal.platform.cgroup.useJvmProcessMemoryLimitForHeap=true -Dcom.amazonaws.sdk.disableMetrics=true
       - TZ=Asia/Seoul
     networks:
       - pyeongsaeng-net
-    restart: always
+    #restart: always
 
   nginx:
     image: nginx:latest

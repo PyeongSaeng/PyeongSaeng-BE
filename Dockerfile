@@ -8,4 +8,5 @@ ARG JAR_FILE=build/libs/*.jar
 COPY ${JAR_FILE} pyeongsaeng.jar
 
 # 엔트리포인트 설정
-ENTRYPOINT ["java", "-jar", "/pyeongsaeng.jar"]
+ENTRYPOINT ["java"]
+CMD ["-jar", "/pyeongsaeng.jar"]
