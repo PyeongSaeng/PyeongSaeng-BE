@@ -22,6 +22,12 @@ public class S3Config {
 	@Value("${cloud.aws.region.static}")
 	private String region;
 
+	static {
+		System.setProperty("com.amazonaws.sdk.disableMetrics", "true");
+		System.setProperty("aws.java.v1.disableDeprecationAnnouncement", "true");
+		System.setProperty("java.awt.headless", "true");
+	}
+
 	@Bean
 	@Primary
 	public BasicAWSCredentials awsCredentialsProvider(){
@@ -31,9 +37,6 @@ public class S3Config {
 
 	@Bean
 	public AmazonS3 amazonS3() {
-		System.setProperty("com.amazonaws.sdk.disableMetrics", "true");
-		System.setProperty("aws.java.v1.disableDeprecationAnnouncement", "true");
-
 		AmazonS3 s3Builder = AmazonS3ClientBuilder.standard()
 			.withRegion(region)
 			.withCredentials(new AWSStaticCredentialsProvider(awsCredentialsProvider()))
