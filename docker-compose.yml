@@ -26,8 +26,10 @@ services:
       - ES_PASSWORD=${ES_PASSWORD}
       - ODCLOUD_SERVICE_KEY=${ODCLOUD_SERVICE_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - JAVA_TOOL_OPTIONS=-Djdk.internal.platform.Metrics.enabled=false -XX:+IgnoreUnrecognizedVMOptions -XX:-UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djdk.internal.platform.cgroup.useJvmProcessMemoryLimitForHeap=true -Dcom.amazonaws.sdk.disableMetrics=true
+      - JAVA_TOOL_OPTIONS="-Djdk.internal.platform.Metrics.enabled=false -XX:+IgnoreUnrecognizedVMOptions -XX:-UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:ContainerMetrics.enabled=false -Dcom.amazonaws.sdk.disableMetrics=true -Djdk.management.jfr.enabled=false"
       - TZ=Asia/Seoul
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     networks:
       - pyeongsaeng-net
     #restart: always

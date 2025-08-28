@@ -31,6 +31,9 @@ public class S3Config {
 
 	@Bean
 	public AmazonS3 amazonS3() {
+		System.setProperty("com.amazonaws.sdk.disableMetrics", "true");
+		System.setProperty("aws.java.v1.disableDeprecationAnnouncement", "true");
+
 		AmazonS3 s3Builder = AmazonS3ClientBuilder.standard()
 			.withRegion(region)
 			.withCredentials(new AWSStaticCredentialsProvider(awsCredentialsProvider()))
