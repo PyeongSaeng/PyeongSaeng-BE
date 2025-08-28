@@ -1,28 +1,25 @@
 package com.umc.pyeongsaeng.domain.job.recommendation.service;
 
-import com.umc.pyeongsaeng.domain.job.entity.JobPost;
-import com.umc.pyeongsaeng.domain.job.recommendation.converter.RecommendationConverter;
-import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.RecommendationResponseDTO;
-import com.umc.pyeongsaeng.domain.job.recommendation.util.DistanceUtil;
-import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
-import com.umc.pyeongsaeng.domain.job.repository.JobPostImageRepository;
-import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
-import com.umc.pyeongsaeng.domain.job.search.service.JobPostSearchQueryService;
-import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
-import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
-import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
-import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
-import com.umc.pyeongsaeng.global.s3.dto.S3DTO;
-import com.umc.pyeongsaeng.global.s3.service.S3Service;
+import java.util.*;
+import java.util.stream.*;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.*;
 
-import org.springframework.stereotype.Service;
+import com.umc.pyeongsaeng.domain.job.entity.*;
+import com.umc.pyeongsaeng.domain.job.recommendation.converter.*;
+import com.umc.pyeongsaeng.domain.job.recommendation.dto.response.*;
+import com.umc.pyeongsaeng.domain.job.recommendation.util.*;
+import com.umc.pyeongsaeng.domain.job.repository.*;
+import com.umc.pyeongsaeng.domain.job.search.document.*;
+import com.umc.pyeongsaeng.domain.job.search.service.*;
+import com.umc.pyeongsaeng.domain.senior.entity.*;
+import com.umc.pyeongsaeng.domain.senior.repository.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
+import com.umc.pyeongsaeng.global.s3.service.*;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
 @Service
 @RequiredArgsConstructor
@@ -94,11 +91,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 		return jobPostImageRepository.findFirstByJobPostIdOrderByIdAsc(jobPostId)
 			.map(img -> {
 				try {
-					return s3Service.getPresignedToDownload(
-						S3DTO.PresignedUrlToDownloadRequest.builder()
-							.keyName(img.getKeyName())
-							.build()
-					).getUrl();
+					return s3Service.getPresignedToDownload(img.getKeyName()).getUrl();
 				} catch (Exception e) {
 					log.error("이미지 URL 생성 실패 - keyName: {}", img.getKeyName(), e);
 					return null;

@@ -1,31 +1,28 @@
 package com.umc.pyeongsaeng.domain.application.service;
 
+import java.util.*;
 
-import com.umc.pyeongsaeng.domain.application.converter.ApplicationConverter;
-import com.umc.pyeongsaeng.domain.application.dto.response.ApplicationResponseDTO;
-import com.umc.pyeongsaeng.domain.application.entity.Application;
-import com.umc.pyeongsaeng.domain.application.enums.ApplicationStatus;
-import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepository;
-import com.umc.pyeongsaeng.domain.application.repository.ApplicationRepositoryCustom;
-import com.umc.pyeongsaeng.domain.job.entity.JobPost;
-import com.umc.pyeongsaeng.domain.job.entity.JobPostImage;
-import com.umc.pyeongsaeng.domain.job.recommendation.service.TravelTimeService;
-import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
-import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
-import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
-import com.umc.pyeongsaeng.domain.user.entity.User;
-import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
-import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
-import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
-import com.umc.pyeongsaeng.global.s3.dto.S3DTO;
-import com.umc.pyeongsaeng.global.s3.service.S3Service;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.*;
+import org.springframework.transaction.annotation.*;
 
-import java.util.List;
+import com.umc.pyeongsaeng.domain.application.converter.*;
+import com.umc.pyeongsaeng.domain.application.dto.response.*;
+import com.umc.pyeongsaeng.domain.application.entity.*;
+import com.umc.pyeongsaeng.domain.application.enums.*;
+import com.umc.pyeongsaeng.domain.application.repository.*;
+import com.umc.pyeongsaeng.domain.job.entity.*;
+import com.umc.pyeongsaeng.domain.job.recommendation.service.*;
+import com.umc.pyeongsaeng.domain.job.repository.*;
+import com.umc.pyeongsaeng.domain.senior.entity.*;
+import com.umc.pyeongsaeng.domain.senior.repository.*;
+import com.umc.pyeongsaeng.domain.user.entity.*;
+import com.umc.pyeongsaeng.domain.user.repository.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
+import com.umc.pyeongsaeng.global.s3.service.*;
+
+import lombok.*;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +38,6 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 	private final S3Service s3Service;
 
 	public Page<Application> findCompanyApplications(Long jobPostId, Integer page) {
-
 		JobPost jobPost = jobPostRepository.findById(jobPostId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
 
@@ -52,7 +48,6 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
 	@Override
 	public ApplicationResponseDTO.ApplicationQnADetailPreViewDTO getApplicationQnADetail(Long applicationId) {
-
 		ApplicationRepositoryCustom.ApplicationDetailView queryResult = applicationRepository.findApplicationQnADetailById(applicationId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_APPLICATION_ID));
 
@@ -61,18 +56,12 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
 	@Override
 	public Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> getSubmittedApplication(User senior, Integer page) {
-
 		Page<Application> applicationPage = applicationRepository.findApplicationsWithDetails(senior, PageRequest.of(page, 10));
 
 		Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> resultApplication = applicationPage.map(application -> {
-
 			List<ApplicationResponseDTO.ImagePreviewWithUrlDTO> imagesWithUrl = application.getJobPost().getImages().stream()
 				.map(img -> {
-					String presignedUrl = s3Service.getPresignedToDownload(
-						S3DTO.PresignedUrlToDownloadRequest.builder()
-							.keyName(img.getKeyName())
-							.build()
-					).getUrl();
+					String presignedUrl = s3Service.getPresignedToDownload(img.getKeyName()).getUrl();
 					return ApplicationConverter.toImagePreviewWithUrlDTO(img, presignedUrl);
 				})
 				.toList();
@@ -84,20 +73,14 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
 	@Override
 	public Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> getSubmittedApplicationByProtector(Long seniorId, Integer page) {
-
 		User senior = userRepository.findById(seniorId).orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_NOT_FOUND));
 
 		Page<Application> applicationPage = applicationRepository.findApplicationsWithDetails(senior, PageRequest.of(page, 10));
 
 		Page<ApplicationResponseDTO.SubmittedApplicationResponseDTO> resultApplication = applicationPage.map(application -> {
-
 			List<ApplicationResponseDTO.ImagePreviewWithUrlDTO> imagesWithUrl = application.getJobPost().getImages().stream()
 				.map(img -> {
-					String presignedUrl = s3Service.getPresignedToDownload(
-						S3DTO.PresignedUrlToDownloadRequest.builder()
-							.keyName(img.getKeyName())
-							.build()
-					).getUrl();
+					String presignedUrl = s3Service.getPresignedToDownload(img.getKeyName()).getUrl();
 					return ApplicationConverter.toImagePreviewWithUrlDTO(img, presignedUrl);
 				})
 				.toList();
@@ -108,7 +91,6 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 	}
 
 	public ApplicationResponseDTO.SubmittedApplicationQnADetailResponseDTO getSubmittedApplicationDetails(Long applicationId, Long userId) {
-
 		ApplicationRepositoryCustom.ApplicationDetailView queryResult = applicationRepository.findApplicationQnADetailById(applicationId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_APPLICATION_ID));
 
@@ -121,12 +103,7 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 		// Presigned URL 포함 이미지 리스트 변환
 		List<ApplicationResponseDTO.ImagePreviewWithUrlDTO> images = jobPost.getImages().stream()
 			.map((JobPostImage img) -> {
-				String presignedUrl = s3Service.getPresignedToDownload(
-					S3DTO.PresignedUrlToDownloadRequest.builder()
-						.keyName(img.getKeyName())
-						.build()
-				).getUrl();
-
+				String presignedUrl = s3Service.getPresignedToDownload(img.getKeyName()).getUrl();
 				return ApplicationConverter.toImagePreviewWithUrlDTO(img, presignedUrl);
 			})
 			.toList();
@@ -147,7 +124,6 @@ public class ApplicationQueryServiceImpl implements ApplicationQueryService {
 
 	@Override
 	public List<ApplicationResponseDTO.ProtectorApplicationJobPostDTO> getProtectorApplications(Long protectorId) {
-
 		// 보호자에 연결된 시니어 ID 리스트
 		List<Long> seniorIds = seniorProfileRepository.findByProtector_Id(protectorId)
 			.stream()

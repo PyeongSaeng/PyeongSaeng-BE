@@ -1,14 +1,12 @@
 package com.umc.pyeongsaeng.global.s3;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.context.annotation.*;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import software.amazon.awssdk.auth.credentials.*;
+import software.amazon.awssdk.regions.*;
+import software.amazon.awssdk.services.s3.*;
+import software.amazon.awssdk.services.s3.presigner.*;
 
 @Configuration
 public class S3Config {
@@ -22,25 +20,22 @@ public class S3Config {
 	@Value("${cloud.aws.region.static}")
 	private String region;
 
-	static {
-		System.setProperty("com.amazonaws.sdk.disableMetrics", "true");
-		System.setProperty("aws.java.v1.disableDeprecationAnnouncement", "true");
-		System.setProperty("java.awt.headless", "true");
-	}
-
 	@Bean
-	@Primary
-	public BasicAWSCredentials awsCredentialsProvider(){
-		BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(accessKey, secretKey);
-		return basicAWSCredentials;
-	}
+	public S3Client s3Client() {
+		AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKey, secretKey);
 
-	@Bean
-	public AmazonS3 amazonS3() {
-		AmazonS3 s3Builder = AmazonS3ClientBuilder.standard()
-			.withRegion(region)
-			.withCredentials(new AWSStaticCredentialsProvider(awsCredentialsProvider()))
+		return S3Client.builder()
+			.region(Region.of(region))
+			.credentialsProvider(StaticCredentialsProvider.create(awsCreds))
 			.build();
-		return s3Builder;
+	}
+
+	@Bean
+	public S3Presigner s3Presigner() {
+		AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKey, secretKey);
+		return S3Presigner.builder()
+			.region(Region.of(region))
+			.credentialsProvider(StaticCredentialsProvider.create(awsCreds))
+			.build();
 	}
 }

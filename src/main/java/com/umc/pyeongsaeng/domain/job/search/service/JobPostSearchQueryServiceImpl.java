@@ -1,43 +1,29 @@
 package com.umc.pyeongsaeng.domain.job.search.service;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.io.*;
+import java.time.*;
+import java.util.*;
+import java.util.stream.*;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.*;
 
-import com.umc.pyeongsaeng.domain.job.search.converter.JobPostDocumentConverter;
-import com.umc.pyeongsaeng.domain.job.search.document.JobPostDocument;
-import com.umc.pyeongsaeng.domain.job.search.dto.request.JobSearchRequest;
-import com.umc.pyeongsaeng.domain.job.search.enums.JobSortType;
-import com.umc.pyeongsaeng.domain.job.search.dto.response.JobSearchResponse;
-import com.umc.pyeongsaeng.domain.job.search.dto.response.JobSearchResult;
-import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
-import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
-import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
-import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
-import com.umc.pyeongsaeng.global.s3.dto.S3DTO;
-import com.umc.pyeongsaeng.global.s3.service.S3Service;
+import com.umc.pyeongsaeng.domain.job.search.converter.*;
+import com.umc.pyeongsaeng.domain.job.search.document.*;
+import com.umc.pyeongsaeng.domain.job.search.dto.request.*;
+import com.umc.pyeongsaeng.domain.job.search.dto.response.*;
+import com.umc.pyeongsaeng.domain.job.search.enums.*;
+import com.umc.pyeongsaeng.domain.senior.entity.*;
+import com.umc.pyeongsaeng.domain.senior.repository.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
+import com.umc.pyeongsaeng.global.s3.service.*;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-
-import co.elastic.clients.elasticsearch._types.DistanceUnit;
-import co.elastic.clients.elasticsearch._types.ElasticsearchException;
-import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.GeoLocation;
-import co.elastic.clients.elasticsearch._types.LatLonGeoLocation;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOrder;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
-import co.elastic.clients.elasticsearch.core.search.Hit;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import co.elastic.clients.elasticsearch.*;
+import co.elastic.clients.elasticsearch._types.*;
+import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.core.search.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
 @Service
 @RequiredArgsConstructor
@@ -254,18 +240,10 @@ public class JobPostSearchQueryServiceImpl implements JobPostSearchQueryService 
 
 		String imageUrl = null;
 		if (doc.getKeyname() != null) {
-			imageUrl = s3Service.getPresignedToDownload(
-				S3DTO.PresignedUrlToDownloadRequest.builder()
-					.keyName(doc.getKeyname())
-					.build()
-			).getUrl();
+			imageUrl = s3Service.getPresignedToDownload(doc.getKeyname()).getUrl();
 		}
 
 		return JobPostDocumentConverter.toJobSearchResponse(doc, distance, imageUrl);
 	}
-
-
-
-
 }
 

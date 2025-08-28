@@ -1,36 +1,28 @@
 package com.umc.pyeongsaeng.domain.job.service;
 
-import com.umc.pyeongsaeng.domain.company.entity.Company;
-import com.umc.pyeongsaeng.domain.job.converter.FormFieldConverter;
-import com.umc.pyeongsaeng.domain.job.converter.JobPostConverter;
-import com.umc.pyeongsaeng.domain.job.converter.JobPostImageConverter;
-import com.umc.pyeongsaeng.domain.job.dto.response.FormFieldResponseDTO;
-import com.umc.pyeongsaeng.domain.job.dto.response.JobPostImageResponseDTO;
-import com.umc.pyeongsaeng.domain.job.dto.response.JobPostResponseDTO;
-import com.umc.pyeongsaeng.domain.job.entity.FormField;
-import com.umc.pyeongsaeng.domain.job.entity.JobPost;
-import com.umc.pyeongsaeng.domain.job.entity.JobPostImage;
-import com.umc.pyeongsaeng.domain.job.enums.JobPostState;
-import com.umc.pyeongsaeng.domain.job.recommendation.service.TravelTimeService;
-import com.umc.pyeongsaeng.domain.job.repository.FormFieldRepository;
-import com.umc.pyeongsaeng.domain.job.repository.JobPostRepository;
-import com.umc.pyeongsaeng.domain.senior.entity.SeniorProfile;
-import com.umc.pyeongsaeng.domain.senior.repository.SeniorProfileRepository;
-import com.umc.pyeongsaeng.domain.user.entity.User;
-import com.umc.pyeongsaeng.domain.user.repository.UserRepository;
-import com.umc.pyeongsaeng.global.apiPayload.code.exception.GeneralException;
-import com.umc.pyeongsaeng.global.apiPayload.code.status.ErrorStatus;
-import com.umc.pyeongsaeng.global.s3.dto.S3DTO;
-import com.umc.pyeongsaeng.global.s3.service.S3Service;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
+import java.util.*;
 
-import java.util.List;
-import java.util.Map;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.*;
+
+import com.umc.pyeongsaeng.domain.company.entity.*;
+import com.umc.pyeongsaeng.domain.job.converter.*;
+import com.umc.pyeongsaeng.domain.job.dto.response.*;
+import com.umc.pyeongsaeng.domain.job.entity.*;
+import com.umc.pyeongsaeng.domain.job.enums.*;
+import com.umc.pyeongsaeng.domain.job.recommendation.service.*;
+import com.umc.pyeongsaeng.domain.job.repository.*;
+import com.umc.pyeongsaeng.domain.senior.entity.*;
+import com.umc.pyeongsaeng.domain.senior.repository.*;
+import com.umc.pyeongsaeng.domain.user.entity.*;
+import com.umc.pyeongsaeng.domain.user.repository.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.exception.*;
+import com.umc.pyeongsaeng.global.apiPayload.code.status.*;
+import com.umc.pyeongsaeng.global.s3.service.*;
+
+import jakarta.transaction.*;
+import lombok.*;
+import lombok.extern.slf4j.*;
 
 @Slf4j
 @Service
@@ -69,20 +61,13 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 
 	@Override
 	public Page<JobPostResponseDTO.JobPostPreviewByCompanyDTO> getJobPostPreViewPageByCompanyByPopularity(Company company, Integer page) {
-
-		Page<JobPost> jobPostPage;
-
-		jobPostPage = jobPostRepository.findActiveJobPostsByCompanyByPopularity(company, PageRequest.of(page, 10));
+		Page<JobPost> jobPostPage = jobPostRepository.findActiveJobPostsByCompanyByPopularity(company, PageRequest.of(page, 10));
 
 		Page<JobPostResponseDTO.JobPostPreviewByCompanyDTO> jobPostPreviewPageByCompany = jobPostPage.map(jobPost -> {
 			// 각 jobPost에 속한 이미지들을 DTO로 변환
 			List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> imagesWithUrl = jobPost.getImages().stream()
 				.map(img -> {
-					String presignedUrl = s3Service.getPresignedToDownload(
-						S3DTO.PresignedUrlToDownloadRequest.builder()
-							.keyName(img.getKeyName())
-							.build()
-					).getUrl();
+					String presignedUrl = s3Service.getPresignedToDownload(img.getKeyName()).getUrl();
 					return JobPostImageConverter.toJobPostImagePreViewWithUrlDTO(img, presignedUrl);
 				})
 				.toList();
@@ -141,7 +126,6 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 
 	@Override
 	public JobPostResponseDTO.JobPostDetailDTO getJobPostDetail(Long jobPostId, Long userId) {
-
 		SeniorProfile seniorProfile = seniorProfileRepository.findBySeniorId(userId).orElseThrow(() -> new GeneralException(ErrorStatus.SENIOR_PROFILE_NOT_FOUND));
 		JobPost jobPost = jobPostRepository.findById(jobPostId).orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_JOB_POST_ID));
 
@@ -151,12 +135,7 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 		// Presigned URL 포함 이미지 리스트 변환
 		List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> images = jobPost.getImages().stream()
 			.map((JobPostImage img) -> {
-				String presignedUrl = s3Service.getPresignedToDownload(
-					S3DTO.PresignedUrlToDownloadRequest.builder()
-						.keyName(img.getKeyName())
-						.build()
-				).getUrl();
-
+				String presignedUrl = s3Service.getPresignedToDownload(img.getKeyName()).getUrl();
 				return JobPostImageConverter.toJobPostImagePreViewWithUrlDTO(img, presignedUrl);
 			})
 			.toList();
@@ -165,17 +144,12 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 	}
 
 	public Page<JobPostResponseDTO.JobPostTrendingDTO> getJobPostTrending(Integer pageNumber) {
-
 		Page<JobPost> jobPostPage = jobPostRepository.findJobPostTrending(PageRequest.of(pageNumber, 10));
 
 		Page<JobPostResponseDTO.JobPostTrendingDTO> jobPostPageTrendingWithUrl = jobPostPage.map(jobPost -> {
 			List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> imagesWithUrl = jobPost.getImages().stream()
 				.map(img -> {
-					String presignedUrl = s3Service.getPresignedToDownload(
-						S3DTO.PresignedUrlToDownloadRequest.builder()
-							.keyName(img.getKeyName())
-							.build()
-					).getUrl();
+					String presignedUrl = s3Service.getPresignedToDownload(img.getKeyName()).getUrl();
 					return JobPostImageConverter.toJobPostImagePreViewWithUrlDTO(img, presignedUrl);
 				})
 				.toList();
@@ -189,11 +163,7 @@ public class JobPostQueryServiceImpl implements JobPostQueryService {
 	private List<JobPostImageResponseDTO.JobPostImagePreviewWithUrlDTO> getJobPostImageUrl(JobPost jobPost) {
 		return jobPost.getImages().stream()
 			.map(img -> {
-				String presignedUrl = s3Service.getPresignedToDownload(
-					S3DTO.PresignedUrlToDownloadRequest.builder()
-						.keyName(img.getKeyName())
-						.build()
-				).getUrl();
+				String presignedUrl = s3Service.getPresignedToDownload(img.getKeyName()).getUrl();
 				return JobPostImageConverter.toJobPostImagePreViewWithUrlDTO(img, presignedUrl);
 			})
 			.toList();
