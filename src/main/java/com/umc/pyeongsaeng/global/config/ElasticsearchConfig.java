@@ -43,6 +43,19 @@ public class ElasticsearchConfig {
 	private String password;
 
 	@Bean
+	public RestClientBuilder elasticsearchRestClientBuilder() {
+		final CredentialsProvider creds = new BasicCredentialsProvider();
+		creds.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+
+		return RestClient.builder(new HttpHost(host, port, scheme))
+			.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(creds))
+			.setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder
+				.setConnectTimeout(4000)
+				.setSocketTimeout(60000)
+			);
+	}
+
+	@Bean
 	public ElasticsearchClient elasticsearchClient() {
 
 		// 보안 설정
