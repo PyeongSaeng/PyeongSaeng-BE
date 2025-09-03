@@ -61,11 +61,7 @@ jobs:
       - name: Push the Docker image
         run: docker push ${{ env.DOCKER_IMAGE_NAME }}:latest
 
-  deploy-to-ec2:
-    needs: build-and-push-docker
-    runs-on: ubuntu-latest
-    steps:
-
+        
       - name: 📄 Copy docker-compose.yml to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -74,6 +70,11 @@ jobs:
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           source: "docker-compose.yml"  
           target: "/home/ubuntu" 
+
+  deploy-to-ec2:
+    needs: build-and-push-docker
+    runs-on: ubuntu-latest
+    steps:
           
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
