@@ -70,7 +70,7 @@ jobs:
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_URL }}
-          username: ${{ secrets.EC2_USERNAME }}
+          username: ubuntu
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           source: "docker-compose.yml"  
           target: "/home/ubuntu" 
