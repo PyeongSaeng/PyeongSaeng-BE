@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-alpine
+FROM eclipse-temurin:17-jre-jammy
 
 # 타임존 설정
 RUN ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
