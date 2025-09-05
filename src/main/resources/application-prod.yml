@@ -39,3 +39,8 @@ management:
     enable:
       processor: false
       system: false
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
