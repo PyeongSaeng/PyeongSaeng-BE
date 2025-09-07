@@ -36,9 +36,6 @@ management:
     health:
       show-details: always
   metrics:
-    enable:
-      #processor: false
-      system: false
     distribution:
       percentiles-histogram:
         http.server.requests: true
