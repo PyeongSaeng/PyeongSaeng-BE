@@ -71,3 +71,8 @@ openai:
   api:
     key: ${OPENAI_API_KEY}
     url: https://api.openai.com/v1/chat/completions
+    
+management:
+  endpoint:
+    health:
+      show-details: always
