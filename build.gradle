@@ -72,6 +72,8 @@ dependencies {
     implementation 'org.glassfish:jakarta.json:2.0.1'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.0'
 
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    
     implementation 'io.github.cdimascio:dotenv-java:3.0.0'
 
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
